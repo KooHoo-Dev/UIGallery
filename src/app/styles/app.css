@@ -1109,6 +1109,21 @@ th {
 .original {
   margin-top: 10px;
 }
+.related {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0 0 10px;
+  display: grid;
+  gap: 6px;
+  border-bottom: 1px dashed var(--line);
+}
+.related a {
+  font-weight: 700;
+}
+.related-why {
+  color: var(--text-2);
+  font-size: 0.88rem;
+}
 .meta-list {
   display: grid;
   grid-template-columns: 70px 1fr;

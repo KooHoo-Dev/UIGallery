@@ -5,15 +5,19 @@
     python tools/shot.py <표본id> --no-build ...        # 이미 빌드한 결과 재사용
 
 - 다른 에이전트와 겹치지 않게 _shots/build-<id>/ 에 따로 빌드한다 (dist 를 건드리지 않음).
+  이 표본만 등록해서 빌드하므로(UIG_ONLY) 다른 표본의 미완성 파일 때문에 깨지지 않는다. --all 이면 전체 빌드.
 - 결과: _shots/<id>/<상태>-<시각>.png  (Read 도구로 열어 확인. 실행마다 새 파일)
 - 상태 문법: default | juice0 | juice0:<이벤트id> | slow | event:<이벤트id> | preset:<프리셋id> | spot:<번호> | aspect916 | mobile | home
-- 옵션: --no-build (빌드 재사용) · --budget=<ms> (캡처 시점, 기본 3500)
+- 옵션: --no-build (빌드 재사용) · --budget=<ms> (캡처 시점, 기본 3500) · --all (모든 표본을 넣어 빌드)
 """
 
 from __future__ import annotations
 
+import os
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -77,7 +81,10 @@ def main() -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     if "--no-build" not in sys.argv:
-        r = subprocess.run([NPX, "vite", "build", "--outDir", str(out_build), "--emptyOutDir", "--logLevel", "error"], cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        env = dict(os.environ)
+        if "--all" not in sys.argv:
+            env["UIG_ONLY"] = sid
+        r = subprocess.run([NPX, "vite", "build", "--outDir", str(out_build), "--emptyOutDir", "--logLevel", "error"], cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
         if r.returncode != 0:
             print("빌드 실패:\n" + (r.stdout + r.stderr)[-4000:])
             return 1
@@ -92,10 +99,12 @@ def main() -> int:
         query, (w, h) = state_to_query(st)
         url = f"{html}#/" if st == "home" else f"{html}#/s/{sid}" + (f"?{query}" if query else "")
         png = out_dir / f"{st.replace(':', '-')}-{stamp}.png"
+        profile = tempfile.mkdtemp(prefix="uig-shot-")  # 동시에 여러 Chrome 을 띄워도 프로필이 겹치지 않게
         subprocess.run(
             [
                 CHROME,
                 "--headless=new",
+                f"--user-data-dir={profile}",
                 "--use-angle=swiftshader",
                 "--enable-unsafe-swiftshader",
                 "--hide-scrollbars",
@@ -108,6 +117,7 @@ def main() -> int:
             capture_output=True,
             timeout=120,
         )
+        shutil.rmtree(profile, ignore_errors=True)
         print(f"{st}: {png}" if png.exists() else f"{st}: 실패")
     return 0
 

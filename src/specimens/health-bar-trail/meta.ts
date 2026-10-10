@@ -161,7 +161,7 @@ Canvas_Overlay (Sort Order 높게)
   },
   inspiredBy: [
     {
-      title: 'Hades',
+      title: 'Hades (2020)',
       credit: '© Supergiant Games',
       borrowed: ['레이아웃 구조'],
       learned: '빠른 탑다운 액션에서 **하단 체력 바 + 화면 가장자리 위험 신호**를 함께 쓰는 배치 개념을 대표 사례로 골랐다. 다만 잔상 바·테두리 효과의 세부(색·타이밍)는 공개 자료로 확인하지 못해 일반 패턴으로 재구성했다 — 수업에서 원작 화면을 직접 확인해 비교해 보길 권한다.',

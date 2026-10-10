@@ -242,7 +242,7 @@ Assets: AccessibilitySettings.asset · Defaults.asset · Preset_Vision/Hearing/M
   },
   inspiredBy: [
     {
-      title: 'The Last of Us Part II (2020, PS4 오리지널판)',
+      title: 'The Last of Us Part II (2020)',
       credit: '© 2020 Sony Interactive Entertainment LLC',
       borrowed: ['정보 구조 (유형별 프리셋 → 개별 조정)', '자막·고대비 옵션 구성'],
       learned:

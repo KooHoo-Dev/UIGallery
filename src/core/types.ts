@@ -121,6 +121,8 @@ export interface SpecimenMeta {
   /** 원작과 다르게 새로 만든 것 */
   original: string
   references: Reference[]
+  /** 함께 보면 좋은 다른 표본 (id 와 이유 한 줄). 해설 문장 안에서는 [제목](#/s/<id>) 로도 링크할 수 있다 */
+  related?: { id: string; why: string }[]
   /** 번쩍이는 효과 포함 (배지 표시, 제한기 사용 필수) */
   flashes?: boolean
 }

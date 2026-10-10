@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { prefersReducedMotion } from '../core/flash'
 import { applyPreset, defaultParams } from '../core/params'
-import { findSpecimen, SPECIMENS } from '../core/registry'
+import { findSpecimen, PLANNED, SPECIMENS } from '../core/registry'
 import { GROUPS, INPUTS, PARADIGMS, PLATFORMS } from '../core/taxonomy'
 import type { Aspect, ParamValues, StageTrigger } from '../core/types'
 import { isTyping } from './App'
@@ -337,6 +337,20 @@ function SpecimenView({
 
         <section className="sec">
           <h2>더 보기</h2>
+          {m.related && m.related.length > 0 && (
+            <ul className="related">
+              {m.related.map(r => {
+                const done = findSpecimen(r.id)
+                const title = done?.meta.title ?? PLANNED.find(p => p.id === r.id)?.title ?? r.id
+                return (
+                  <li key={r.id}>
+                    {done ? <a href={hrefSpecimen(r.id)}>{title}</a> : <span>{title} (제작 중)</span>}
+                    <span className="related-why"> — <Rich text={r.why} /></span>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
           <ul className="refs">
             {m.references.map((r, i) => (
               <li key={i}>

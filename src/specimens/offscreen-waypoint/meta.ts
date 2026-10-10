@@ -147,14 +147,14 @@ export const meta: SpecimenMeta = {
   },
   inspiredBy: [
     {
-      title: 'Horizon Forbidden West',
+      title: 'Horizon Forbidden West (2022)',
       credit: '© Sony Interactive Entertainment',
       borrowed: ['레이아웃 구조', '색 체계'],
       learned: '상단 나침반은 주변 관심 지점을, 켜고 끌 수 있는 웨이포인트는 목표와 거리를 맡는 **역할 분리**, 목표 구역에서 나침반이 강조되는 **상태 표시**, 안내 수준을 고르는 옵션 구조. 출시 당시 리뷰가 지적한 작은 아이콘·배경 없는 표시의 가독성 문제는 반면교사로 삼아 배경판과 크기 옵션을 더했다. 화면 밖 클램프 동작은 출처로 확인되지 않아 일반 패턴으로 재구성했다.',
       link: 'https://blog.playstation.com/2022/02/10/accessibility-features-in-horizon-forbidden-west/',
     },
     {
-      title: 'Ghost of Tsushima',
+      title: 'Ghost of Tsushima (2020)',
       credit: '© Sony Interactive Entertainment',
       borrowed: ['모션 리듬'],
       learned: '비교 사례. 개발 초기에는 평범한 미니멀 나침반을 썼지만 플레이어가 UI만 쳐다보는 문제가 드러나 **바람으로 길을 안내하는 방식**으로 바꿨다고 개발자들이 회고했다. 정보량은 그대로 두고 화면의 군더더기만 줄인 결정. "환경 신호" 모드는 이 아이디어를 추상적인 선 흐름으로만 옮겼고, 원작의 풀·나뭇잎 연출은 재현하지 않았다.',

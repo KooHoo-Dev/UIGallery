@@ -62,6 +62,22 @@ src/unity/<id>/uitk/*.uxml *.uss *.cs UI Toolkit 구현
 
 - 게임패드 버튼은 **위치(아래/오른쪽/왼쪽/위)** 로만 표기한다. 특정 콘솔의 기호(A/B/X/Y, ○/×/△/□)·로고 금지.
 - 파라미터 이름은 camelCase, 같은 개념은 같은 이름: `edgeMargin`(px), `fovDeg`, `accentColor`, `skewDeg`, `inputDevice`(auto|keyboard|gamepad|touch), `pulseHz`(≤ 3).
+- 단위가 있는 값은 이름 끝에 단위를 붙인다: 시간 `…Ms`, 각도 `…Deg`, 주파수 `…Hz`, 배율 `…Scale`, 초당 글자 수 `…Cps` (예: `displayMs`, `cooldownMs`, `typeSpeedCps`).
+- 색 설정은 대상을 이름에 넣는다 (`damageColorMap`, `rarityColors`). `colorMode` 처럼 설정·접근성 표본의 색각 보정과 헷갈리는 이름은 쓰지 않는다.
+
+### 공통 용어 (해설에서 같은 말로 쓴다)
+
+| 용어 | 뜻 |
+|---|---|
+| **입력 소비** | 입력 하나는 한 단계만 처리한다. 한 번 눌렀는데 여러 단계가 넘어가면(관통) 실수 |
+| **입력 버퍼** | 연출 중에 들어온 입력을 버리지 않고 기억했다가 연출이 끝나면 적용한다 |
+| **입력 잠금** | 새 선택지·창이 막 나타난 직후 짧게(0.2~0.4초) 확정 입력을 막아 실수로 고르는 것을 방지한다 |
+| **시간 제한** | 자동으로 넘어가거나 사라지는 것은 끄거나 길게 늘릴 수 있어야 한다 (자세한 기준은 설정 · 접근성 표본) |
+
+### 다른 표본과 이어 주기
+
+- 겹치는 주제는 한 표본이 맡고, 다른 표본은 짧게 비교한 뒤 링크한다. `meta.related` 에 `{ id, why }` 를 넣으면 '더 보기'에 나타난다.
+- 해설 문장 안에서는 `[화면 밖 목표 표시](#/s/offscreen-waypoint?preset=ambient)` 처럼 링크한다 (같은 탭에서 열린다).
 
 ### 공통 세계관 · 문구
 
@@ -88,6 +104,7 @@ src/unity/<id>/uitk/*.uxml *.uss *.cs UI Toolkit 구현
 ## 6. 콘텐츠 정책 (요약)
 
 - 원작 에셋·로고·캐릭터·전용 폰트·고유 문구 0. 원작에서 빌리는 시각 축은 **최대 2개** (`inspiredBy[].borrowed`).
+- `inspiredBy[].title` 은 `원제 (연도)` 형식 (예: `Dead Space (2008)`). 근거로 확인하지 못한 화면 묘사는 "미확인"이라고 밝히고, 확인된 근거가 없으면 `borrowed: []` (장르 관례로만 다룬다).
 - 표본 제목·ID·프리셋 이름·CSS 클래스·변수명에 **게임명 금지**. 게임명은 `inspiredBy` 에만.
 - 비트맵 금지. 아이콘은 직접 그린 SVG/CSS.
 - 화면 속 텍스트(퀘스트명, 아이템명, 대사)는 원작과 무관한 새 문구로.
@@ -109,7 +126,7 @@ src/unity/<id>/uitk/*.uxml *.uss *.cs UI Toolkit 구현
 
 ```bash
 npx tsc --noEmit                                   # 내 파일 오류 0
-python tools/shot.py <id> default juice0 event:<이벤트> preset:<프리셋> spot:1 mobile
+python tools/shot.py <id> default juice0 event:<이벤트> preset:<프리셋> spot:1 mobile   # 이 표본만 넣어 빌드
 python tools/check.py                              # (dist 빌드 후) 전체 규칙
 ```
 
