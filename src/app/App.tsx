@@ -74,7 +74,7 @@ export function App() {
 
       <main id="main" className="main" tabIndex={-1}>
         {route.name === 'home' && <Home />}
-        {route.name === 'specimen' && <SpecimenPage key={route.id} id={route.id} presetId={route.preset} presenter={presenter} />}
+        {route.name === 'specimen' && <SpecimenPage key={route.id} id={route.id} presetId={route.preset} opts={route.opts} presenter={presenter} />}
         {route.name === 'about' && <About />}
       </main>
 

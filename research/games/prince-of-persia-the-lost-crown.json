@@ -1,0 +1,218 @@
+{
+  "game": {
+    "id": "prince-of-persia-the-lost-crown",
+    "title": "Prince of Persia: The Lost Crown",
+    "title_ko": "페르시아의 왕자: 로스트 크라운",
+    "version": "2024년 1월 콘솔·PC 발매판(Ubisoft Montpellier) + 약 1년 뒤(2025) 출시된 모바일 포팅판(iOS·Android, Ubisoft Da Nang). 요소마다 기준 판을 본문에 따로 적었다.",
+    "developer": "Ubisoft Montpellier (원작) / Ubisoft Da Nang (모바일 포팅)",
+    "publisher_credit": "© Ubisoft Entertainment",
+    "platforms": [
+      "PS5",
+      "PS4",
+      "Xbox Series X|S",
+      "Xbox One",
+      "Nintendo Switch",
+      "PC",
+      "iOS",
+      "Android"
+    ],
+    "year": 2024,
+    "genres": [
+      "액션 플랫포머",
+      "메트로이드바니아"
+    ],
+    "visual_style": "2.5D 셀 애니메이션풍 아트(출처로 검증하지 않은 서술용 표기)",
+    "official_url": "https://www.ubisoft.com/en-us/game/prince-of-persia/the-lost-crown"
+  },
+  "elements": [
+    {
+      "specimen_id": "prince-of-persia-the-lost-crown__skill-cooldown-prompt",
+      "pattern_name": "touch-control-customization-replacing-device-prompts",
+      "player_task_ko": "(모바일판, 확인됨) 화면 위 가상 입력(버튼·스와이프·더블탭·이동 스틱 등)으로 전투와 능력을 입력하고, 필요하면 Edit Controls에서 버튼의 크기·위치·투명도를 자기 손에 맞게 고친다. (콘솔·PC판, 미확인) Athra 게이지와 Athra Surge 아이콘을 보고 능력을 쓸 수 있는지 판단한다.",
+      "info_shown_ko": [
+        "(모바일, 확인됨) 가상 입력 요소. 모든 요소의 크기·위치·투명도를 조절할 수 있음",
+        "(모바일, 확인됨) Edit Controls 모드에서 선택한 버튼의 편집 항목(투명도·위치·크기·대체 입력 방식)과 고급 설정용 톱니바퀴 아이콘",
+        "(콘솔·PC, 미확인) Athra 게이지와 Athra Surge 아이콘. 쿨다운 표시 방식과 레벨별 소모 칸 수는 출처로 확인하지 못함"
+      ],
+      "interaction_ko": "모바일판에서는 일시정지 메뉴 → System → Customize Mobile Controls → Edit Controls 순서로 들어간다. 바꿀 버튼을 탭해 투명도·위치·크기·대체 입력 방식을 조정한 뒤 저장하고 시험해 본다. Reset을 누르면 기본값으로 돌아간다. 가상 컨트롤 설정은 3개 슬롯에 저장할 수 있다. 입력 방식도 고를 수 있다(버튼/스와이프/더블탭, 이동 버튼/가상 스틱, 이동 버튼의 배치와 모양). Auto-Potion·Auto-Parry·Auto-Hit을 켜면 해당 입력이 자동 처리되고 그 버튼이 화면에서 빠진다. 외부 게임패드는 Customize Controls에서 Modify input / Reset Inputs로 리매핑한다. 콘솔·PC판에서 입력 장치에 따라 버튼 프롬프트가 바뀌는 방식은 확인하지 못했다.",
+      "layout_ko": "모바일판 가상 입력의 기본 위치·개수는 출처로 확인하지 못했다. 사용자가 위치를 옮길 수 있다는 점만 확인됨. 콘솔·PC판 HUD에서 Athra 게이지와 능력 아이콘의 위치도 확인하지 못했다.",
+      "motion_ko": "쿨다운 타이머 애니메이션과 버튼 편집 시 전환 효과는 출처로 확인하지 못했다(미확인).",
+      "accessibility_ko": [
+        "모바일 Auto-Potion / Auto-Parry / Auto-Hit: 입력을 자동화하면서 해당 버튼도 없애 HUD를 정리함",
+        "모바일 Time Lord: 게임 속도를 최저 75%까지 상시로 낮춰 입력 사이 반응 시간을 늘림",
+        "모바일 난이도 프리셋 5종. 보스 체력, 적 피해·체력, 환경 위험 피해, 패리 타이밍, Athra 충전 속도를 개별 조정",
+        "모바일 게임패드 리매핑, 스틱 좌우 교체, 연타 자동 완료, QTE 없음"
+      ],
+      "states": [
+        {
+          "name": "default-layout(기본 배치)",
+          "trigger_ko": "모바일판 첫 실행 또는 Edit Controls에서 Reset",
+          "visual_ko": "기본 가상 입력 배치로 돌아감. 구체적인 배치 모양은 미확인"
+        },
+        {
+          "name": "edit-controls(편집 모드)",
+          "trigger_ko": "Customize Mobile Controls 화면에서 Edit Controls 선택",
+          "visual_ko": "버튼을 탭해 선택하면 투명도·위치·크기·대체 입력 방식 편집 항목과 톱니바퀴(고급 설정)가 나타남. 텍스트로만 확인했으므로 실제 화면 모양은 plausible"
+        },
+        {
+          "name": "layout-slot-saved(슬롯 저장)",
+          "trigger_ko": "사용자가 편집한 배치를 저장",
+          "visual_ko": "3개 구성 슬롯 중 하나에 저장됨. 슬롯 선택 UI의 모양은 미확인"
+        },
+        {
+          "name": "automation-enabled(자동화 켬)",
+          "trigger_ko": "Auto-Potion/Auto-Parry/Auto-Hit 옵션을 켬",
+          "visual_ko": "해당 입력 버튼이 HUD에서 사라져 화면이 단순해짐"
+        },
+        {
+          "name": "ability-cooldown(콘솔·PC, 미확인)",
+          "trigger_ko": "Athra Surge 사용 직후",
+          "visual_ko": "쿨다운 표시 방식과 크기는 출처(커뮤니티 글)가 열리지 않아 확인하지 못함. 미확인으로 남김"
+        }
+      ],
+      "why_it_works_ko": [
+        "모바일판은 콘솔·PC식 '입력 장치별 버튼 아이콘'이 아니라 터치 입력 자체를 고칠 수 있게 하는 쪽을 택했다. 크기·위치·투명도·입력 방식을 바꾸고 3개 슬롯에 저장할 수 있어서 손 크기와 기기 화면이 달라도 맞출 수 있다.",
+        "자동화 옵션이 입력과 함께 버튼까지 없애므로, 조작 부담과 화면 혼잡을 한 번에 줄인다. 공식 자료도 HUD 정리 효과를 함께 설명한다.",
+        "편집 → 저장 → 시험 → Reset으로 이어지는 흐름이라 잘못 바꿔도 쉽게 기본값으로 돌아갈 수 있다."
+      ],
+      "signature_traits_ko": [
+        "Time Lord, Auto-Hit 같은 이 게임 고유의 옵션 이름과 75% 같은 구체 수치",
+        "3개 가상 컨트롤 슬롯 같은 이 포팅판의 구체적 구성. 패턴으로 참고하되 이름과 수치를 그대로 쓰지 말 것"
+      ],
+      "evidence": [
+        {
+          "claim": "GDC 2026 세션에서 Ubisoft Da Nang의 Alexis Denance가 모바일 포팅 과정, 3Cs 적응, 추가 기능, 무료 체험 형식, 플레이테스트 교훈을 다룸",
+          "url": "https://gdcvault.com/play/1035691/UX-Mobile-Porting-Challenges-in",
+          "tier": "T1"
+        },
+        {
+          "claim": "모바일판은 모든 가상 입력의 크기·위치·투명도 조절, 3개 구성 슬롯, 여러 터치 입력 방식, Auto-Potion/Auto-Parry/Auto-Hit(버튼 제거와 HUD 정리 포함), Time Lord(최저 75%), 난이도 프리셋 5종, 게임패드 리매핑을 제공",
+          "url": "https://news.ubisoft.com/en-us/article/7HvHq2SIDTcXg6ap0v4QgD/prince-of-persia-the-lost-crown-mobile-accessibility-spotlight",
+          "tier": "T1",
+          "paraphrase": "출처 문장: three configuration slots for virtual controls"
+        },
+        {
+          "claim": "모바일 조작 편집 경로는 Pause Menu → System → Customize Mobile Controls → Edit Controls이고, Reset으로 초기화하며, 외부 컨트롤러는 Customize Controls에서 Modify input / Reset Inputs로 리매핑",
+          "url": "https://ubisoft-mobile.helpshift.com/hc/en/59-prince-of-persia-the-lost-crown/faq/2361-key-and-button-mapping-in-prince-of-persia-the-lost-crown/",
+          "tier": "T1"
+        },
+        {
+          "claim": "(범위 좁힘) 모바일판 리뷰가 터치 버튼의 크기·위치·투명도 변경과 조작 리매핑을 언급하며, 콘솔판 약 1년 뒤 모바일판이 나왔다고 설명. 원래 주장인 '최대 8개 버튼, 우측 엄지 영역'은 이 글에 없어 삭제",
+          "url": "https://en.androidayuda.com/games/lists/Prince-of-Persia:-The-Lost-Crown-is-now-available-on-mobile-devices.-Full-review-of-the-Android-and-iOS-versions./",
+          "tier": "T2"
+        }
+      ],
+      "reference_links": [
+        {
+          "label": "GameFAQs 게시판 스레드(403으로 열리지 않음, 쿨다운 표시 가시성 관련 주장 미확인)",
+          "url": "https://gamefaqs.gamespot.com/boards/409449-prince-of-persia-the-lost-crown/80675827"
+        }
+      ],
+      "confidence": "plausible"
+    },
+    {
+      "specimen_id": "prince-of-persia-the-lost-crown__settings-accessibility",
+      "pattern_name": "tabbed-accessibility-settings-with-live-preview-and-presets",
+      "player_task_ko": "(콘솔·PC판 기준) 설정 메뉴에서 고대비 모드, 자막 배경 불투명도, 대체 폰트, HUD 크기, 화면 흔들림, 난이도 같은 접근성 옵션을 조정하고, 메뉴를 나가지 않은 채 결과를 미리 확인한다.",
+      "info_shown_ko": [
+        "설정 카테고리 목록(Display, Sound 등). 탭 형태인지와 정확한 배치는 미확인",
+        "각 옵션의 현재 값",
+        "메뉴 안에서 보여주는 변경 결과 미리보기",
+        "난이도 프리셋별로 각 난이도 요소가 어떻게 바뀌는지 숫자로 미리 보여주는 설명",
+        "고대비 모드의 색상 프리셋. 프리셋 개수와 색각 유형별 구분은 미확인"
+      ],
+      "interaction_ko": "옵션 값을 바꾸면 설정 메뉴 안에서 바로 미리보기가 되므로, 메뉴를 나가지 않고도 새 설정이 어떻게 보일지 확인할 수 있다. 다만 타이틀 화면에서는 Display와 Sound 메뉴만 열려 있고, 나머지는 세이브를 시작해 게임 중 일시정지해야 열린다. 고대비 모드는 오프닝 컷신이 끝나기 전에는 켤 수 없다. 플레이 중에 바로 전환하는 단축 수단 없이 설정 메뉴에서만 바꿀 수 있고, 컷신 중에는 설정 메뉴를 열 수 없다.",
+      "layout_ko": "카테고리별로 옵션을 묶은 구조다. 탭 위치와 미리보기 영역의 배치는 스크린샷으로 확인하지 못해 미확정이다.",
+      "motion_ko": "설정 변경 시 전환 애니메이션 타이밍은 출처로 확인하지 못했다(미확인).",
+      "accessibility_ko": [
+        "고대비 모드: 배경 채도를 낮추고 대상 오브젝트를 색으로 강조하며, 사용자 정의 설정과 프리셋을 제공",
+        "자막 배경 불투명도 조절, 대체 폰트, HUD 크기 확대, 화면 흔들림 끄기",
+        "상호작용 가능한 오브젝트에 흰 점 표시",
+        "난이도 프리셋 4종(콘솔·PC). 적 피해·체력, 환경 위험, 패리 타이밍, 회피 판정 시간, Athra 소모 속도를 세부 조정. 모바일판은 5종으로 늘어남",
+        "키보드·컨트롤러 전체 리매핑, 근접 타겟 보조, 조준 보조 조절",
+        "어려운 플랫포밍 구간 앞에 나타나는 포털을 써서 해당 구간 건너뛰기",
+        "대화 텍스트 로그(최근 50줄)",
+        "Guided Mode(맵에 힌트·마커 표시), Memory Shards(위치 스크린샷을 맵에 고정)"
+      ],
+      "states": [
+        {
+          "name": "title-screen-limited(타이틀 화면 제한)",
+          "trigger_ko": "세이브를 시작하기 전 타이틀 화면에서 설정에 들어감",
+          "visual_ko": "Display와 Sound 메뉴만 사용할 수 있음"
+        },
+        {
+          "name": "in-game-full(게임 중 전체 설정)",
+          "trigger_ko": "세이브를 시작한 뒤 일시정지 메뉴에서 설정에 들어감",
+          "visual_ko": "나머지 카테고리가 열림. 고대비 모드는 오프닝 컷신이 끝난 뒤부터 켤 수 있음"
+        },
+        {
+          "name": "modified-with-preview(값 변경과 미리보기)",
+          "trigger_ko": "플레이어가 옵션 값을 바꿈",
+          "visual_ko": "설정 메뉴 안에서 변경 결과가 바로 미리 보임. 텍스트 리뷰로만 확인했으므로 실제 화면 구성은 plausible"
+        },
+        {
+          "name": "high-contrast-active(고대비 켬)",
+          "trigger_ko": "고대비 모드를 켜고 프리셋 또는 사용자 정의 색을 선택",
+          "visual_ko": "배경 채도가 낮아지고 대상 오브젝트가 색으로 강조됨"
+        },
+        {
+          "name": "high-contrast-cinematic-suppressed(컷신 중 강조 해제)",
+          "trigger_ko": "고대비 모드를 켠 상태에서 컷신 재생",
+          "visual_ko": "정체가 아직 드러나지 않은 적 캐릭터가 컷신에서 미리 적으로 강조되지 않도록 컷신 중에는 적 강조를 하지 않음"
+        }
+      ],
+      "why_it_works_ko": [
+        "메뉴 안에서 결과를 바로 미리 볼 수 있어, 설정이 자기에게 맞는지 판단하려고 메뉴를 들락날락할 필요가 없다.",
+        "난이도 프리셋마다 각 요소가 어떻게 바뀌는지 숫자로 먼저 보여 주므로 고르기 전에 결과를 예상할 수 있다.",
+        "선임 게임 디자이너 Remi Boutin은 접근성 문제는 개발 끝에 고치기보다 처음부터 예상하는 편이 훨씬 쉽다고 말했다. 고대비 모드가 컷신 반전을 드러내는 문제를 개발 중에 잡아낸 것이 그 예다."
+      ],
+      "signature_traits_ko": [
+        "고대비 모드가 컷신에서 아직 드러나지 않은 적을 미리 강조해 반전을 망칠 수 있어, 컷신 중에는 적 강조를 끄도록 바꾼 이 게임 고유의 사례",
+        "Memory Shards(스크린샷을 맵에 고정)와 Guided Mode라는 이 게임 고유의 이름과 구현",
+        "타이틀 화면에서는 Display/Sound만 열리고 고대비 모드는 오프닝 컷신 이후에야 켤 수 있다는 진행 단계별 제약. 리뷰가 지적한 불편이므로 그대로 따라 하지 말 것. 이 제약을 의도한 이유는 출처에 나오지 않음"
+      ],
+      "evidence": [
+        {
+          "claim": "Prince of Persia: The Lost Crown이 The Game Awards 2024 Innovation in Accessibility 부문 수상",
+          "url": "https://www.youtube.com/watch?v=VhCEkNQARGI&pp=0gcJCdgAo7VqN5tD",
+          "tier": "T2"
+        },
+        {
+          "claim": "콘솔·PC판은 프리셋이 있는 고대비 설정, 배경 채도 낮추기, 오브젝트 색 강조, HUD 확대, 화면 흔들림 끄기, 대체 폰트, 상호작용 요소 강조와 구간 건너뛰기, 근접·조준 보조, 키보드·컨트롤러 전체 리매핑, 세부 조정 가능한 난이도 프리셋 4종, Guided Mode, Memory Shards, 대화 로그 50줄을 제공",
+          "url": "https://caniplaythat.com/2024/01/05/ubisoft-shows-off-more-accessibility-of-prince-of-persia-the-lost-crown/",
+          "tier": "T2"
+        },
+        {
+          "claim": "타이틀 화면에서는 Display·Sound만 열리고, 고대비 모드는 오프닝 컷신 끝까지 켤 수 없으며 플레이 중 바로 전환할 수 없음. 설정 변경은 메뉴 안에서 미리보기 가능. 자막 배경 불투명도, 대체 폰트, 흰 점 표시, 플랫포밍 건너뛰기 포털, 난이도별 숫자 설명 언급",
+          "url": "https://access-ability.uk/2024/01/17/prince-of-persia-the-lost-crown-accessibility-review/",
+          "tier": "T2"
+        },
+        {
+          "claim": "(범위 좁힘) 선임 게임 디자이너 Remi Boutin이 접근성을 처음부터 고려해야 한다고 말함. 고대비 모드가 컷신에서 아직 드러나지 않은 적을 강조하는 문제가 있어 컷신 중 적 강조를 끄도록 바꿈. 이 일화와 타이틀 화면 설정 제약은 서로 관련이 없음",
+          "url": "https://www.inverse.com/gaming/prince-of-persia-lost-crown-accessibility-interview",
+          "tier": "T2",
+          "paraphrase": "인용: easier to anticipate accessibility problems than to fix them at the end"
+        },
+        {
+          "claim": "모바일판은 난이도 프리셋을 5종으로 늘리고, 가상 컨트롤 커스터마이즈, Auto-Potion/Auto-Parry/Auto-Hit, Time Lord(최저 75% 속도)를 추가",
+          "url": "https://news.ubisoft.com/en-us/article/7HvHq2SIDTcXg6ap0v4QgD/prince-of-persia-the-lost-crown-mobile-accessibility-spotlight",
+          "tier": "T1"
+        },
+        {
+          "claim": "(범위 좁힘) GDC 2026 세션 초록은 포팅팀의 작업을 설명하면서 이 게임이 2024 Innovation in Accessibility 상을 받았다고 언급. 모바일판이 이 상을 받은 것은 아님(2024 수상은 콘솔·PC판)",
+          "url": "https://gdcvault.com/play/1035691/UX-Mobile-Porting-Challenges-in",
+          "tier": "T1"
+        }
+      ],
+      "confidence": "plausible"
+    }
+  ],
+  "verification": {
+    "claims_checked": 11,
+    "supported": 6,
+    "partial": 4,
+    "unsupported_removed": 1,
+    "unreachable": 1,
+    "notes_ko": "evidence URL 11개를 모두 WebFetch로 다시 열어 확인함. [열리지 않음] GameFAQs 스레드가 403을 반환해 재시도하지 않음. 이 글에만 기대던 내용(Athra Surge 쿨다운 원형 타이머가 매우 작다는 주장, 자원 부족 시 회색 처리 상태, 관련 signature trait와 why_it_works)은 삭제하거나 미확인으로 낮췄고 URL은 reference_links에만 남김. 웹 검색 한도(200회)가 소진되어 대체 출처는 찾지 못함. [뒷받침 안 됨, 삭제] androidayuda의 '최대 8개 버튼, 우측 엄지 영역' 주장은 원문에 없음. 원문이 뒷받침하는 크기·위치·투명도 변경 내용으로 범위를 좁힘. [본문에서 근거 없어 삭제·수정] 자막 배경 '없음/절반/전체' 3단계, 고대비 '색각 유형별 3종', 콘솔 '패리 매우 쉬움'과 'Auto Athra' 옵션, Athra 레벨별 소모 칸 수, HUD 하단 배치. 콘솔판 Athra 조정은 원문 표현인 소모 속도로, 모바일판은 충전 속도로 바꿈. [범위 좁힘] Inverse의 고대비 일화는 컷신 중 적 강조를 끈 것이며, 타이틀 화면 설정 제약과 관련된 내용이 없음. 원래 레코드는 그 제약이 '스포일러 방지를 위한 의도적 조정'이라고 연결했는데 근거가 없어 분리함. GDC 초록의 수상 언급은 게임 전체(2024 콘솔·PC판)에 대한 것이므로 모바일판의 성과로 읽히지 않게 고침. [버전] 요소마다 콘솔·PC판인지 모바일판인지 명시함. 첫 요소는 확인된 내용이 모바일 조작 커스터마이즈뿐이라 pattern_name을 그 중심으로 바꾸고, specimen_id는 그대로 둠. [tier] Inverse는 언론 인터뷰라 T1에서 T2로 낮춤. 시각 주장은 모두 텍스트로만 확인되어 plausible 또는 미확인. gameuidatabase.com과 interfaceingame.com에는 접근하지 않음."
+  }
+}

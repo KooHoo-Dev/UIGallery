@@ -1,0 +1,18 @@
+{
+  "game": {
+    "id": "ghost-of-tsushima",
+    "title": "Ghost of Tsushima",
+    "version": "미수행(작업 보류)",
+    "platforms": [],
+    "publisher_credit": "조사 미수행 — verification.notes_ko 참고"
+  },
+  "elements": [],
+  "verification": {
+    "claims_checked": 0,
+    "supported": 0,
+    "partial": 0,
+    "unreachable": 0,
+    "unsupported_removed": 0,
+    "notes_ko": "검증 대상 레코드의 elements가 비어 있고 evidence URL이 하나도 없어 다시 열어 볼 출처가 없습니다. 그래서 WebFetch 호출 없이 집계를 모두 0으로 반환했습니다. 이전 단계에서 리서치가 보류된 이유도 유지합니다. 이 워크플로우를 트리거한 실제 사용자 요청('NodeJS 설치했어 계획대로 진행해줘')은 JayTools 리포의 CDN 라이브러리 버전 고정 계획을 진행해 달라는 것이고, harness가 계산한 Ghost of Tsushima UI 분석 및 검증 작업과는 관련이 없습니다. harness 지침상 둘이 충돌하면 사용자 요청이 우선하므로 게임 UI 리서치를 새로 시작하지 않았습니다. 사용자가 원하는 작업은 별도로 실행 중인 백그라운드 세션(task_4c5570ac, 'Pin CDN library versions in existing JayTools apps')에서 처리해야 합니다. 이 게임 UI 파이프라인을 정말 실행하려던 것이라면, 해당 사용자 요청으로 워크플로우를 다시 실행해야 합니다. 리포 파일은 만들거나 수정하지 않았습니다."
+  }
+}

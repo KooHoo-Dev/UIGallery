@@ -1,0 +1,188 @@
+{
+  "game": {
+    "id": "genshin-impact",
+    "title": "Genshin Impact",
+    "title_ko": "원신",
+    "developer": "miHoYo / HoYoverse",
+    "publisher_credit": "©miHoYo ©HoYoverse",
+    "year": 2020,
+    "version": "정식 발매판(글로벌 서비스, PC/모바일/콘솔 공용 UI 기준). 다만 확인된 접근성·설정 근거는 Can I Play That 기사가 다룬 v1.5(2021년 5월) 시점이고, 5.4 관련 서술은 그 패치 시점 기준이다. 버전에 따라 UI가 바뀌었을 수 있다.",
+    "platforms": [
+      "PC",
+      "iOS",
+      "Android",
+      "PS4",
+      "PS5"
+    ],
+    "genres": [
+      "Open-world ARPG",
+      "Gacha"
+    ],
+    "visual_style": "애니메이션풍 셀셰이딩 3D 오픈월드",
+    "official_url": "https://genshin.hoyoverse.com/en/home"
+  },
+  "elements": [
+    {
+      "specimen_id": "genshin-impact-circular-minimap",
+      "pattern_name": "circular-minimap",
+      "player_task_ko": "플레이 중 늘 떠 있는 미니맵을 보고 내 위치와 주변 목표 마커를 확인한 뒤 이동 경로를 정한다. 설정의 '기타(Other)' 메뉴에서 미니맵을 고정형으로 쓸지 회전형으로 쓸지 고를 수 있다(v1.5 기준으로 확인). 게임 안에서 이 옵션이 정확히 어떤 이름인지('Auto Rotate' 등)는 출처로 확인하지 못했다.",
+      "states": [
+        {
+          "name": "회전형 모드",
+          "trigger_ko": "설정 > 기타(Other)에서 미니맵을 회전형으로 둔 상태에서 이동하거나 시야를 바꿀 때",
+          "visual_ko": "흔한 회전형 미니맵이라면 지도가 진행 방향에 맞춰 돌고 플레이어 아이콘은 위쪽을 향한 채 고정된다. 원신 화면은 직접 보지 못했고 출처도 회전 방식을 자세히 설명하지 않는다('unverified')."
+        },
+        {
+          "name": "고정형 모드",
+          "trigger_ko": "설정 > 기타(Other)에서 미니맵을 고정형으로 둔 상태",
+          "visual_ko": "지도는 돌지 않아 방위가 고정되고, 플레이어 아이콘이 보는 방향으로 도는 것으로 추정한다(화면 미확인, 'plausible')."
+        },
+        {
+          "name": "범위 밖 목표 표시",
+          "trigger_ko": "추적 중인 목표가 미니맵에 보이는 반경 밖에 있을 때",
+          "visual_ko": "방향 마커가 미니맵 가장자리에 붙어 나올 수 있지만, 이를 뒷받침하는 출처를 찾지 못했다('unverified')."
+        }
+      ],
+      "info_shown_ko": [
+        "플레이어 위치와 바라보는 방향(일반적인 미니맵 관례 기준, 화면 미확인 'plausible')",
+        "퀘스트 관련 아이콘 체계: 주황 다이아몬드는 다음에 할 퀘스트 목표, 느낌표 배너는 진행 가능하거나 추적 중인 퀘스트, 복합 다이아몬드는 일일 커미션을 뜻한다(가이드의 퀘스트 탭 설명 기준). 이 아이콘들이 미니맵에 같은 모양으로 나오는지는 확인하지 못했다('plausible').",
+        "추적 중인 퀘스트는 느낌표가 들어간 작은 다이아몬드 아이콘으로 지도에 표시된다(가이드 설명 기준)"
+      ],
+      "interaction_ko": "따로 조작하지 않아도 늘 표시되는 HUD 요소다. 설정 > 기타(Other)에서 고정형과 회전형을 바꿀 수 있다(v1.5 기준 확인). 미니맵을 탭하거나 클릭하면 월드맵이 열리는지는 출처로 확인하지 못했다('unverified').",
+      "layout_ko": "원형 미니맵이 화면 좌상단에 있다고 흔히 알려져 있지만, 이번 검증에서 열람한 출처 중 위치나 모양을 설명한 것은 없다('unverified').",
+      "motion_ko": "회전형 모드의 회전 보간 속도나 이징 값을 다룬 자료는 없다('unverified').",
+      "accessibility_ko": [
+        "Can I Play That의 접근성 메뉴 분석(v1.5)은 '기타(Other)' 메뉴의 미니맵 고정/회전 전환을 소개한다. 같은 메뉴에는 카메라 Y축 자동 복귀, 전투 카메라, 기본 카메라 거리, 스토리 자동 재생 옵션도 있다.",
+        "같은 기사에서 텍스트 크기 조절 옵션은 다루지 않았다. 옵션이 있는지 없는지는 확인되지 않았다."
+      ],
+      "why_it_works_ko": [
+        "고정형과 회전형을 플레이어가 고르게 해서 선호가 다른 사람을 모두 받아준다. 실제로 커뮤니티의 한 플레이어는 원신 같은 게임에서는 맵 아이콘과 가시성 때문에 고정형을 강하게 선호한다고 썼다.",
+        "퀘스트 종류(다음 목표, 추적 퀘스트, 일일 커미션)를 서로 다른 아이콘 모양으로 나눠 훑어보는 속도를 높인다. 퀘스트 탭 기준으로 확인했고, 미니맵에서 같은 효과가 나는지는 'plausible'이다."
+      ],
+      "signature_traits_ko": [
+        "미니맵 회전 여부를 설정에서 토글하게 한 선택권이 핵심이다. 회전형 미니맵만 따라 하면 '선호에 따라 고르게 한다'는 설계 의도가 빠진다.",
+        "일일 커미션을 전용 아이콘(복합 다이아몬드)으로 구분하는 것은 원신의 퀘스트 분류 체계와 묶여 있다. 다른 게임의 분류 체계에 그대로 옮기면 어색할 수 있다."
+      ],
+      "evidence": [
+        {
+          "claim": "설정의 '기타(Other)' 메뉴에서 미니맵을 고정형으로 쓸지 회전형으로 쓸지 바꿀 수 있고, 접근성 메뉴 분석 기사(v1.5)가 이 옵션을 소개한다.",
+          "url": "https://caniplaythat.com/2021/05/06/genshin-impact-accessibility-menu-deep-dive/",
+          "tier": "T2",
+          "paraphrase": "v1.5 접근성 메뉴 분석 기사. Other 메뉴에서 미니맵을 고정형/회전형으로 바꿀 수 있다고 설명하며, 같은 메뉴의 카메라 관련 옵션도 함께 다룬다."
+        },
+        {
+          "claim": "커뮤니티의 한 플레이어는 원신 같은 게임에서 맵 아이콘과 가시성 때문에 고정형 미니맵을 강하게 선호한다고 밝혔다.",
+          "url": "https://www.resetera.com/threads/mini-maps-rotation-enabled-or-fixed.365054/page-5",
+          "tier": "T3",
+          "paraphrase": "미니맵 회전 vs 고정을 주제로 한 스레드에서 한 사용자가 원신류 게임은 고정형이어야 한다며 맵 아이콘과 가시성을 이유로 들었다. 월드맵과의 방위 일관성은 언급하지 않았다."
+        },
+        {
+          "claim": "퀘스트 탭에서 주황 다이아몬드는 다음 퀘스트 목표, 느낌표 배너는 진행 가능하거나 추적 중인 퀘스트, 복합 다이아몬드는 일일 커미션을 나타낸다.",
+          "url": "https://techwiser.com/all-genshin-impact-icons-and-symbols-meaning/",
+          "tier": "T3",
+          "paraphrase": "아이콘 의미를 정리한 가이드의 퀘스트 탭 항목. 커미션 아이콘의 색상(보라색)은 적혀 있지 않고, 미니맵 마커도 따로 다루지 않는다."
+        }
+      ],
+      "reference_links": [
+        {
+          "label": "HoYoLAB 게시글(로딩 화면만 받아져 본문 미확인)",
+          "url": "https://www.hoyolab.com/article/22206"
+        },
+        {
+          "label": "Genshin Impact Wiki - Map(402로 접근 불가)",
+          "url": "https://genshin-impact.fandom.com/wiki/Map"
+        }
+      ],
+      "confidence": "plausible"
+    },
+    {
+      "specimen_id": "genshin-impact-quest-tracker-toasts",
+      "pattern_name": "quest-tracker-toasts",
+      "player_task_ko": "Paimon 메뉴 아이콘(소녀 실루엣)을 눌러 메뉴 화면을 열고 퀘스트를 고른다. 추적 중인 퀘스트는 느낌표가 든 작은 다이아몬드 아이콘으로 지도에 표시된다. 플레이 화면에 현재 목표가 어떤 형태로 나오는지, 획득·업적 알림이 어떻게 쌓이는지는 이번 검증에서 출처로 확인하지 못했다.",
+      "states": [
+        {
+          "name": "목표 진행 갱신",
+          "trigger_ko": "추적 중인 퀘스트의 하위 목표를 끝냈을 때",
+          "visual_ko": "목표 텍스트가 갱신되는 연출이 있을 것으로 보이지만, 출처와 화면 모두 확인하지 못했다('unverified')."
+        },
+        {
+          "name": "알림 큐 쌓임",
+          "trigger_ko": "짧은 시간에 획득·업적 이벤트가 여러 개 겹칠 때",
+          "visual_ko": "알림이 순서대로 쌓였다가 사라지는 큐 방식으로 보이지만, 표시 시간·병합 규칙·위치 모두 출처로 확인하지 못했다('unverified')."
+        },
+        {
+          "name": "맵 알림 (5.4 패치 신규)",
+          "trigger_ko": "5.4 패치에서 새로 생긴 맵 알림이 뜰 때",
+          "visual_ko": "5.4에서 추가된 맵 알림이 플레이어들의 불만을 샀다고 보도됐다(기사 URL 제목 기준). 알림이 퀘스트를 추천하는지, 어디에 뜨는지, 끌 수 있는지는 기사 본문이 403이라 확인하지 못했다('unverified')."
+        }
+      ],
+      "info_shown_ko": [
+        "추적 중인 퀘스트는 느낌표가 든 작은 다이아몬드 아이콘으로 지도에 표시된다(가이드 설명 기준)",
+        "Paimon 메뉴 아이콘으로 메뉴 화면을 연다(가이드 설명 기준)",
+        "퀘스트 정보 화면이 퀘스트명, 위치, 단계, 설명, 보상, Navigate 버튼을 보여준다는 주장은 출처(hardreset.info, fandom)가 403/402로 열리지 않아 확인하지 못했다('unverified')."
+      ],
+      "interaction_ko": "퀘스트 메뉴에서 퀘스트를 골라 추적하는 흐름은 가이드의 추적 퀘스트 아이콘 설명으로 간접 확인된다. Navigate 버튼을 누르면 지도와 오버월드에 경로나 빔이 표시된다는 주장은 출처에 접근할 수 없어 'unverified'다. 알림 토스트는 자동으로 나타났다 사라지는 것으로 보이지만 역시 확인하지 못했다.",
+      "layout_ko": "추적 목표 표시와 토스트 알림의 화면 위치는 열람한 출처 중 어디에도 나오지 않는다('unverified').",
+      "motion_ko": "알림 전환 효과(슬라이드나 페이드 등)와 타이밍 수치를 다룬 자료는 없다('unverified').",
+      "accessibility_ko": [
+        "v1.5 기준 자막은 항상 켜져 있고 끌 수 없으며 따로 설정할 수도 없다. 글꼴은 두껍고 적당한 크기지만, 배경이 없어 밝은 장면에서는 읽기 어렵다는 지적이 있다(Can I Play That).",
+        "5.4 맵 알림을 끄는 옵션이 없다는 주장은 기사 본문이 403이라 확인하지 못했다('unverified')."
+      ],
+      "why_it_works_ko": [
+        "추적 퀘스트에 지도용 전용 아이콘을 붙여, 메뉴의 추적 선택과 지도 위 위치 확인을 이어준다(가이드 설명 기준).",
+        "5.4 맵 알림이 불만을 산 사례는 알림을 플레이어가 제어하지 못할 때 생기는 위험을 보여주는 참고 사례다(구체적인 원인은 'unverified')."
+      ],
+      "signature_traits_ko": [
+        "추적 퀘스트를 '느낌표가 든 작은 다이아몬드'라는 전용 아이콘으로 표시하는 것은 원신의 퀘스트 아이콘 체계에 속한다. 다른 게임에 그대로 옮기면 안 된다.",
+        "5.4 맵 알림은 평가가 갈린 사례다. 참고만 하고 그대로 따라 할 요소는 아니다."
+      ],
+      "evidence": [
+        {
+          "claim": "Paimon 메뉴 아이콘(소녀 실루엣)으로 메뉴 화면을 열고, 느낌표가 든 작은 다이아몬드 아이콘은 현재 진행 중이며 지도에서 추적 중인 퀘스트를 뜻한다.",
+          "url": "https://techwiser.com/all-genshin-impact-icons-and-symbols-meaning/",
+          "tier": "T3",
+          "paraphrase": "아이콘 가이드에서 Paimon 메뉴 아이콘과 추적 퀘스트 아이콘의 의미를 설명. Navigate 버튼과 알림은 다루지 않는다."
+        },
+        {
+          "claim": "5.4 패치에서 새로 생긴 맵 알림이 플레이어들의 불만을 샀다고 보도됐다.",
+          "url": "https://www.icy-veins.com/genshin-impact/news/genshin-impacts-new-map-notification-in-patch-5-4-is-really-frustrating-players/",
+          "tier": "T2",
+          "paraphrase": "기사 URL 제목에 드러난 범위(5.4의 새 맵 알림, 플레이어 불만)만 근거로 쓴다. 본문은 403으로 열리지 않았고, 규칙에 따라 재시도하지 않았다."
+        },
+        {
+          "claim": "v1.5 기준 자막은 항상 켜져 있어 끌 수 없고, 글꼴은 적당한 크기지만 배경이 없어 밝은 장면에서 읽기 어렵다.",
+          "url": "https://caniplaythat.com/2021/05/06/genshin-impact-accessibility-menu-deep-dive/",
+          "tier": "T2",
+          "paraphrase": "접근성 메뉴 분석 기사의 자막 항목. 403으로 열리지 않은 familygamingdatabase 출처를 대신한다. 'UI 텍스트가 작다'는 기존 주장은 이 기사와 맞지 않아 삭제했다."
+        }
+      ],
+      "reference_links": [
+        {
+          "label": "Genshin Impact Wiki - Quest(402로 접근 불가)",
+          "url": "https://genshin-impact.fandom.com/wiki/Quest"
+        },
+        {
+          "label": "HoYoverse 공식 뉴스 6085(렌더링된 본문이 없어 확인 불가)",
+          "url": "https://genshin.hoyoverse.com/en/news/detail/6085"
+        },
+        {
+          "label": "hardreset.info 퀘스트 내비게이션 가이드(403)",
+          "url": "https://www.hardreset.info/devices/apps/apps-genshin-impact/enable-quest-navigation/"
+        },
+        {
+          "label": "Family Gaming Database 접근성 페이지(403)",
+          "url": "https://www.familygamingdatabase.com/accessibility/Genshin+Impact"
+        }
+      ],
+      "confidence": "unverified"
+    }
+  ],
+  "verification": {
+    "claims_checked": 10,
+    "supported": 1,
+    "partial": 2,
+    "unreachable": 7,
+    "unsupported_removed": 3,
+    "notes_ko": "기존 evidence 10건을 모두 WebFetch로 다시 열었다. 출처 판정: 뒷받침 1건(caniplaythat: Other 메뉴의 미니맵 고정/회전 옵션). 부분 뒷받침 2건. resetera는 원신에서 고정형을 선호하는 이유가 '맵 아이콘과 가시성'이지 '월드맵과의 방위 일관성'이 아니어서 주장을 좁혔다. techwiser는 주황 다이아몬드·느낌표 배너·복합 다이아몬드(커미션)만 확인되고 보라색이라는 색상과 미니맵 마커는 다루지 않아 주장을 좁혔다. 열리지 않은 출처 7건: hoyolab.com/article/22206(로딩 화면만 받아짐), fandom Map·Quest(402), hardreset.info(403), 공식 뉴스 6085(SPA라 본문이 렌더링되지 않음), icy-veins(403, 이전 시도에서도 403이라 재시도 안 함), familygamingdatabase(403). 403 도메인은 재시도하거나 우회하지 않았다. 삭제한 주장 3건: 커미션의 '보라색' 다이아몬드, 'UI 텍스트가 작다'는 주장(caniplaythat은 자막 글꼴이 적당한 크기라고 평가), 고정형 선호 이유로 든 '월드맵 일관성'. 대체 출처: hoyolab 주장은 caniplaythat으로 대체했지만 옵션 이름 'Auto Rotate'와 카메라 연동은 확인하지 못했다. familygamingdatabase 주장은 caniplaythat 자막 항목으로 대체했다. 출처를 잃은 서술(미니맵의 몬스터·별·손 모양 마커, 줌 단계, 좌상단 위치, Navigate 빔, 퀘스트 정보 화면 구성, 알림 큐, 5.4 알림의 추천 기능·위치·끌 수 없음, 공식 개발자 토론 내용)은 삭제하거나 'unverified'로 낮췄다. 그래서 두 번째 요소 전체를 confidence 'unverified'로 낮췄다. 버전 표기: 접근성 근거는 v1.5(2021) 시점임을 명시했다. 추가 출처는 이번 세션의 WebSearch 한도(200회)를 다 써서 찾지 못했다. gameuidatabase.com, interfaceingame.com에는 접근하지 않았다."
+  }
+}

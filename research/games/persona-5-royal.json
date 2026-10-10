@@ -1,0 +1,285 @@
+{
+  "elements": [
+    {
+      "specimen_id": "dialogue-choices",
+      "pattern_name": "speaker-tagged-typewriter-dialogue-with-choice-menu-and-log",
+      "player_task_ko": "대화창이 뜨면 좌측 상단 이름표로 화자를 확인하고 타자기 효과로 출력되는 텍스트를 읽는다. 더 빠르게 보고 싶으면 버튼을 눌러 빨리감기(FFWD)하거나 옵션에서 자동 진행을 꺼서 직접 다음으로 넘긴다. 선택 분기에서는 포커스를 이동해 원하는 답변을 고르고 확정하며, 놓친 대화는 로그 버튼으로 다시 열어 확인한다.",
+      "info_shown_ko": [
+        "화자 이름표(캐릭터 얼굴 아이콘 포함, 처음 소개되지 않은 인물은 모호한 호칭으로 표시)",
+        "대화 본문 텍스트(변동 정보는 산세리프체, 반복적으로 기억해야 하는 메뉴·이름류는 장식적 서체로 구분)",
+        "선택지 목록",
+        "화면 우하단 FFWD(빨리감기) 안내 아이콘",
+        "로그 화면: 지금까지 나온 대화 텍스트 리스트"
+      ],
+      "interaction_ko": "버튼 연타로 텍스트 출력 가속, 옵션 메뉴의 자동 진행 온/오프 토글, 선택지 간 포커스 이동 후 확정 입력, 전용 버튼(PS 기준 Square, Switch는 왼쪽 스틱 아래)으로 로그 오버레이 열기.",
+      "layout_ko": "화면 하단에 가로로 긴 대화 패널이 깔리고, 패널 좌측에 화자 이름표와 얼굴 아이콘이 겹쳐 배치된다. 선택지는 대화 패널 위쪽이나 별도 리스트 형태로 출력되며, 빨리감기 안내는 화면 우하단 구석에 작게 표시된다.",
+      "motion_ko": "글자가 한 자씩 순차 출력되는 타자기 효과가 기본이며, 빨리감기 시 출력 속도가 즉시 빨라진다. 자동 진행이 꺼진 상태에서는 완성된 자막이 사용자가 넘기기 전까지 화면에 고정된다.",
+      "accessibility_ko": [
+        "자동 진행(Auto-Advance) 온/오프 옵션 — 꺼두면 자막이 플레이어가 직접 넘길 때까지 유지됨",
+        "대화 로그 기능으로 지나간 텍스트 재확인 가능",
+        "전투 중 중요 대화는 화면 우상단에 추가 자막으로 보충 설명",
+        "확인된 한계: 자막 크기 조절 옵션 없음, 컷신 내 자막은 평상시 대화보다 작게 표시되어 일관성이 떨어짐, 오프닝 가사·배경 안내방송 등 일부 음성에는 자막이 없음"
+      ],
+      "why_it_works_ko": [
+        "이름표+얼굴 아이콘 조합으로 다수 등장인물의 대화를 빠르게 구분하게 해 JRPG 특유의 정보 과부하를 줄인다.",
+        "자동 진행 토글과 로그 기능을 함께 제공해 읽는 속도가 다른 플레이어 모두를 수용한다.",
+        "서체를 변동 정보용과 반복 기억용으로 분리해 가독성과 스타일을 동시에 확보한다(개발자 인터뷰에서 직접 언급된 설계 의도)."
+      ],
+      "signature_traits_ko": [
+        "붉은색을 주색으로 하고 보조색을 최소화한 고대비 흑백적 배색(페르소나5 시리즈 전체의 UI 색 전략과 연결되는 선택)",
+        "도둑들의 '예고장'을 연상시키는 신문 스크랩풍 비정형 서체·사선 패널 형태(다른 게임 UI를 그대로 베끼면 서사적 맥락이 사라지는 요소)"
+      ],
+      "evidence": [
+        {
+          "claim": "CEDEC 2017에서 Sutoh·Wada가 변동 정보는 산세리프체, 반복 기억 요소는 장식 서체를 쓴다고 설명",
+          "url": "https://personacentral.com/persona-5-interview-ui-design-sound-music/",
+          "tier": "T1",
+          "paraphrase": "Famitsu 인터뷰에서 UI 아트디렉터가 서체 구분 의도를 직접 언급"
+        },
+        {
+          "claim": "자동 진행 토글, 로그로 지난 대화 재확인 가능",
+          "url": "https://caniplaythat.com/2020/04/02/deaf-hoh-review-persona-5-royal/",
+          "tier": "T2",
+          "paraphrase": "장애 접근성 전문 리뷰 매체의 플레이 기반 검증"
+        },
+        {
+          "claim": "Square 버튼(PS)/왼쪽 스틱 아래(Switch)로 대화 로그 열람",
+          "url": "https://gamefaqs.gamespot.com/boards/371756-persona-5-royal/80218115",
+          "tier": "T3",
+          "paraphrase": "커뮤니티 Q&A의 조작법 확인"
+        },
+        {
+          "claim": "신문 스크랩풍 비정형 서체·사선 패널이 도둑 예고장 테마를 반영",
+          "url": "https://jiaxinwen.wordpress.com/2017/04/27/the-ui-design-of-persona-5/",
+          "tier": "T3",
+          "paraphrase": "디자인 분석 블로그의 해석"
+        }
+      ],
+      "confidence": "plausible",
+      "states": [
+        {
+          "name": "idle_dialogue",
+          "trigger_ko": "대화 진행 시 텍스트 출력 시작",
+          "visual_ko": "타자기 효과로 글자가 순차 출력, 화자 이름표와 얼굴 아이콘이 좌측에 표시"
+        },
+        {
+          "name": "auto_advance_paused",
+          "trigger_ko": "옵션에서 자동 진행을 끈 경우",
+          "visual_ko": "완성된 자막이 플레이어가 넘기기 전까지 화면에 고정 유지"
+        },
+        {
+          "name": "fast_forward",
+          "trigger_ko": "버튼 연타 또는 FFWD 안내 확인 후 입력",
+          "visual_ko": "텍스트 출력 속도가 빨라지고 화면 우하단 FFWD 아이콘이 강조"
+        },
+        {
+          "name": "choice_open",
+          "trigger_ko": "대화 분기 지점 도달",
+          "visual_ko": "선택지 목록이 열리고 포커스된 항목이 하이라이트"
+        },
+        {
+          "name": "log_view",
+          "trigger_ko": "로그 전용 버튼 입력",
+          "visual_ko": "스타일이 단순화된 리스트형 로그 오버레이가 화면에 덮임"
+        }
+      ]
+    },
+    {
+      "specimen_id": "main-pause-menu",
+      "pattern_name": "line-of-sight-guided-stylized-transition-menu",
+      "player_task_ko": "메뉴 버튼을 눌러 일시정지/메인 메뉴를 열고, 키보드·게임패드로 항목 간 포커스를 이동해 원하는 하위 메뉴로 들어간다. 뒤로가기 입력으로 상위 메뉴로 복귀하며, 화면 하단 버튼 안내 바를 보고 현재 입력 장치(패드/키보드)에 맞는 버튼을 확인한다.",
+      "info_shown_ko": [
+        "메뉴 항목 리스트(장비, 페르소나, 능력 등)",
+        "포커스된 항목의 강조 표시",
+        "현재 턴 캐릭터를 향하는 길쭘한 삼각형 포인터(배틀 메뉴에서 1점 투시처럼 깊이감을 줌)",
+        "화면 하단의 버튼 안내 바(선택/뒤로가기 등 입력 장치별 아이콘)"
+      ],
+      "interaction_ko": "방향 입력으로 메뉴 항목 간 포커스 이동, 확정 버튼으로 하위 메뉴 진입, 전용 뒤로가기 버튼으로 상위 메뉴 복귀, 하단 안내 바가 입력 장치(패드 vs 키보드)에 따라 바뀌어 표시됨.",
+      "layout_ko": "메뉴를 열면 화면 중앙에 흰 선이 그어지며 시선을 유도하고, 그 주변에 항목들이 비대칭적으로 배치된다. 배틀 메뉴는 캐릭터 쪽을 가리키는 긴 삼각형 버튼들로 구성되어 평면 UI에 원근감을 더한다.",
+      "motion_ko": "메뉴를 열 때 3D 모델이 회전하다 특정 포즈에서 정지하는 모션그래픽이 재생된다(포즈는 Photoshop에서 레이아웃을 잡고 모션 디자이너가 캡처한 뒤 전용 툴로 2D 컷으로 렌더링). 하위 메뉴 전환 시에도 패널이 밀려 들어오는 전환 애니메이션이 쓰인다. 응답성 확보를 위해 GUI 데이터를 상주 메모리 영역에 유지했다고 개발자가 언급.",
+      "accessibility_ko": [
+        "확인된 공식 접근성 전용 옵션(배색 변경, 모션 감소 등)은 검색 범위 내에서 발견하지 못함 — 확인되지 않은 항목으로 남김"
+      ],
+      "why_it_works_ko": [
+        "시선을 끄는 흰 선과 조명 대비로 '무엇을 먼저 봐야 하는지'를 정보 기능을 해치지 않고 전달한다(CEDEC 2017 패널에서 직접 설명된 설계 원리).",
+        "3D 포즈 연출이 매 메뉴 진입을 캐릭터성의 연장으로 만들어, 기능적 메뉴를 브랜드 경험으로 바꾼다.",
+        "턴 포인터를 삼각형으로 표현해 평면적인 메뉴에도 전투의 긴장감과 깊이를 부여한다."
+      ],
+      "signature_traits_ko": [
+        "페르소나3(파란색)·페르소나4(노란색)와 달리 빨강 단일 주색 + 보조색 최소화 전략(시리즈 내에서도 5편만의 색 선택)",
+        "메뉴 오픈마다 커스텀 툴로 제작한 3D 모델 포즈 연출 — 다른 게임에 그대로 옮기면 캐릭터 애니메이션 리소스가 전제되어야 해 쉽게 복제되지 않는 부분"
+      ],
+      "evidence": [
+        {
+          "claim": "CEDEC+KYUSHU 2017 패널에서 Wada가 '대중성과 개성의 공존'을 설계 목표로, 흰 선으로 시선을 유도한다고 설명",
+          "url": "https://personacentral.com/persona-5-panel-concept-development-ui/",
+          "tier": "T1",
+          "paraphrase": "공식 개발자 강연 내용을 다룬 보도"
+        },
+        {
+          "claim": "Sutoh가 CEDEC Awards 2019 Visual Arts 상을 수상",
+          "url": "https://personacentral.com/cedec-awards-2019-persona-5-masayoshi-sutoh-visual-arts/",
+          "tier": "T1",
+          "paraphrase": "공식 시상 발표 보도"
+        },
+        {
+          "claim": "메뉴용 3D 모델 포즈는 Photoshop 레이아웃 후 모션 디자이너가 캡처, 전용 툴로 2D 렌더링",
+          "url": "https://www.playstationlifestyle.net/2017/11/13/atlus-details-designs-persona-5s-unique-ui/",
+          "tier": "T2",
+          "paraphrase": "CEDEC 패널 보도를 다룬 매체 기사"
+        },
+        {
+          "claim": "GUI 데이터를 상주 메모리에 유지해 응답성 확보",
+          "url": "https://personacentral.com/persona-5-interview-ui-design-sound-music/",
+          "tier": "T1",
+          "paraphrase": "Famitsu 개발자 인터뷰 내용"
+        },
+        {
+          "claim": "배틀 메뉴의 긴 삼각형 버튼이 턴 캐릭터를 가리켜 1점 투시 효과를 만든다",
+          "url": "https://jiaxinwen.wordpress.com/2017/04/27/the-ui-design-of-persona-5/",
+          "tier": "T3",
+          "paraphrase": "디자인 분석 블로그의 관찰"
+        }
+      ],
+      "confidence": "plausible",
+      "states": [
+        {
+          "name": "menu_opening",
+          "trigger_ko": "일시정지/메뉴 버튼 입력",
+          "visual_ko": "화면 중앙에 흰 선이 그려지며 시선을 유도, 3D 모델이 회전해 포즈로 정지"
+        },
+        {
+          "name": "item_focused",
+          "trigger_ko": "포커스 이동 입력",
+          "visual_ko": "선택 항목이 강조되고 하단 버튼 안내 바가 현재 입력 장치에 맞게 갱신"
+        },
+        {
+          "name": "submenu_transition",
+          "trigger_ko": "하위 메뉴 진입 확정",
+          "visual_ko": "패널이 밀려 들어오는 전환 모션그래픽 재생"
+        },
+        {
+          "name": "back_navigation",
+          "trigger_ko": "뒤로가기 버튼 입력",
+          "visual_ko": "이전 패널로 복귀하는 역방향 전환 애니메이션"
+        },
+        {
+          "name": "closed",
+          "trigger_ko": "메뉴 닫기 입력",
+          "visual_ko": "게임 플레이 화면으로 복귀"
+        }
+      ]
+    },
+    {
+      "specimen_id": "results-reward",
+      "pattern_name": "sequential-reward-reveal-with-levelup-spotlight",
+      "player_task_ko": "전투에서 승리하면 결과 화면으로 넘어가 경험치, 돈, 아이템이 차례로 공개되는 것을 지켜본다. 버튼 입력으로 각 단계를 넘기거나 빠르게 진행시키고, 레벨이 오른 캐릭터·페르소나가 있으면 전용 레벨업 연출을 확인한다.",
+      "info_shown_ko": [
+        "획득 경험치(파티원 전체에게 적용되는 기본값; 실제 개인별 배분량은 화면에 직접 노출되지 않음)",
+        "획득 금액",
+        "획득 아이템 목록",
+        "레벨업한 캐릭터/페르소나의 별도 안내 페이지"
+      ],
+      "interaction_ko": "결과 화면 각 단계에서 버튼을 눌러 다음 단계로 진행하거나 빠르게 넘긴다. 올아웃 어택으로 전투를 마무리하면 마지막 공격을 가한 멤버의 클로즈업 '결정타' 연출이 일반 승리 컷을 대체한다.",
+      "layout_ko": "붉은 색조가 결과 화면 전반을 지배하고, 노란색 포인트가 어두운 배경 위에서 경험치·돈·아이템 같은 핵심 수치를 눈에 띄게 만든다(색 대비로 중요 정보를 강조하는 방식). 레벨업 캐릭터는 초상화가 팝업 형태로 나타난다.",
+      "motion_ko": "올아웃 어택이 마무리 타가 되면 화면이 붉은 유리 파편처럼 깨지며 캐릭터 얼굴이 비치는 연출이 깔리고, 이어 주인공 일행이 전장을 가로지르는 '승리 랩' 모션 후 보상이 한 가지씩 순차적으로 등장한다. 레벨업 캐릭터 초상화는 팝업 사운드와 함께, 획득 금액은 동전이 굴러들어오는 듯한 사운드와 함께 표시된다는 설명이 있으나, 정확한 카운트업 수치 타이밍·속도는 1차 자료로 확인하지 못해 'plausible'로 둔다.",
+      "accessibility_ko": [
+        "결과 화면을 완전히 생략하거나 빨리 넘기는 전용 접근성 옵션이 공식적으로 확인되지는 않음(커뮤니티에서는 '결과 화면을 통째로 끄게 해달라'는 요청이 꾸준히 제기됨) — 확인되지 않은 항목으로 남김"
+      ],
+      "why_it_works_ko": [
+        "보상을 경험치→레벨업→돈→아이템처럼 종류별로 나눠 순차 공개함으로써 한 화면에 모든 정보를 몰아넣지 않고 각 보상에 짧은 '보여주기' 순간을 부여한다.",
+        "레벨업만 별도 페이지로 분리해 성장이라는 핵심 동기부여 요소를 다른 수치(돈·아이템)보다 두드러지게 만든다.",
+        "강한 그래픽 스타일(올아웃 어택의 유리 파편 연출 등)을 승리의 보상이 아니라 전투 자체의 클라이맥스와 자연스럽게 이어 붙여 긴장에서 보상으로의 전환을 매끄럽게 한다."
+      ],
+      "signature_traits_ko": [
+        "올아웃 어택 마무리 시 화면이 붉은 유리 파편처럼 깨지는 연출 — 일반적인 'VICTORY' 텍스트 배너로 단순화하면 시리즈 특유의 그래픽 임팩트가 사라지는 부분",
+        "보상 순차 공개를 시리즈 전체의 빨강 중심 고대비 배색 전략과 묶어서 제시하는 점(개별 수치보다 전체 화면의 그래픽 디자인이 먼저 인지되도록 설계)"
+      ],
+      "evidence": [
+        {
+          "claim": "CEDEC Awards 2019에서 Persona 5 UI/비주얼 아트 디자이너가 Visual Arts 우수상 수상(3년 연속 CEDEC Awards 수상)",
+          "url": "https://personacentral.com/cedec-awards-2019-persona-5-masayoshi-sutoh-visual-arts/",
+          "tier": "T1",
+          "paraphrase": "공식 시상 발표를 다룬 보도"
+        },
+        {
+          "claim": "결과 화면 경험치는 모든 처치 적의 합산 기본값이며, 개인별 최종 배분량은 화면에 직접 노출되지 않음",
+          "url": "https://gamefaqs.gamespot.com/ps4/260936-persona-5-royal/faqs/82621/exp-drop",
+          "tier": "T3",
+          "paraphrase": "공략 위키의 경험치 계산 설명"
+        },
+        {
+          "claim": "올아웃 어택 마무리 시 화면이 붉은 유리 파편처럼 깨지고, 레벨업 캐릭터는 팝업 사운드, 금액은 동전 사운드와 함께 표시",
+          "url": "https://ridwankhan.com/the-ui-and-ux-of-persona-5-183180eb7cce",
+          "tier": "T3",
+          "paraphrase": "검색 엔진이 요약한 UX 분석 글 내용(직접 열람은 접근 차단으로 실패)"
+        },
+        {
+          "claim": "결과 화면을 완전히 스킵하는 기능이 없다는 점에 대한 플레이어 불만이 커뮤니티에서 반복 제기됨",
+          "url": "https://www.resetera.com/threads/victory-results-screens-in-rpgs-are-annoying-please-let-players-completely-disable-them-to-speed-things-up-devs.556687/",
+          "tier": "T3",
+          "paraphrase": "포럼 스레드의 플레이어 의견"
+        }
+      ],
+      "confidence": "plausible",
+      "states": [
+        {
+          "name": "victory_transition",
+          "trigger_ko": "전투 승리 확정(일반 승리 또는 올아웃 어택 마무리)",
+          "visual_ko": "올아웃 어택이면 화면이 붉은 유리 파편처럼 깨지며 캐릭터 얼굴이 비치는 연출, 이어 주인공 일행의 승리 랩 모션"
+        },
+        {
+          "name": "exp_money_reveal",
+          "trigger_ko": "승리 연출 종료 후 자동 진행 또는 버튼 입력",
+          "visual_ko": "경험치와 획득 금액이 붉은 바탕에 노란 포인트로 순차 표시"
+        },
+        {
+          "name": "levelup_spotlight",
+          "trigger_ko": "레벨이 오른 캐릭터/페르소나가 있는 경우 조건부 발생",
+          "visual_ko": "해당 캐릭터 초상화가 팝업 형태로 별도 페이지에 등장"
+        },
+        {
+          "name": "item_reveal",
+          "trigger_ko": "수치 공개 이후 다음 단계로 진행",
+          "visual_ko": "획득 아이템 목록이 이어서 표시"
+        },
+        {
+          "name": "screen_close",
+          "trigger_ko": "마지막 단계에서 버튼 입력으로 결과 화면 종료",
+          "visual_ko": "결과 화면이 닫히고 필드/탐험 화면으로 복귀"
+        }
+      ]
+    }
+  ],
+  "game": {
+    "id": "persona-5-royal",
+    "title": "Persona 5 Royal",
+    "title_ko": "페르소나5 로열",
+    "developer": "Atlus",
+    "publisher_credit": "© ATLUS © SEGA",
+    "year": 2019,
+    "version": "Royal판(일본 2019 / 글로벌 2020) 기준. 본문의 UI는 Persona 5 원작(2016)에서 확립된 디자인을 그대로 계승.",
+    "genres": [
+      "JRPG",
+      "Social simulation"
+    ],
+    "platforms": [
+      "PS4",
+      "PS5",
+      "Nintendo Switch",
+      "Xbox One",
+      "Xbox Series X|S",
+      "Windows PC"
+    ],
+    "visual_style": "빨강 단일 주색 + 흑백 고대비, 콜라주·신문 스크랩풍 비정형 타이포그래피를 활용한 '팝 펑크' 그래픽 UI",
+    "official_url": "https://atlus.com/persona-5-royal-launch-faq/"
+  },
+  "verification": {
+    "claims_checked": 14,
+    "supported": 10,
+    "partial": 4,
+    "unreachable": 2,
+    "unsupported_removed": 0,
+    "notes_ko": "gameuidatabase.com, interfaceingame.com 은 접근하지 않음. ridwankhan.com, ousiadroid.medium.com, medium.com/@fruitcupkun 은 WebFetch 시 403으로 직접 열람 실패(재시도·우회하지 않음) — 해당 내용은 검색 엔진이 반환한 요약 텍스트에서만 확인했으며, 시각적 디테일(색상 대비, 연출 타이밍)은 모두 confidence 'plausible'로 낮춰 표기함. 공식 Atlus 접근성 전용 페이지는 검색 범위 내에서 발견하지 못해 해당 항목은 '확인되지 않음'으로 남김."
+  }
+}

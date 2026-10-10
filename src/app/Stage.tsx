@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { getEnv } from '../core/env'
 import type { Aspect, Hotspot, ParamValues, SpecimenModule, StageTrigger } from '../core/types'
 import { Backdrop } from './Backdrop'
+import { ErrorBoundary } from './ErrorBoundary'
 import { Rich } from './Rich'
 
 export interface StageProps {
@@ -27,6 +28,9 @@ export interface StageProps {
 
 const LOGICAL: Record<Aspect, [number, number]> = { '16:9': [1920, 1080], '9:16': [1080, 1920] }
 
+/** 최신 Chromium 은 길이÷길이 = 숫자 계산을 지원 → 레이아웃 즉시 반영, JS 측정 불필요 */
+const CSS_SCALE = typeof CSS !== 'undefined' && CSS.supports('scale', 'calc(100cqw / 1920px)')
+
 /**
  * 무대 — 논리 해상도(1920×1080)로 그린 HUD 를 실제 크기에 맞춰 축소해 보여준다.
  * Unity 의 Canvas Scaler(Scale With Screen Size, Reference Resolution 1920×1080) 와 같은 방식.
@@ -42,14 +46,19 @@ export function Stage(props: StageProps) {
   const [visible, setVisible] = useState(true)
   const [pageVisible, setPageVisible] = useState(!document.hidden)
 
+  // 크기 맞춤: CSS 만으로 가능하면(container 단위 나눗셈) CSS 로, 아니면 ResizeObserver 로 계산
   useLayoutEffect(() => {
+    if (CSS_SCALE) return
     const el = viewportRef.current!
     const measure = () => setScale(el.getBoundingClientRect().width / W)
     const ro = new ResizeObserver(measure)
     ro.observe(el)
     measure()
-    document.fonts?.ready.then(measure)
-    return () => ro.disconnect()
+    addEventListener('resize', measure)
+    return () => {
+      ro.disconnect()
+      removeEventListener('resize', measure)
+    }
   }, [W])
 
   // 화면 밖이면 정지 (저사양 PC 배려)
@@ -98,23 +107,31 @@ export function Stage(props: StageProps) {
     >
       {webgl && Scene && (
         <div className="stage-3d" aria-hidden>
-          <Canvas
-            dpr={[1, 2]}
-            frameloop={playing ? 'always' : 'demand'}
-            resize={{ scroll: false, debounce: 0 }}
-            gl={{ antialias: true, powerPreference: 'high-performance' }}
-          >
-            <Scene {...specimenProps} />
-          </Canvas>
+          <ErrorBoundary label="3D 장면">
+            <Canvas
+              dpr={[1, 2]}
+              frameloop={playing ? 'always' : 'demand'}
+              resize={{ scroll: false, debounce: 0 }}
+              gl={{ antialias: true, powerPreference: 'high-performance' }}
+            >
+              <Scene {...specimenProps} />
+            </Canvas>
+          </ErrorBoundary>
         </div>
       )}
       <div
         ref={hudRef}
         className="stage-hud"
-        style={{ width: W, height: H, transform: `scale(${scale})`, visibility: scale ? 'visible' : 'hidden' }}
+        style={
+          CSS_SCALE
+            ? { width: W, height: H, scale: `calc(100cqw / ${W}px)` }
+            : { width: W, height: H, transform: `scale(${scale})`, visibility: scale ? 'visible' : 'hidden' }
+        }
       >
         {!webgl && <Backdrop id={mod.meta.stage.backdrop ?? 'none'} width={W} height={H} />}
-        <Hud {...specimenProps} />
+        <ErrorBoundary label={mod.meta.title}>
+          <Hud {...specimenProps} />
+        </ErrorBoundary>
       </div>
       {props.hotspots?.visible && <HotspotOverlay viewportRef={viewportRef} hudRef={hudRef} {...props.hotspots} presenter={props.presenter} />}
       {props.showBadges && (

@@ -1,0 +1,185 @@
+{
+  "game": {
+    "id": "the-last-of-us-part-ii",
+    "title": "The Last of Us Part II",
+    "title_ko": "라스트 오브 어스 파트 II",
+    "version": "오리지널판 (2020, PlayStation 4, Naughty Dog). 2024 Remastered(PS5/PC)판은 분석 대상이 아님",
+    "year": 2020,
+    "developer": "Naughty Dog",
+    "publisher_credit": "© 2020 Sony Interactive Entertainment LLC. The Last of Us and Naughty Dog are trademarks of Sony Interactive Entertainment LLC.",
+    "platforms": [
+      "PlayStation 4"
+    ],
+    "genres": [
+      "액션 어드벤처",
+      "서바이벌 호러"
+    ],
+    "visual_style": "포토리얼리스틱 3D 그래픽, 영화적 연출 중심의 서드 퍼슨 액션 어드벤처",
+    "official_url": "https://www.playstation.com/en-us/games/the-last-of-us-part-ii/accessibility/"
+  },
+  "elements": [
+    {
+      "specimen_id": "settings-accessibility",
+      "pattern_name": "accessibility-preset-driven-settings-menu",
+      "player_task_ko": "플레이어는 설정 메뉴의 접근성 섹션에서 60개 이상의 세부 옵션을 카테고리별로 개별 조정하거나, 시각·청각·운동 세 가지 접근성 프리셋 중 하나를 선택해 해당 유형에 권장되는 옵션 묶음을 한 번에 켠 뒤 필요에 따라 개별 항목을 추가로 미세 조정한다.",
+      "states": [
+        {
+          "name": "프리셋 선택",
+          "trigger_ko": "접근성 메뉴의 Presets 항목에서 시각/청각/운동 프리셋 중 하나를 선택",
+          "visual_ko": "프리셋을 선택하면 텍스트음성변환·고대비 디스플레이·HUD 크기·조준 보조·내비게이션 보조·자막 등 여러 카테고리에 흩어진 권장 설정 묶음(프리셋당 약 8~12개 항목)이 한꺼번에 적용된다고 공식 블로그에 서술됨. 화면상 표시 방식은 직접 확인하지 못함."
+        },
+        {
+          "name": "개별 옵션 미세 조정",
+          "trigger_ko": "프리셋 적용 후 또는 프리셋 없이 자막, 고대비 디스플레이, 멀미 방지(Motion Sickness) 등 하위 카테고리에 진입해 값 변경",
+          "visual_ko": "슬라이더형 옵션(카메라 흔들림 1~10, 모션 블러 1~10, FOV -5~+5)과 선택형 옵션(자막 크기 소/중/대, 배경 Off/기본/진하게, 색상 5종)이 항목별로 제공된다고 공식 자료에 기재됨. 실제 위젯 모양은 직접 확인하지 못함."
+        },
+        {
+          "name": "고대비 디스플레이 빠른 전환",
+          "trigger_ko": "게임플레이 중 메뉴를 열지 않고 터치패드를 왼쪽으로 스와이프",
+          "visual_ko": "환경 색을 억제(mute)하고 동료·적·아이템·상호작용 오브젝트에 뚜렷한 대비 색을 입히는 모드(Setting 1/2/3 중 메뉴에서 선택)가 켜지고 꺼진다고 공식 페이지에 서술됨. 실제 화면의 색상값·좌표는 스크린샷으로 직접 확인하지 못했다."
+        }
+      ],
+      "why_it_works_ko": [
+        "장애 유형별(시각/청각/운동) 프리셋이 여러 카테고리에 흩어진 권장 옵션 묶음을 한 번에 켜 주므로, 60개가 넘는 메뉴 전체를 탐색하지 않고도 필요한 지원을 빠르게 적용할 수 있다.",
+        "공식 블로그가 밝히듯 프리셋 선택 후에도 개별 항목을 다시 조정할 수 있어 일괄 설정과 세밀한 커스터마이징을 양립시킨다.",
+        "전투 대화까지 포함하는 자막(Story + Combat), 화자명, 화자 방향 화살표 같은 옵션이 소리로만 전달되던 정보를 시각적으로 옮겨 청각 장애 플레이어를 돕는다(청각 접근성 컨설턴트의 설명과 부합).",
+        "고대비 디스플레이를 메뉴 진입 없이 터치패드 스와이프로 켜고 끌 수 있어 상황에 따라 시인성을 수시로 바꿀 수 있다."
+      ],
+      "signature_traits_ko": [
+        "접근성 프리셋 구조 자체는 다른 게임에도 있지만, 이 게임의 프리셋은 조준·탐색·퍼즐 스킵·전투 접근성·자막·진동 신호 등 서로 다른 카테고리의 항목을 유형별로 묶어 동시에 켠다. 프리셋 틀만 베끼고 하위 옵션 체계 없이 재현하면 같은 효과가 나지 않는다.",
+        "자막에 전투 대화(Combat Dialogue)를 포함하고 화자별 고유 색상과 화면 기준 화자 방향 화살표를 함께 제공하는 조합이 특징이다(출시 당시 업계에서의 희소성은 출처로 확인하지 못해 단정하지 않음).",
+        "고대비 디스플레이 토글이 PS4 컨트롤러 터치패드 스와이프에 매핑되어 있어, 해당 입력이 없는 플랫폼에는 그대로 옮길 수 없다."
+      ],
+      "evidence": [
+        {
+          "claim": "게임은 60개 이상의 접근성 설정을 제공한다.",
+          "url": "https://www.playstation.com/en-us/games/the-last-of-us-part-ii/accessibility/",
+          "tier": "T1",
+          "paraphrase": "PlayStation 공식 접근성 페이지에 기재된 설정 개수. 원래 레코드의 '전맹 플레이어용 신규 기능' 부분은 재확인 시 확인되지 않아 범위를 좁힘."
+        },
+        {
+          "claim": "시각/청각/운동 3종 접근성 프리셋이 각 유형에 권장되는 설정들을 한 번에 적용한다.",
+          "url": "https://www.naughtydog.com/blog/the_last_of_us_part_ii_accessibility_features_detailed",
+          "tier": "T1",
+          "paraphrase": "Naughty Dog 공식 블로그의 프리셋별 적용 항목 목록을 요약."
+        },
+        {
+          "claim": "프리셋을 선택한 뒤에도 개별 옵션을 다시 조정할 수 있다.",
+          "url": "https://www.naughtydog.com/blog/the_last_of_us_part_ii_accessibility_features_detailed",
+          "tier": "T1",
+          "paraphrase": "공식 블로그에 프리셋 선택 후에도 개별 옵션을 조정할 수 있다고 명시."
+        },
+        {
+          "claim": "운동 프리셋은 Auto-Target, Auto Weapon Swap, Auto Pick Up, Camera Assist, 연타를 길게 누르기로 바꾸는 Repeated Button Presses > Hold 등을 포함한다.",
+          "url": "https://www.naughtydog.com/blog/the_last_of_us_part_ii_accessibility_features_detailed",
+          "tier": "T1",
+          "paraphrase": "공식 블로그의 Motor 프리셋 항목 목록 요약."
+        },
+        {
+          "claim": "자막은 크기(소/중/대), 색상(백/황/청/적/녹), 배경(Off/기본/진하게), 화자명(화자별 색상 옵션), 화면 기준 화자 방향 화살표, Story + Combat 범위까지 조정 가능하다.",
+          "url": "https://www.playstation.com/en-us/games/the-last-of-us-part-ii/accessibility/",
+          "tier": "T1",
+          "paraphrase": "공식 페이지의 자막 커스터마이징 옵션 목록을 요약."
+        },
+        {
+          "claim": "HUD 색각 모드는 Off, Protanopia, Deuteranopia, Tritanopia 중 선택할 수 있다.",
+          "url": "https://www.naughtydog.com/blog/the_last_of_us_part_ii_accessibility_features_detailed",
+          "tier": "T1",
+          "paraphrase": "공식 블로그 및 PlayStation 페이지의 색각 모드 목록 요약."
+        },
+        {
+          "claim": "고대비 디스플레이는 3개 설정(Setting 1/2/3)을 제공하며, 환경 색을 억제하고 동료·적·아이템·상호작용 오브젝트에 대비 색을 입힌다. 터치패드 왼쪽 스와이프로 토글한다.",
+          "url": "https://www.playstation.com/en-us/games/the-last-of-us-part-ii/accessibility/",
+          "tier": "T1",
+          "paraphrase": "공식 페이지의 고대비 디스플레이 설명 요약. 원래 레코드의 '무채화' 표현은 원문(mutes)보다 강해 '억제'로 좁힘."
+        },
+        {
+          "claim": "카메라 흔들림·모션 블러는 1~10 슬라이더, FOV는 -5~+5 슬라이더이며 돌리줌 효과 토글과 화면 중앙 고정점(Persistent Center Dot) 토글을 제공한다.",
+          "url": "https://www.naughtydog.com/blog/the_last_of_us_part_ii_accessibility_features_detailed",
+          "tier": "T1",
+          "paraphrase": "공식 블로그의 멀미 방지 옵션 수치 범위 요약."
+        },
+        {
+          "claim": "The Game Awards 2020에서 이 해 새로 도입된 Innovation in Accessibility 상을 수상했다.",
+          "url": "https://en.wikipedia.org/wiki/The_Game_Awards_2020",
+          "tier": "T2",
+          "paraphrase": "TGA 2020 문서에 해당 상이 2020년 시상식에서 처음 도입되었고 이 게임이 수상했다고 기재. 원래 출처(수상 목록 문서)는 수상 사실만 뒷받침하고 '신설' 여부는 언급하지 않아 출처를 교체."
+        },
+        {
+          "claim": "AbleGamers의 첫(inaugural) Video Game Accessibility Awards에서 Second Channel, Helping Hand 2개 부문을 수상했다.",
+          "url": "https://en.wikipedia.org/wiki/List_of_accolades_received_by_The_Last_of_Us_Part_II",
+          "tier": "T2",
+          "paraphrase": "Wikipedia 수상 목록 문서의 AbleGamers 수상 내역 요약."
+        },
+        {
+          "claim": "청각 접근성 컨설턴트 Morgan L. Baker가 2019~2020년 Naughty Dog과 협업해 청각 프리셋·자막·HUD 지표·전투 진동 신호 등 청각 장애 플레이어 대응에 기여했다.",
+          "url": "https://leahybaker.com/tlou2_access/",
+          "tier": "T2",
+          "paraphrase": "컨설턴트 본인 사이트에 기재된 협업 기간과 역할 요약."
+        },
+        {
+          "claim": "PSU 기사는 접근성 옵션을 6개 카테고리(대체 조작/확대·시각 보조/멀미 방지/내비게이션·이동/텍스트음성변환·오디오 신호/전투 접근성)로 정리하는데, 공식 블로그는 Presets, Holds and Presses, Assistance, HUD, Subtitles, Game Difficulty 등을 포함해 12개 구분으로 제시해 일치하지 않는다.",
+          "url": "https://www.psu.com/news/the-last-of-us-part-2-all-accessibility-options/",
+          "tier": "T2",
+          "paraphrase": "PSU 기사의 카테고리 구분을 요약하고 공식 블로그 구분과의 차이를 표시."
+        }
+      ],
+      "accessibility_ko": [
+        "시각 접근성 프리셋 (텍스트음성변환, 고대비 디스플레이, HUD 크기 Large, Auto-Target, 이동·전투 오디오 신호, 내비게이션 보조, 퍼즐 스킵 등 일괄 적용)",
+        "청각 접근성 프리셋 (Awareness Indicators, 획득 알림, 회피 프롬프트 Frequent, Story + Combat 자막, 화자명·방향 표시, 전투·기타 진동 신호)",
+        "운동 접근성 프리셋 (Auto-Target, Auto Weapon Swap, Auto Pick Up, Camera Assist, 연타를 길게 누르기로 전환, Infinite Breath, 퍼즐 스킵 등)",
+        "자막 커스터마이징: 크기 3단계, 색상 5종, 배경 3단계, 화자명(화자별 색상)·방향 화살표, 전투 대화 포함 여부",
+        "HUD 색각 모드 (Protanopia/Deuteranopia/Tritanopia)",
+        "고대비 디스플레이 3개 설정, 게임플레이 중 터치패드 스와이프로 토글",
+        "멀미 방지: 카메라 흔들림/모션 블러 슬라이더(1~10), FOV 조정(-5~+5), 돌리줌 비활성화, 화면 중앙 고정점"
+      ],
+      "info_shown_ko": [
+        "각 옵션의 현재 선택값(예: 자막 크기 Medium, 고대비 Setting 2)",
+        "슬라이더형 옵션의 숫자 범위(1~10, -5~+5 등)",
+        "프리셋 활성 여부 및 하위 항목 반영 방식은 공식 자료에 화면 표시로 기술되지 않아 미확인"
+      ],
+      "interaction_ko": "컨트롤러로 메뉴 내 카테고리·항목을 탐색하며 선택형 옵션은 값을 순환, 슬라이더는 좌우 입력으로 수치를 조정하는 것으로 추정(직접 확인 못함). 고대비 디스플레이는 예외적으로 게임플레이 중 터치패드 왼쪽 스와이프로 토글할 수 있다고 공식 페이지에 서술되어 있다.",
+      "layout_ko": "공식 블로그는 접근성 옵션을 Presets, Alternate Controls, Holds and Presses, Assistance, Magnification and Visual Aids, Motion Sickness, Navigation and Traversal, Text-to-Speech and Audio Cues, Combat Accessibility, HUD, Subtitles, Game Difficulty 등 12개 구분으로 소개한다. 이를 근거로 계층형 리스트 구조로 추정하나, 실제 화면의 탭 배치·좌표·폰트·배경색은 스크린샷으로 직접 확인하지 못해 단정하지 않는다.",
+      "motion_ko": "프리셋 적용, 슬라이더 조정, 고대비 토글 시 전환 애니메이션의 지속시간·이징 값은 1차 자료에 기재되어 있지 않다. (원래 레코드의 '스와이프 직후 추가 로딩 없이 반영된다'는 서술은 공식 페이지에서 확인되지 않아 삭제.)",
+      "reference_links": [
+        {
+          "label": "PlayStation 공식 접근성 페이지",
+          "url": "https://www.playstation.com/en-us/games/the-last-of-us-part-ii/accessibility/"
+        },
+        {
+          "label": "Naughty Dog 공식 블로그 - Accessibility Features Detailed",
+          "url": "https://www.naughtydog.com/blog/the_last_of_us_part_ii_accessibility_features_detailed"
+        },
+        {
+          "label": "PlayStation Blog - Accessibility features detailed (재검증 시 미열람)",
+          "url": "https://blog.playstation.com/2020/06/09/the-last-of-us-part-ii-accessibility-features-detailed/"
+        },
+        {
+          "label": "Wikipedia - The Game Awards 2020",
+          "url": "https://en.wikipedia.org/wiki/The_Game_Awards_2020"
+        },
+        {
+          "label": "Wikipedia - List of accolades received by The Last of Us Part II",
+          "url": "https://en.wikipedia.org/wiki/List_of_accolades_received_by_The_Last_of_Us_Part_II"
+        },
+        {
+          "label": "Morgan L. Baker - TLOU2 Accessibility Consultation",
+          "url": "https://leahybaker.com/tlou2_access/"
+        },
+        {
+          "label": "PSU - All Accessibility Options",
+          "url": "https://www.psu.com/news/the-last-of-us-part-2-all-accessibility-options/"
+        }
+      ],
+      "confidence": "plausible"
+    }
+  ],
+  "verification": {
+    "claims_checked": 12,
+    "supported": 9,
+    "partial": 3,
+    "unreachable": 0,
+    "unsupported_removed": 3,
+    "notes_ko": "모든 evidence URL을 WebFetch로 다시 열어 확인했다(모두 열림). 추가 확인용으로 Wikipedia 'The Game Awards 2020' 문서를 열었다. 원래 10개 주장에 공식 블로그 근거 2개(프리셋 적용 후 개별 조정, 운동 프리셋 구성)를 추가해 12개를 판정했다. 부분적 3건: (1) 60개 이상 설정은 확인됐으나 '전맹 플레이어용 신규 기능'은 확인되지 않아 범위를 좁힘. (2) 고대비 '무채화' 표현을 원문(mutes)에 맞춰 '억제'로 좁히고 대상에 아이템을 추가. (3) TGA '신설' 부분은 원래 출처(수상 목록)에 없어 TGA 2020 문서로 출처를 교체하고 supported로 처리, 원 출처 기준으로는 partial로 집계. 서술에서 삭제하거나 수정한 근거 없는 내용 3건: motion_ko의 '추가 로딩 없이 즉시 반영'(공식 페이지에 없음), 운동 프리셋 '길게 누르기→토글'(실제로는 연타(Tap)를 길게 누르기(Hold)로 바꾸는 설정이라 정정), signature_traits의 '프리셋이 60개 이상 항목을 동시 연동'(프리셋당 약 8~12개 항목이라 과장) 및 '2020년 업계에서 드물었다'(출처 없음, 단정 제거). PSU 비교 주장은 공식 블로그의 실제 12개 구분으로 구체화했다. 버전은 2020 PS4 오리지널판으로 유지했고 2024 Remastered판과 구분하도록 명시했다. 메뉴 화면 스크린샷은 직접 확인하지 못해 시각 서술과 element confidence는 'plausible'로 유지했다. PlayStation Blog 링크는 evidence가 아니라 참고 링크라 이번 재검증에서는 열지 않았다. gameuidatabase.com, interfaceingame.com에는 접근하지 않았다."
+  }
+}

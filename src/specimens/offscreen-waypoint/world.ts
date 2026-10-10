@@ -16,6 +16,19 @@ export const OBJECTIVES: Objective[] = [
   { id: 'ally', label: '동료', kind: 'ally', pos: [12, 0, 34], color: '#7dff9a' },
 ]
 
+/** 주변 관심 지점(POI) — 나침반 띠에만 표시된다 */
+export interface Poi {
+  id: string
+  label: string
+  glyph: 'tent' | 'tower' | 'spring'
+  pos: [number, number, number]
+}
+export const POIS: Poi[] = [
+  { id: 'camp', label: '야영지', glyph: 'tent', pos: [-34, 0, -44] },
+  { id: 'tower', label: '전망탑', glyph: 'tower', pos: [52, 0, 18] },
+  { id: 'spring', label: '샘', glyph: 'spring', pos: [-12, 0, 72] },
+]
+
 /** 결정론적 지형 소품 (무작위 없음 → 매번 같은 장면) */
 export const PROPS = Array.from({ length: 46 }, (_, i) => {
   const a = i * 2.39996

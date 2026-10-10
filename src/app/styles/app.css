@@ -604,9 +604,30 @@ a.card:hover {
   transform-origin: 0 0;
   overflow: hidden;
 }
+/* 무대 안의 3D 캔버스는 R3F 측정과 무관하게 항상 무대를 꽉 채운다 */
+.stage-3d canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
 .backdrop {
   position: absolute;
   inset: 0;
+}
+.stage-error {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 16px;
+  text-align: center;
+  color: #fff;
+  font-size: 40px;
+  background: #2a0b12;
+}
+.stage-error code {
+  font-size: 26px;
+  background: none;
+  color: #ffb1b9;
 }
 .stage-badges {
   position: absolute;
@@ -1175,7 +1196,12 @@ th {
   right: 8px;
   top: 8px;
   font-size: 0.75rem;
+  color: #d8e1ef;
   background: rgba(10, 15, 25, 0.85);
+  border-color: #34425f;
+}
+.code-copy:hover {
+  background: #1a2334;
 }
 .hljs-keyword,
 .hljs-selector-tag,

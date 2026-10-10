@@ -1,0 +1,154 @@
+{
+  "game": {
+    "id": "dredge-2023",
+    "title": "DREDGE",
+    "title_ko": "드레지",
+    "developer": "Black Salt Games",
+    "publisher_credit": "Black Salt Games (개발) / Team17 (퍼블리싱)",
+    "year": 2023,
+    "version": "정식 발매판 (PC/콘솔 2023-03-30, iOS/Android 2025-02-27). 그리드 구조의 주 근거인 GameDeveloper 딥다이브는 게재일이 출시 전(요약 도구가 읽은 날짜는 2022-03-02)일 수 있다. 그렇다면 개발 중 설계를 다룬 글이므로 최종 출시 빌드와 같은지는 따로 확인해야 한다.",
+    "platforms": [
+      "Windows",
+      "PlayStation 4/5",
+      "Xbox One/Series",
+      "Nintendo Switch",
+      "iOS",
+      "Android"
+    ],
+    "genres": [
+      "fishing",
+      "survival",
+      "Lovecraftian horror"
+    ],
+    "visual_style": "로우폴리 3D, 음침한 해양 호러 분위기 (출처로 검증하지 않은 서술)",
+    "official_url": "https://www.blacksaltgames.com/"
+  },
+  "elements": [
+    {
+      "specimen_id": "inventory-grid-tooltip",
+      "pattern_name": "spatial-tetris-inventory-with-info-tooltip",
+      "player_task_ko": "잡은 물고기와 낚시 장비(엔진·조명·낚시 장비)를 7×9 공간 인벤토리 격자에 회전시켜 끼워 맞춘다. 선택한 아이템의 정보 패널(내구도·수용량 등)을 보면서 공간을 관리한다.",
+      "states": [
+        {
+          "name": "그리드 기본 상태",
+          "trigger_ko": "인벤토리/화물칸 창을 열었을 때",
+          "visual_ko": "7×9 격자. 개발자 글의 원문은 'Six spaces in each corner'가 사용 불가라고 쓴다. 하단 테두리는 엔진, 상단은 조명, 측면은 낚시 장비(도식에는 낚싯대만 나옴) 전용 칸이고 나머지가 화물 공간이다. 측면 칸에 그물·통발이 들어가는지는 출처에 나오지 않는다."
+        },
+        {
+          "name": "아이템 선택/정보 패널 표시",
+          "trigger_ko": "그리드의 아이템을 선택",
+          "visual_ko": "내구도·수용량 등을 담은 상세 정보 패널이 뜨고, 툴팁에 'Rotate' 같은 조작 힌트도 나온다. 디자이너가 직접 인정한 문제로, 이 패널이 그리드 왼쪽 공간 정보를 가려 재배치할 때 빈 칸을 알아보기 어렵다."
+        },
+        {
+          "name": "회전",
+          "trigger_ko": "회전 입력 (구체적인 키·버튼은 출처에 없음)",
+          "visual_ko": "아이템을 회전시켜 다른 틈에 맞출 수 있다. 개발자는 회전을 유도하도록 그리드와 아이템 모양을 설계했다고 설명한다. 회전 각도 단위와 애니메이션은 확인하지 못했다."
+        },
+        {
+          "name": "핫스왑 (1:1 교체)",
+          "trigger_ko": "아이템을 든 채 다른 아이템이 있는 칸에 놓기",
+          "visual_ko": "개발자는 핫스왑 지원이 플레이어 좌절을 막는 데 필수라고 썼다. 큰 아이템 하나로 작은 아이템 여러 개를 덮는 경우는 '훨씬 어려운 문제'로 남겨 두었다. 글이 나열한 해결책(임시 배치 그리드, 'Swap Sides' 버튼, 'Auto Move' 버튼) 가운데 무엇이 출시 빌드에 들어갔는지는 확인되지 않는다."
+        }
+      ],
+      "why_it_works_ko": [
+        "개발자 글에 따르면 이 그리드 하나에 일곱 가지 전통 시스템이 들어 있다. 아이템 보관, 플레이어 체력, 능력치, 업그레이드, 상점 인벤토리, 인벤토리 관리 게임플레이, 환경 퍼즐이다. 별도 UI 화면을 늘리지 않고도 여러 겹의 결정을 만든다(GameDeveloper 딥다이브).",
+        "테두리 칸이 엔진·조명·낚시 장비 전용으로 고정된 비균질 그리드라서, 장비 선택이 곧 공간 배치 문제가 된다. 그리드 구조는 위 기사가 근거이고, 이 해석은 분석자의 추론이다.",
+        "DREDGE는 2025 Apple Design Award Interaction 부문 수상작이다. Apple은 iPhone·iPad·Mac에서의 'seamless interactions'를 언급했다. 다만 수상 설명은 인벤토리 드래그·회전 조작을 따로 짚지 않는다."
+      ],
+      "signature_traits_ko": [
+        "단순한 슬롯 개수가 아니라 지형이 고정된 7×9 그리드다. 모서리는 쓸 수 없고 상단은 조명, 하단은 엔진, 측면은 낚시 장비 전용이다. 그래서 '어디에 무엇을 둘 수 있는가'가 핵심 제약이 된다.",
+        "선택한 아이템의 정보 패널이 그리드 왼쪽 공간 정보를 가린다. 공동 디자이너가 이 트레이드오프를 글에서 직접 인정해, 정보량과 공간 가시성 사이의 긴장을 숨기지 않았다."
+      ],
+      "evidence": [
+        {
+          "claim": "Dredge의 공간 인벤토리는 7×9 격자다. 각 모서리 칸은 사용할 수 없고(원문 'Six spaces in each corner'), 하단은 엔진, 상단은 조명, 측면은 낚시 장비 전용 칸이다.",
+          "url": "https://www.gamedeveloper.com/design/deep-dive-the-surprising-depth-of-spatial-inventories-in-dredge",
+          "tier": "T1",
+          "paraphrase": "Black Salt Games의 프로그래머 겸 공동 디자이너 Joel Mason이 그리드 크기와 테두리 전용 칸을 설명한다. 측면 칸 도식에는 낚싯대만 나온다."
+        },
+        {
+          "claim": "선택한 아이템의 정보 패널이 그리드 왼쪽의 공간 정보를 가린다는 문제를 디자이너가 인정했다.",
+          "url": "https://www.gamedeveloper.com/design/deep-dive-the-surprising-depth-of-spatial-inventories-in-dredge",
+          "tier": "T1",
+          "paraphrase": "크랩 통발을 옮기려 할 때 인벤토리 왼쪽이 보이지 않는다고 씀. 원문 일부: \"the selected item's detailed information obscures some of the spatial information\""
+        },
+        {
+          "claim": "아이템 회전과 1:1 핫스왑이 있다. 큰 아이템이 작은 아이템 여럿을 덮는 경우는 어려운 문제로 제시되었고, 'Auto Move' 버튼은 가능한 해결책 가운데 하나로만 나열되었다.",
+          "url": "https://www.gamedeveloper.com/design/deep-dive-the-surprising-depth-of-spatial-inventories-in-dredge",
+          "tier": "T1",
+          "paraphrase": "회전 유도 설계와 핫스왑 필수성을 설명한다. 다대일 교체에는 임시 그리드, Swap Sides, Auto Move 같은 후보안을 나열하지만 무엇을 채택했는지는 명시하지 않는다."
+        },
+        {
+          "claim": "인벤토리 그리드가 보관·체력·능력치·업그레이드·상점·관리 게임플레이·환경 퍼즐 등 일곱 가지 전통 시스템을 담는다.",
+          "url": "https://www.gamedeveloper.com/design/deep-dive-the-surprising-depth-of-spatial-inventories-in-dredge",
+          "tier": "T1",
+          "paraphrase": "기사는 공간 인벤토리가 여러 전통 시스템을 한데 담는다고 설명한다."
+        },
+        {
+          "claim": "DREDGE는 2025 Apple Design Award Interaction 부문 수상작이다. 설명문은 iPhone·iPad·Mac에서의 매끄러운 상호작용을 언급한다.",
+          "url": "https://www.apple.com/newsroom/2025/06/apple-unveils-winners-and-finalists-of-the-2025-apple-design-awards/",
+          "tier": "T1",
+          "paraphrase": "Apple 발표문이 DREDGE를 Interaction 부문 게임 수상작으로 올리고 'seamless interactions'를 언급한다."
+        },
+        {
+          "claim": "텍스트 크기는 조절할 수 없다. 서사적으로 중요한 단어와 긍정·부정 의미 단어의 색을 고를 수 있고, 팝업 시간과 텍스트 속도도 조절할 수 있다.",
+          "url": "https://caniplaythat.com/2023/05/10/dredge-accessibility-review/",
+          "tier": "T2",
+          "paraphrase": "Can I Play That 리뷰가 텍스트 크기 고정, 텍스트 범주별 색 선택, 팝업·텍스트 속도 옵션을 서술한다. 색 개수와 색맹 모드는 언급하지 않는다."
+        },
+        {
+          "claim": "강조·긍정·부정·중요 텍스트 색을 범주마다 12가지 중에서 고르는 색맹 대응 옵션이 있고, 팝업 지속시간과 텍스트 속도도 조절할 수 있다.",
+          "url": "https://www.gamegrin.com/articles/how-accessible-is-dredge/",
+          "tier": "T2",
+          "paraphrase": "GameGrin 기사는 이 색 옵션을 colourblind options로 소개하고, 범주마다 12가지 드롭다운 선택지가 있다고 쓴다."
+        },
+        {
+          "claim": "DREDGE 개발사는 Black Salt Games, 퍼블리셔는 Team17이다. 2023년 3월 30일 PC/콘솔, 2025년 2월 27일 iOS/Android로 출시되었다.",
+          "url": "https://en.wikipedia.org/wiki/Dredge_(video_game)",
+          "tier": "T2",
+          "paraphrase": "위키백과 항목이 개발사·퍼블리셔·플랫폼·출시일과 2025 Apple Design Award Interaction 수상을 정리한다."
+        }
+      ],
+      "accessibility_ko": [
+        "강조/긍정/부정/중요 텍스트 색을 범주별로 12가지 중에서 지정한다. GameGrin은 이를 색맹 대응 옵션으로 소개한다. 별도 색맹 '필터 프리셋'이 있는지는 확인되지 않았다 (T2: gamegrin, caniplaythat).",
+        "텍스트 크기는 조절할 수 없다 (T2: caniplaythat).",
+        "팝업 노출 시간과 텍스트 속도를 조절할 수 있다 (T2: caniplaythat, gamegrin).",
+        "그리드/툴팁 전용 접근성 옵션(고대비, UI 스케일 등)은 조사한 자료에서 확인되지 않아 생략했다."
+      ],
+      "info_shown_ko": [
+        "아이템 칸 모양",
+        "내구도",
+        "수용량",
+        "장착 슬롯 종류(엔진/조명/낚시 장비)",
+        "'Rotate' 같은 조작 힌트",
+        "장착품과 실시간으로 비교하는 툴팁, 희귀도 색상, 정렬/필터 기능은 조사한 자료에서 확인되지 않았다."
+      ],
+      "interaction_ko": "아이템을 선택해 칸에 배치하고, 회전 입력으로 방향을 바꾸며, 다른 아이템이 있는 칸에 놓으면 1:1 핫스왑이 된다. 다대일 교체 처리와 'Auto Move' 버튼이 출시 빌드에 있는지는 확인되지 않았다. 개발자는 컨트롤러로 아이템을 옮기는 일이 번거로울 수 있다고 언급했다. 모바일 터치 조작의 구체적 방식은 출처에 없다.",
+      "layout_ko": "7×9 고정 격자다. 모서리 칸은 쓸 수 없고 상단은 조명, 하단은 엔진, 측면은 낚시 장비 전용 칸이 테두리에 고정되어 있으며 나머지가 화물 공간이다. 선택한 아이템의 정보 패널이 그리드 왼쪽 일부를 덮는다(텍스트 출처만 있고 화면은 직접 보지 않았다). 화면 가장자리에서 툴팁 위치를 자동 보정하는지는 확인하지 못했다.",
+      "motion_ko": "회전·배치·핫스왑의 트랜지션 타이밍 수치는 조사한 자료에 없어 서술하지 않는다.",
+      "reference_links": [
+        {
+          "label": "GameDeveloper 딥다이브 (Joel Mason)",
+          "url": "https://www.gamedeveloper.com/design/deep-dive-the-surprising-depth-of-spatial-inventories-in-dredge"
+        },
+        {
+          "label": "2025 Apple Design Awards 발표",
+          "url": "https://www.apple.com/newsroom/2025/06/apple-unveils-winners-and-finalists-of-the-2025-apple-design-awards/"
+        },
+        {
+          "label": "Inventory Sorter 모드 (403으로 열람 불가, 내용 미검증)",
+          "url": "https://www.nexusmods.com/dredge/mods/43"
+        }
+      ],
+      "confidence": "plausible"
+    }
+  ],
+  "verification": {
+    "claims_checked": 9,
+    "supported": 5,
+    "partial": 3,
+    "unreachable": 1,
+    "unsupported_removed": 2,
+    "notes_ko": "모든 evidence URL을 다시 열어 확인했다. 지지됨(5): 정보 패널이 왼쪽을 가린다는 디자이너 인정, 그리드가 일곱 가지 시스템을 담는다는 설명, Apple Design Award Interaction 수상, GameGrin의 팝업·텍스트 속도·12색 옵션, 위키백과의 개발/퍼블리셔/출시일. 부분 지지(3)와 수정 내용: (1) 그리드 구조 - 원문은 'Six spaces in each corner'이고 측면 칸 도식에는 낚싯대만 나와 그물·통발 부분을 좁혔다. (2) 회전/핫스왑/자동 이동 - 기사에서 'Auto Move'는 가능한 해결책 목록의 하나일 뿐 확정 기능이 아니고, 큰 아이템이 작은 아이템 여럿을 밀어내는 동작도 미해결 문제로 제시되어 있다. 그래서 '자동 이동' state를 삭제하고 핫스왑 state를 1:1 교체로 좁혔다. (3) Can I Play That은 텍스트 크기 고정과 색 선택만 다루고 12색이나 '색맹 모드 없음'은 말하지 않는다. GameGrin은 오히려 이 색 옵션을 colourblind options로 부르므로 '공식 색맹 모드 없음' 문구를 고쳤다. 열람 불가(1): nexusmods.com이 403을 돌려줘 재시도나 우회를 하지 않았다. 그래서 '정식판에 정렬 기능 없음, 모드가 보완' 주장과 그에 기댄 signature trait를 삭제하고 참고 링크로만 남겼다. 근거 부족으로 삭제(2): Apple 수상 사유를 '모바일 터치에서도 같은 드래그·회전 조작이 통한다'로 확대한 해석(발표문은 iPhone·iPad·Mac의 seamless interactions만 언급), 그리고 출처 없이 부재를 단정한 '희귀도 색상 미사용' signature trait. 버전 주의: 요약 도구는 GameDeveloper 기사 게재일을 2022-03-02로 읽었다. 이는 정식 출시(2023-03-30)보다 앞서므로 기사 내용이 개발 중 설계일 수 있다. 화면을 직접 보지 않았기 때문에 시각 주장은 모두 plausible로 유지했다. 웹 검색 예산이 소진되어 게재일을 교차 확인하지 못했다. gameuidatabase.com과 interfaceingame.com에는 접근하지 않았다."
+  }
+}

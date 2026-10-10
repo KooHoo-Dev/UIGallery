@@ -1,0 +1,132 @@
+{
+  "game": {
+    "id": "honkai-star-rail",
+    "title": "Honkai: Star Rail",
+    "title_ko": "붕괴: 스타레일",
+    "developer": "HoYoverse (miHoYo / COGNOSPHERE PTE. LTD.)",
+    "publisher_credit": "© COGNOSPHERE PTE. LTD. / HoYoverse",
+    "version": "정식 발매판 (글로벌 서비스, 2023년 4월 26일 출시 ~ 현재 라이브 서비스). 접근성 항목은 1.2 패치(2023-07-19) 시점 기준 출처 포함",
+    "platforms": [
+      "PC",
+      "Mobile (iOS/Android)",
+      "PlayStation 5"
+    ],
+    "genres": [
+      "턴제 RPG",
+      "가챠"
+    ],
+    "official_url": "https://hsr.hoyoverse.com",
+    "visual_style": "애니메 스타일 3D 렌더링",
+    "year": 2023
+  },
+  "elements": [
+    {
+      "specimen_id": "honkai-star-rail-damage-numbers",
+      "pattern_name": "turn-based-damage-number-callout",
+      "player_task_ko": "턴제 전투 중 공격·스킬·필살기가 적에게 적중하면 표시되는 피해 수치를 보고, 그것이 일반 피해인지 치명타인지, 약점 격파(Weakness Break) 시의 격파 피해(Break DMG)인지, 회복인지를 구분해 현재 턴의 전황(적 체력·강인도(Toughness) 상태·다음 턴 계획)을 판단한다.",
+      "info_shown_ko": [
+        "적중당 개별 피해 수치(미확인 — 화면을 직접 관찰하지 못함)",
+        "치명타 여부의 구분 표시(추정, 세부 색/크기 미확인)",
+        "약점 격파 시 격파 피해(Break DMG) — 강인도가 0이 되면 발생하며 치명타가 적용되지 않고, 적의 다음 행동이 지연되며 피해 속성에 대응하는 상태이상이 부여됨(수치 체계는 2차 가이드로 확인, 화면 표기 방식은 미확인)",
+        "회복량 표시(추정, 색상 등 미확인)",
+        "누적/총합 피해 표시 여부는 확인하지 못함(미확인)"
+      ],
+      "interaction_ko": "입력 장치는 터치(모바일), 마우스/키보드(PC), 게임패드(PS5)이며, 피해 숫자 표시 자체는 플레이어 입력이 아니라 전투 로직(적중, 치명타 판정, 강인도 소진)에 의해 자동으로 나타나는 피드백이다. 피해 숫자를 숨기는 설정 옵션의 존재 여부는 출처(팬덤 포럼)가 열리지 않아 확인하지 못했다(미확인).",
+      "layout_ko": "숫자가 피격 적 유닛 근처에 떠오르는 일반적인 턴제 RPG 관례를 따를 것으로 보이나, 정확한 앵커 위치·세이프 에어리어는 직접 관찰하지 못했다(미확인).",
+      "motion_ko": "다단 히트 시 숫자 겹침 방지 처리, 등장/소멸 타이밍·이징 값은 출처로 확인하지 못했다(미확인). 약점 격파는 행동 지연이라는 턴 순서 변화를 수반하므로 일반 타격과 다른 연출이 있을 가능성이 있으나 이 역시 추정이다.",
+      "states": [
+        {
+          "name": "일반 타격 피해",
+          "trigger_ko": "공격/스킬이 적에게 적중",
+          "visual_ko": "적 근처에 피해 숫자가 표시될 것으로 보임. 속성별 색 구분 여부·색상값은 검증 가능한 출처가 없어 미확인"
+        },
+        {
+          "name": "치명타(CRIT) 피해",
+          "trigger_ko": "공격 판정에서 치명타 확률에 따라 치명타 발생",
+          "visual_ko": "일반 타격과 구분되는 강조 표시가 있을 것으로 추정되나 세부 디자인은 확인하지 못함(미확인)"
+        },
+        {
+          "name": "약점 격파(Weakness Break) 격파 피해",
+          "trigger_ko": "적의 강인도(Toughness) 게이지가 0으로 소진됨",
+          "visual_ko": "치명타가 적용되지 않는 격파 피해가 발생하고, 피해 속성에 대응하는 상태이상(출혈·화상·동결 등)이 부여되며 적의 다음 행동이 행동 순서에서 지연됨 — 수치 체계는 2차 가이드로 뒷받침되나 화면상 숫자의 색·크기 차이는 미확인"
+        },
+        {
+          "name": "회복(HP 회복)",
+          "trigger_ko": "회복 스킬/효과 발동",
+          "visual_ko": "피해 숫자와 구분되는 표기가 있을 것으로 추정되나 확인된 출처가 없어 미확인"
+        }
+      ],
+      "why_it_works_ko": [
+        "턴제 전투에서는 한 번의 행동에 성격이 다른 결과(일반/치명타/격파/회복)가 겹칠 수 있으므로, 이를 구분해 보여주면 플레이어가 결과를 즉시 해석하고 다음 턴 전략을 세울 수 있다(설계 해석, 화면 관찰 근거 없음).",
+        "격파 피해는 치명타가 적용되지 않고 행동 지연·상태이상을 동반하는 별도 범주이므로, 일반 피해와 구분된 피드백이 정보 설계상 중요하다(수치 체계는 출처로 뒷받침, 피드백 표현은 해석)."
+      ],
+      "signature_traits_ko": [
+        "격파 피해(Break DMG)는 치명타가 적용되지 않는 별도 피해 범주이며, 적 행동 지연과 속성별 상태이상을 동반한다는 점이 이 게임 전투 수치 체계의 특징이므로, 단순히 '강조된 치명타 숫자'로 뭉뚱그려 재현하면 안 된다.",
+        "격파 특화 빌드는 치명타 스탯을 버리고 격파 특수효과(Break Effect)에 투자하는 등, 일반/치명타 계열과 격파 계열의 의미 체계가 빌드 단계부터 분리되어 있다."
+      ],
+      "accessibility_ko": [
+        "1.2 업데이트(2023년 7월 19일)에서 Seele 필살기의 점멸·밝기를 낮추는 'Eye Comfort Mode'가 휴대폰 메뉴의 설정에 추가됨. 공지에는 다른 캐릭터에도 적용되는지 언급이 없었으며, 피해 숫자 UI와 관련된 옵션은 아님",
+        "시각장애인 당사자의 Tumblr 글(T3)은 게임 텍스트가 작고 크기 조절이 불가하다고 지적하며, 음성 연기 감소로 텍스트 의존도가 늘었다고 언급함. 다만 글의 중심은 실명 캐릭터 묘사이며 전투 피드백·피해 숫자에 대한 언급은 없음",
+        "피해 숫자를 끄는 설정 존재 여부는 확인하지 못함(원 출처 접근 불가)"
+      ],
+      "evidence": [
+        {
+          "claim": "HoYoverse의 Chengnan An이 GDC 2025 세션에서 Honkai: Star Rail을 접근하기 쉬우면서도 깊이 있는 RPG로 설계한 과정을 다룸(공개 요약 기준; 턴제·UI·피해 숫자 언급 없음)",
+          "url": "https://gdcvault.com/play/1035480/-Honkai-Star-Rail-Reimagining",
+          "tier": "T1",
+          "paraphrase": "공개 요약은 이 RPG를 \"both accessible and deeply engaging\"하게 설계했다고 소개. 여기서 accessible은 대중적 진입 장벽을 뜻하며 장애 접근성 의미로 단정할 수 없음. 본문은 회원 전용이라 미접근"
+        },
+        {
+          "claim": "강인도가 0이 되면 격파한 속성의 격파 피해가 들어가고, 적의 다음 행동이 지연되며, 피해 속성에 맞는 상태이상이 부여됨",
+          "url": "https://gamemarket.gg/news/honkai-star-rail/hsr-weakness-break-explained-toughness-break-effect-damage",
+          "tier": "T3",
+          "paraphrase": "원 출처(fandom Toughness 위키)가 402로 열리지 않아 대체한 2차 가이드"
+        },
+        {
+          "claim": "격파 피해는 치명타가 발생하지 않으며, 격파 특화 빌드는 치명타 스탯 대신 격파 특수효과에 투자함",
+          "url": "https://gamemarket.gg/news/honkai-star-rail/hsr-weakness-break-explained-toughness-break-effect-damage",
+          "tier": "T3",
+          "paraphrase": "원 출처(fandom Break Effect 위키)가 402로 열리지 않아 대체. 가이드는 \"Break DMG cannot crit\"라고 명시"
+        },
+        {
+          "claim": "1.2 업데이트(2023-07-19)에서 Seele 필살기의 점멸·밝기를 낮추는 Eye Comfort Mode가 추가됨(기사 게재 2023-07-18)",
+          "url": "https://www.siliconera.com/honkai-star-rail-gets-eye-comfort-mode-for-seeles-ultimate/",
+          "tier": "T2"
+        },
+        {
+          "claim": "시각장애인 당사자가 게임 텍스트가 작고 크기 조절이 불가하다고 지적",
+          "url": "https://www.tumblr.com/blindbeta/795507803521515520/blind-person-reviews-blindness-in-honkai-star-rail",
+          "tier": "T3",
+          "paraphrase": "글 작성일은 페이지에서 확인되지 않음. 주제는 주로 실명 캐릭터 표현"
+        }
+      ],
+      "reference_links": [
+        {
+          "label": "GDC Vault - Honkai: Star Rail 세션 페이지(공개 요약만 확인)",
+          "url": "https://gdcvault.com/play/1035480/-Honkai-Star-Rail-Reimagining"
+        },
+        {
+          "label": "Honkai: Star Rail 공식 사이트",
+          "url": "https://hsr.hoyoverse.com"
+        },
+        {
+          "label": "Fandom Wiki - Toughness (검증 시 402로 접근 불가)",
+          "url": "https://honkai-star-rail.fandom.com/wiki/Toughness"
+        },
+        {
+          "label": "Fandom Wiki - Break Effect (검증 시 402로 접근 불가)",
+          "url": "https://honkai-star-rail.fandom.com/wiki/Break_Effect"
+        }
+      ],
+      "confidence": "plausible"
+    }
+  ],
+  "verification": {
+    "claims_checked": 6,
+    "supported": 4,
+    "partial": 1,
+    "unreachable": 3,
+    "unsupported_removed": 2,
+    "notes_ko": "원 evidence 6개 URL을 모두 WebFetch로 재확인함. (1) GDC Vault: 열림. 공개 요약에 accessible 언급은 있으나 '턴제 RPG'·UI·피해 숫자 언급은 없고, 기존 레코드의 영문 인용문은 확인되지 않아 짧은 원문 구절로 교체하고 주장 범위를 좁힘(partial). why_it_works의 GDC 기반 해석 항목은 근거 부족으로 삭제. (2)(3)(5) fandom Toughness/Break Effect/포럼 글: 모두 HTTP 402로 접근 불가 — 재시도·우회하지 않음(unreachable 3). Toughness·Break Effect 주장은 gamemarket.gg 가이드로 대체해 뒷받침됨(격파 피해·행동 지연·속성 상태이상·치명타 불가·치명타 스탯과 분리). '25% 행동 지연' 같은 구체 수치는 대체 출처가 직접 뒷받침하지 않아 넣지 않음. 포럼 기반 '피해 숫자 숨김 옵션 없음' 주장은 대체 출처를 찾지 못해(검색 예산 소진) 삭제하고 미확인으로 표기(unsupported_removed 1). (4) Siliconera: 뒷받침됨 — 다만 'Seele에 한정'은 기사상 '공지에 다른 캐릭터 언급 없음'으로 좁힘. (6) Tumblr: 텍스트 크기 지적은 뒷받침됨, 글 주제는 실명 캐릭터 표현 중심이라 그 범위를 명시. states의 '속성별 텍스트 색 구분이 위키에서 확인됨' 서술은 evidence가 없어 미확인으로 하향(unsupported_removed 1). 피해 숫자의 색·크기·위치·모션은 모두 화면 관찰 근거가 없어 미확인/plausible 유지. 장르 표기 오타 '갓챠'를 '가챠'로 수정, 플랫폼 입력에 PS5 게임패드 추가. supported 4 = 직접 확인 2(Siliconera, Tumblr) + 대체 출처로 확인 2(Toughness, Break Effect)."
+  }
+}

@@ -8,8 +8,19 @@ import { ALIASES } from '../core/registry'
  */
 export type Route =
   | { name: 'home' }
-  | { name: 'specimen'; id: string; preset?: string }
+  | { name: 'specimen'; id: string; preset?: string; opts: SpecimenUrlOptions }
   | { name: 'about' }
+
+/** 수업 자료·자동 검사용 딥링크 옵션: #/s/<id>?preset=x&juice=0&speed=0.25&event=heavy&spot=2&spots=0&auto=0&aspect=9:16 */
+export interface SpecimenUrlOptions {
+  juice?: boolean
+  speed?: number
+  event?: string
+  spot?: number
+  spots?: boolean
+  auto?: boolean
+  aspect?: '16:9' | '9:16'
+}
 
 export function parseHash(hash: string): Route {
   const [path, query = ''] = hash.replace(/^#/, '').split('?')
@@ -17,7 +28,24 @@ export function parseHash(hash: string): Route {
   const params = new URLSearchParams(query)
   if (parts[0] === 's' && parts[1]) {
     const id = ALIASES[parts[1]] ?? parts[1]
-    return { name: 'specimen', id, preset: params.get('preset') ?? undefined }
+    const flag = (k: string) => (params.has(k) ? params.get(k) !== '0' : undefined)
+    const speed = Number(params.get('speed'))
+    const spot = Number(params.get('spot'))
+    const aspect = params.get('aspect')
+    return {
+      name: 'specimen',
+      id,
+      preset: params.get('preset') ?? undefined,
+      opts: {
+        juice: flag('juice'),
+        speed: [0.25, 0.5, 1].includes(speed) ? speed : undefined,
+        event: params.get('event') ?? undefined,
+        spot: spot > 0 ? spot : undefined,
+        spots: flag('spots'),
+        auto: flag('auto'),
+        aspect: aspect === '9:16' || aspect === '16:9' ? aspect : undefined,
+      },
+    }
   }
   if (parts[0] === 'about') return { name: 'about' }
   return { name: 'home' }

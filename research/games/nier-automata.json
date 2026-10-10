@@ -1,0 +1,163 @@
+{
+  "game": {
+    "id": "nier-automata",
+    "title": "NieR:Automata",
+    "title_ko": "니어:오토마타",
+    "version": "원작 정식 발매판(2017). 개발 블로그의 조작 설명은 PS4 버튼 표기(○/×/L1/R1) 기준이며 PC(Steam)판 키보드 단축키는 T3 출처로 보완. Xbox One판은 후속 이식판으로 이번 검증에서 차이점 미확인",
+    "platforms": [
+      "PS4",
+      "PC(Steam)",
+      "Xbox One"
+    ],
+    "developer": "PlatinumGames",
+    "publisher_credit": "© 2017 SQUARE ENIX CO., LTD. All Rights Reserved. / PlatinumGames Inc.",
+    "official_url": "https://www.platinumgames.com/official-blog/games/nier-automata/",
+    "genres": [
+      "액션 RPG"
+    ],
+    "year": 2017,
+    "visual_style": "플랫 디자인 바탕에 옅은 격자 텍스처, 볼록 모니터 같은 가장자리 왜곡·감광을 더한 저채도 베이지 중심 시스템 UI"
+  },
+  "elements": [
+    {
+      "specimen_id": "main-pause-menu",
+      "pattern_name": "diegetic-monitor-system-menu",
+      "player_task_ko": "플레이어는 시스템 메뉴에 들어가 무기·데이터·지도 등 카테고리를 오가며 항목을 확인·변경하고 게임으로 복귀한다. PC판 키보드에서는 P키로 연다(T3 단축키 목록 기준). 패드 진입 버튼은 이번 출처로 확인하지 못했다.",
+      "info_shown_ko": [
+        "무기 상세·서사 기록·개체 데이터 등 페이지별 정보(일본어 개발 블로그 서술 기준)",
+        "지도 화면(우스틱·L2/R2로 전체 화면 지도 전환)",
+        "격자 텍스처와 가장자리 왜곡·감광으로 표현된 '모니터 화면'이라는 틀"
+      ],
+      "states": [
+        {
+          "name": "게임플레이(메뉴 닫힘)",
+          "trigger_ko": "메뉴 미호출 상태",
+          "visual_ko": "시스템 메뉴 비노출(세부 미확인)"
+        },
+        {
+          "name": "시스템 메뉴 진입",
+          "trigger_ko": "PC 키보드 P키(T3). 패드 버튼 미확인",
+          "visual_ko": "저채도 베이지 톤 플랫 화면에 옅은 격자 텍스처와 가장자리 왜곡·감광을 더해 볼록 모니터에 표시된 화면처럼 보임(공식 블로그 텍스트 기반, 실제 화면 미확인)"
+        },
+        {
+          "name": "카테고리/페이지 전환",
+          "trigger_ko": "L1/R1(문서화되지 않은 숙련자용 단축키) 또는 스틱+○",
+          "visual_ko": "같은 틀 안에서 내용이 교체되며 색 대신 글자 굵기·진하기 차이로 항목 구분(텍스트 기반, 세부 미확인)"
+        },
+        {
+          "name": "개체 데이터 조작",
+          "trigger_ko": "개체 데이터 화면에서 △/□, 우스틱",
+          "visual_ko": "장비 변경·애니메이션 재생·모델 회전이 가능하다고 서술됨(시각 세부 미확인)"
+        },
+        {
+          "name": "항목 선택/확정",
+          "trigger_ko": "○ 입력",
+          "visual_ko": "하이라이트 방식·사운드 피드백은 출처로 확인하지 못함"
+        },
+        {
+          "name": "뒤로가기/종료",
+          "trigger_ko": "× 입력",
+          "visual_ko": "이전 단계 또는 게임플레이로 복귀(전환 효과 미확인)"
+        }
+      ],
+      "interaction_ko": "모든 메뉴 기능을 스틱과 ○/× 두 버튼만으로 쓸 수 있게 하고 화면 내 안내는 최소화했다. 숙련자용으로 L1/R1(카테고리 이동·페이지 전환), △/□(개체 데이터의 장비 변경·애니메이션 재생), 지도의 우스틱·L2/R2(전체 화면 지도)를 문서화하지 않은 단축키로 숨겼다. PC판은 P키로 시스템 메뉴를 연다(T3). 별개의 퀵 메뉴는 Steam 유저 보고상 마우스 휠로 연 뒤 방향키로 아래 항목에 접근해야 해 키보드/마우스 조작이 헷갈린다는 불만이 있었다.",
+      "layout_ko": "플랫 디자인에 옅은 격자 텍스처와 가장자리 왜곡·감광을 더해 볼록 모니터 화면처럼 구성. 따뜻한 베이지 기본, 색 종류를 최소화하고 글자 굵기·진하기로 위계 표현, 포인트는 칙칙한 적주황, 드물게 백색·옅은 녹색(공식 블로그 텍스트 기반, 실제 배치는 미확인).",
+      "motion_ko": "전환 타이밍·이징 수치와 선택 피드백(하이라이트·클릭음)은 공식 자료에서 확인하지 못했다. 이전 레코드의 '클릭음' 서술은 출처가 없어 삭제.",
+      "accessibility_ko": [
+        "요코 타로 감독이 '할머니도 쓸 수 있게' 해 달라고 반복 요청했다는 디자이너 본인의 공식 블로그 서술",
+        "핵심 입력을 스틱+○/× 두 버튼으로 제한하고 심화 기능은 숨김 단축키로 분리",
+        "색맹 모드·자막 설정 등 전용 접근성 옵션에 대한 공식 서술은 확인하지 못함"
+      ],
+      "why_it_works_ko": [
+        "모니터 화면처럼 보이게 하는 격자·왜곡 처리로 플랫 디자인의 밋밋함을 보완하고 세계관 몰입을 높인다(디자이너 설명)",
+        "색 대신 글자 굵기·진하기로 정보 위계를 표현해 색 종류가 적은 저채도 팔레트에서도 정보를 구분한다",
+        "2버튼 기본 조작 + 숨김 단축키로 '단순한 조작, 복잡한 사양'을 만들어 초심자와 숙련자를 함께 수용한다"
+      ],
+      "signature_traits_ko": [
+        "오선·낮은음자리표·겹세로줄 등 악보 기호를 노골적이지 않게 장식 요소로 숨겨 넣은 디테일(콜론 같은 문장부호도 이 모티프를 반영). 음악이 중요한 이 작품 고유의 장치",
+        "볼록 모니터 왜곡·감광과 격자 텍스처로 '화면 속 화면'을 암시하는 처리"
+      ],
+      "evidence": [
+        {
+          "claim": "UI·메카 디자이너 키지마 히사요시가 NieR:Automata UI의 컨셉·배색·조작 설계를 직접 설명한 공식 블로그 글이다.",
+          "url": "https://www.platinumgames.com/official-blog/article/9624",
+          "tier": "T1",
+          "paraphrase": "디자이너 본인이 UI 컨셉, 색상, 조작 단순화를 서술."
+        },
+        {
+          "claim": "플랫 디자인에 옅은 격자 텍스처와 가장자리 왜곡·감광을 더해 볼록 모니터 화면처럼 보이게 했다.",
+          "url": "https://www.platinumgames.com/official-blog/article/9624",
+          "tier": "T1",
+          "paraphrase": "스큐어모픽 처리로 플랫 화면에 물리적 실재감 부여."
+        },
+        {
+          "claim": "요코 타로가 '할머니도 쓸 수 있게' 요청했고 모든 메뉴 기능을 스틱과 ○/×로 쓸 수 있게 했으며, L1/R1/△/□ 숨김 단축키를 따로 구현했다.",
+          "url": "https://www.platinumgames.com/official-blog/article/9624",
+          "tier": "T1",
+          "paraphrase": "감독 요청에 따른 입력 단순화와 숙련자용 숨김 단축키."
+        },
+        {
+          "claim": "L1/R1은 시스템 메뉴의 카테고리 이동·페이지 전환, △/□는 개체 데이터의 장비 변경·애니메이션 재생, 지도에서 우스틱·L2/R2는 전체 화면 지도 전환이다.",
+          "url": "https://www.platinumgames.co.jp/dev-nier-automata/article/183",
+          "tier": "T1",
+          "paraphrase": "일본어판 개발 블로그의 숨김 단축키 상세."
+        },
+        {
+          "claim": "따뜻한 베이지를 기본으로 색 종류를 최소화하고 글자 굵기·진하기로 구분했으며, 포인트는 칙칙한 적주황, 드물게 백색·옅은 녹색이다.",
+          "url": "https://www.platinumgames.com/official-blog/article/9624",
+          "tier": "T1",
+          "paraphrase": "색상보다 굵기·진하기로 구분하는 배색 설계."
+        },
+        {
+          "claim": "오선·낮은음자리표·겹세로줄 같은 악보 기호의 형태를 디자인 전반에 상징적으로 사용했다.",
+          "url": "https://www.platinumgames.com/official-blog/article/9624",
+          "tier": "T1",
+          "paraphrase": "악보 모티프를 노골적이지 않게 장식에 활용."
+        },
+        {
+          "claim": "PC판 키보드에서 P키가 시스템 메뉴다.",
+          "url": "https://defkey.com/nier-automata-shortcuts",
+          "tier": "T3",
+          "paraphrase": "단축키 목록에 P=System menu, Del=Shortcuts로 기재."
+        },
+        {
+          "claim": "키보드/마우스로 퀵 메뉴를 쓸 때 휠로 연 뒤 아래 항목 접근이 어려워 방향키를 써야 한다는 유저 보고가 있다.",
+          "url": "https://steamcommunity.com/app/524220/discussions/0/135512625249047198/",
+          "tier": "T3",
+          "paraphrase": "퀵 메뉴 키보드/마우스 탐색 불편 보고와 우회법."
+        }
+      ],
+      "confidence": "plausible",
+      "reference_links": [
+        {
+          "label": "UI Design in NieR:Automata (PlatinumGames 공식 블로그, 키지마 히사요시)",
+          "url": "https://www.platinumgames.com/official-blog/article/9624"
+        },
+        {
+          "label": "『NieR:Automata』のUIデザイン (일본어판 개발 블로그)",
+          "url": "https://www.platinumgames.co.jp/dev-nier-automata/article/183"
+        },
+        {
+          "label": "NieR:Automata 키보드 단축키 목록",
+          "url": "https://defkey.com/nier-automata-shortcuts"
+        },
+        {
+          "label": "Steam 커뮤니티: 키보드+마우스 퀵 메뉴 조작 토론",
+          "url": "https://steamcommunity.com/app/524220/discussions/0/135512625249047198/"
+        },
+        {
+          "label": "interfaceingame.com NieR:Automata 항목 (AI 접근 금지 사이트, URL만 기록·미접근)",
+          "url": "https://interfaceingame.com/games/nierautomata/"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "claims_checked": 8,
+    "supported": 7,
+    "partial": 1,
+    "unreachable": 0,
+    "unsupported_removed": 2,
+    "notes_ko": "evidence URL 4개(영문·일문 공식 블로그, defkey, Steam 토론)와 official_url을 모두 다시 열어 확인했다. 영문 공식 블로그는 격자·왜곡, 배색, 2버튼 조작, 숨김 단축키, 악보 모티프를 뒷받침한다. 일문 블로그로 L1/R1이 카테고리 이동·페이지 전환이라는 점을 확인해 evidence를 추가했다. 이전 레코드의 'L1/R1=탭 전환'은 영문판만으로는 근거가 부족했으나 일문판으로 보강했다. Steam 토론은 '키보드/마우스와 패드 입력 동시 활성화' 언급이 없고, 퀵 메뉴의 키보드/마우스 탐색 불편만 다룬다. 그래서 partial로 판정하고 주장을 축소했다. 출처 없는 '확정 시 클릭음' 서술과 '패드 옵션/메뉴 버튼으로 진입' 서술은 삭제했다(unsupported_removed 2). defkey는 Del=Shortcuts로 적었지만 Steam 댓글 하나는 Del을 일시정지 메뉴로 언급해 상충한다. 그래서 P키 주장은 T3 수준으로 유지했다. 영문 블로그에 사운드·접근성 옵션 언급은 없다. 시각 주장은 모두 텍스트 출처뿐이라 confidence는 plausible로 유지했다. 이전 패스에서 403이었던 godisageek/medium은 evidence에 없어 재접근하지 않았다. Xbox One 출시 연도는 웹 검색 한도 초과로 확인하지 못해 version에 미확인으로 적었다."
+  }
+}

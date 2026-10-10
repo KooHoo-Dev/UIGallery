@@ -5,6 +5,8 @@
   cursor: grab;
   touch-action: none;
   user-select: none;
+  --ms: 1;
+  --accent: #39e0d0;
 }
 .root:active {
   cursor: grabbing;
@@ -14,14 +16,16 @@
 .fallbackHorizon {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(180deg, #8fb7d2 0%, #c9dde8 52%, #5d7a4a 52.2%, #3e5531 100%);
+  background: linear-gradient(180deg, #8fb7d2 0%, #c9dde8 52%, #5d7a4a 52.2%, #3e5531 100%);
+}
+.root[data-bright='true'] .fallbackHorizon {
+  background: linear-gradient(180deg, #e9f3fb 0%, #ffffff 52%, #f1f4f6 52.2%, #d9e2e8 100%);
 }
 
 /* 클램프 경계 가이드 */
 .guide {
   position: absolute;
-  border: 3px dashed rgba(255, 255, 255, 0.55);
+  border: 3px dashed rgba(255, 255, 255, 0.6);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s;
@@ -34,6 +38,14 @@
 }
 
 /* ───── 마커 ───── */
+.markers {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.3s;
+}
+.root[data-hud='false'] .markers {
+  opacity: 0;
+}
 .marker {
   position: absolute;
   left: 0;
@@ -41,12 +53,26 @@
   width: 0;
   height: 0;
   --c: #ffc443;
-  --size: 46px;
+  --size: calc(44px * var(--ms));
   pointer-events: none;
   will-change: transform;
 }
 .marker[data-active='true'] {
-  --size: 60px;
+  --size: calc(58px * var(--ms));
+}
+.plate {
+  position: absolute;
+  left: calc(var(--size) * -0.85);
+  top: calc(var(--size) * -0.85);
+  width: calc(var(--size) * 1.7);
+  height: calc(var(--size) * 1.7);
+  border-radius: 50%;
+  background: rgba(10, 14, 22, 0.62);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.18);
+  opacity: 0;
+}
+.root[data-plate] .plate {
+  opacity: 1;
 }
 .icon {
   position: absolute;
@@ -55,50 +81,54 @@
   width: var(--size);
   height: var(--size);
   background: var(--c);
-  border: 4px solid #10131a;
-  box-shadow: 0 0 0 3px var(--c), 0 4px 14px rgba(0, 0, 0, 0.5);
 }
 .marker[data-kind='main'] .icon {
-  transform: rotate(45deg) scale(0.78);
+  transform: rotate(45deg) scale(0.72);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 calc(5px * var(--ms)) rgba(255, 255, 255, 0.55);
 }
 .marker[data-kind='side'] .icon {
   border-radius: 50%;
-  background: radial-gradient(circle, #10131a 0 22%, var(--c) 24%);
+  background: radial-gradient(circle, transparent 0 26%, var(--c) 28% 62%, transparent 64%);
+  box-shadow: 0 0 0 calc(4px * var(--ms)) var(--c) inset;
 }
 .marker[data-kind='ally'] .icon {
-  clip-path: polygon(50% 8%, 92% 88%, 50% 68%, 8% 88%);
-  border: 0;
-  box-shadow: none;
-  filter: drop-shadow(0 0 3px #10131a) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+  clip-path: polygon(50% 6%, 94% 90%, 50% 70%, 6% 90%);
 }
 .caption {
   position: absolute;
   left: 0;
-  top: calc(var(--size) / 2 + 12px);
+  top: calc(var(--size) * 0.85 + 8px);
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 2px;
   white-space: nowrap;
   color: #fff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.85), 0 0 2px #000;
   line-height: 1.1;
 }
 .caption b {
-  font-size: 22px;
+  font-size: calc(22px * var(--ms));
   font-family: 'Malgun Gothic', sans-serif;
-  opacity: 0;
+  display: none;
 }
 .marker[data-active='true'] .caption b {
-  opacity: 1;
+  display: block;
 }
 .dist {
-  font-size: 26px;
+  font-size: calc(26px * var(--ms));
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
+.root[data-plate] .caption b,
+.root[data-plate] .dist {
+  background: rgba(10, 14, 22, 0.62);
+  padding: 1px 10px;
+  border-radius: 6px;
+}
 
-/* 화면 밖: 바깥을 가리키는 화살표 */
+/* 화면 밖: 바깥을 가리키는 둥근 삼각형 */
 .arrow {
   position: absolute;
   left: 0;
@@ -111,18 +141,15 @@
 .arrow::before {
   content: '';
   position: absolute;
-  left: calc(var(--size) / 2 + 8px);
-  top: -16px;
-  border-left: 26px solid var(--c);
-  border-top: 16px solid transparent;
-  border-bottom: 16px solid transparent;
-  filter: drop-shadow(0 0 2px #000);
+  left: calc(var(--size) * 0.85 + 6px);
+  top: calc(-15px * var(--ms));
+  width: calc(26px * var(--ms));
+  height: calc(30px * var(--ms));
+  background: var(--c);
+  clip-path: polygon(0 0, 100% 50%, 0 100%, 18% 50%);
 }
 .marker[data-mode='off'] .arrow {
   opacity: 1;
-}
-.marker[data-mode='off'] .icon {
-  opacity: 0.92;
 }
 .root[data-juice] .marker[data-mode='off'] .icon {
   animation: nudge 1.4s ease-in-out infinite;
@@ -133,6 +160,33 @@
   }
 }
 
+/* ───── 바람 줄기 (환경 신호) ───── */
+.wind {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.5s;
+  pointer-events: none;
+}
+.root[data-guidance='ambient'] .wind {
+  opacity: 1;
+}
+.streak {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 160px;
+  height: 3px;
+  margin-left: -160px;
+  transform-origin: 100% 50%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85));
+  will-change: transform, opacity;
+}
+.root[data-bright='true'] .streak {
+  background: linear-gradient(90deg, transparent, rgba(40, 70, 100, 0.7));
+}
+
 /* ───── 나침반 띠 ───── */
 .compass {
   position: absolute;
@@ -140,8 +194,12 @@
   top: 44px;
   width: 960px;
   margin-left: -480px;
-  height: 92px;
+  height: 100px;
   pointer-events: none;
+  transition: opacity 0.3s;
+}
+.root[data-compass='false'] .compass {
+  opacity: 0;
 }
 .compassTrack {
   position: absolute;
@@ -149,11 +207,34 @@
   right: 0;
   top: 0;
   height: 64px;
-  background: linear-gradient(180deg, rgba(8, 12, 20, 0.55), rgba(8, 12, 20, 0.25));
+  background: linear-gradient(180deg, rgba(8, 12, 20, 0.6), rgba(8, 12, 20, 0.3));
   border-top: 2px solid rgba(255, 255, 255, 0.5);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
   overflow: hidden;
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+.compass[data-zone] .compassTrack {
+  border-top-color: var(--accent);
+  box-shadow: inset 0 3px 18px rgba(57, 224, 208, 0.45);
+}
+.zoneGlow {
+  position: absolute;
+  left: 50%;
+  top: -34px;
+  transform: translateX(-50%);
+  font-family: 'Malgun Gothic', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #052a27;
+  background: var(--accent);
+  padding: 2px 14px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.compass[data-zone] .zoneGlow {
+  opacity: 1;
 }
 .tick {
   position: absolute;
@@ -189,15 +270,17 @@
   font-weight: 700;
   top: 16px;
 }
-.compassIcon {
+.compassIcon,
+.poi {
   position: absolute;
   left: 0;
-  top: 44px;
+  top: 46px;
   width: 0;
   height: 0;
   --c: #ffc443;
 }
-.compassIcon::before {
+.compassIcon::before,
+.poi::before {
   content: '';
   position: absolute;
   left: -9px;
@@ -205,32 +288,45 @@
   width: 18px;
   height: 18px;
   background: var(--c);
-  border: 2px solid #10131a;
 }
 .compassIcon[data-kind='main']::before {
-  transform: rotate(45deg);
+  transform: rotate(45deg) scale(0.85);
 }
 .compassIcon[data-kind='side']::before {
   border-radius: 50%;
 }
 .compassIcon[data-kind='ally']::before {
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
-  border: 0;
 }
 .compassIcon[data-active='true']::before {
-  transform: scale(1.35);
+  transform: scale(1.4);
   box-shadow: 0 0 10px var(--c);
 }
 .compassIcon[data-kind='main'][data-active='true']::before {
-  transform: rotate(45deg) scale(1.35);
+  transform: rotate(45deg) scale(1.25);
 }
-.compassIcon[data-edge='true'] {
-  opacity: 0.55;
+.poi::before {
+  background: rgba(235, 240, 248, 0.85);
+}
+.poi[data-glyph='tent']::before {
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.poi[data-glyph='tower']::before {
+  left: -5px;
+  width: 10px;
+}
+.poi[data-glyph='spring']::before {
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(235, 240, 248, 0.9) 0 35%, transparent 37% 55%, rgba(235, 240, 248, 0.9) 57%);
+}
+.compassIcon[data-edge='true'],
+.poi[data-edge='true'] {
+  opacity: 0.5;
 }
 .heading {
   position: absolute;
   left: 50%;
-  top: 66px;
+  top: 68px;
   transform: translateX(-50%);
   font-size: 22px;
   font-weight: 700;
@@ -251,11 +347,30 @@
   border-top: 0;
 }
 
+.toast {
+  position: absolute;
+  left: 50%;
+  top: 196px;
+  font-family: 'Malgun Gothic', sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(8, 12, 20, 0.72);
+  border-left: 5px solid var(--accent);
+  padding: 8px 22px;
+  border-radius: 4px;
+  opacity: 0;
+  transform: translate(-50%, -16px);
+  transition: transform 0.25s ease-out;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
 .hint {
   position: absolute;
   right: 36px;
   bottom: 32px;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
   font-family: 'Malgun Gothic', sans-serif;
   font-size: 22px;
   background: rgba(8, 12, 20, 0.5);

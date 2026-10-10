@@ -8,13 +8,13 @@ import { isTyping } from './App'
 import { ControlPanel } from './ControlPanel'
 import { PlayBar } from './PlayBar'
 import { Rich } from './Rich'
-import { hrefSpecimen } from './router'
+import { hrefSpecimen, type SpecimenUrlOptions } from './router'
 import { Stage } from './Stage'
 import { UnityPanel } from './UnityPanel'
 
 const SPEEDS = [1, 0.5, 0.25]
 
-export function SpecimenPage({ id, presetId, presenter }: { id: string; presetId?: string; presenter: boolean }) {
+export function SpecimenPage({ id, presetId, opts, presenter }: { id: string; presetId?: string; opts: SpecimenUrlOptions; presenter: boolean }) {
   const mod = findSpecimen(id)
   if (!mod) {
     return (
@@ -26,25 +26,42 @@ export function SpecimenPage({ id, presetId, presenter }: { id: string; presetId
       </div>
     )
   }
-  return <SpecimenView mod={mod} presetId={presetId} presenter={presenter} />
+  return <SpecimenView mod={mod} presetId={presetId} opts={opts} presenter={presenter} />
 }
 
-function SpecimenView({ mod, presetId, presenter }: { mod: NonNullable<ReturnType<typeof findSpecimen>>; presetId?: string; presenter: boolean }) {
+function SpecimenView({
+  mod,
+  presetId,
+  opts,
+  presenter,
+}: {
+  mod: NonNullable<ReturnType<typeof findSpecimen>>
+  presetId?: string
+  opts: SpecimenUrlOptions
+  presenter: boolean
+}) {
   const m = mod.meta
   const initialPreset = m.presets.find(p => p.id === presetId)
   const [params, setParams] = useState<ParamValues>(() => (initialPreset ? applyPreset(m.params, initialPreset) : defaultParams(m.params)))
   const [presetActive, setPresetActive] = useState<string | null>(initialPreset?.id ?? null)
   const [playing, setPlaying] = useState(true)
-  const [juice, setJuice] = useState(true)
-  const [speed, setSpeed] = useState(1)
-  const [autoplay, setAutoplay] = useState(() => !prefersReducedMotion())
+  const [juice, setJuice] = useState(opts.juice ?? true)
+  const [speed, setSpeed] = useState(opts.speed ?? 1)
+  const [autoplay, setAutoplay] = useState(() => opts.auto ?? (!prefersReducedMotion() && !opts.event))
   const [trigger, setTrigger] = useState<StageTrigger | null>(null)
-  const [aspect, setAspect] = useState<Aspect>(m.stage.aspect === '9:16' ? '9:16' : '16:9')
-  const [showSpots, setShowSpots] = useState(true)
-  const [activeSpot, setActiveSpot] = useState<number | null>(null)
+  const [aspect, setAspect] = useState<Aspect>(opts.aspect && m.stage.aspect === 'both' ? opts.aspect : m.stage.aspect === '9:16' ? '9:16' : '16:9')
+  const [showSpots, setShowSpots] = useState(opts.spots ?? true)
+  const [activeSpot, setActiveSpot] = useState<number | null>(opts.spot ?? null)
   const [tab, setTab] = useState<'controls' | 'notes'>('controls')
 
   const fire = useCallback((eid: string) => setTrigger(t => ({ id: eid, seq: (t?.seq ?? 0) + 1 })), [])
+
+  // ?event=<id> : 페이지가 열리고 잠시 뒤 이벤트를 한 번 발생 (수업 자료 링크·자동 검사용)
+  useEffect(() => {
+    if (!opts.event) return
+    const t = setTimeout(() => fire(opts.event!), 400)
+    return () => clearTimeout(t)
+  }, [opts.event, fire])
   const stepSpot = useCallback(
     (dir: 1 | -1) => {
       setShowSpots(true)

@@ -1,0 +1,674 @@
+{
+  "assignments": [
+    {
+      "specimen_id": "health-bar-trail",
+      "primary_game_id": "hades",
+      "primary_why_ko": "하단 고정형 non-diegetic 체력 바에 저체력 시 화면 가장자리가 붉게 물드는 meta 효과가 겹쳐, 표본 두 축(바+화면 효과)을 한 화면에서 보여주는 사례. 텍스트 자료(GDC 강연 기사, HUD 리디자인 분석, 접근성 리뷰)가 풍부함. 단 잔상 바의 감소 타이밍·비네트 색상은 화면 미확인이라 'plausible'로 다룰 것.",
+      "contrast_game_id": "dead-space-2008",
+      "contrast_why_ko": "같은 체력 정보를 화면 HUD가 아니라 캐릭터 등의 RIG 척추 게이지로 옮긴 다이어제틱 해법. 화면 효과·잔상 바 없이 상태를 전달하는 방식이라 '바+화면 효과' 접근과 정반대 선택지를 보여줌(GDC 2013 Dino Ignacio 강연)."
+    },
+    {
+      "specimen_id": "damage-numbers",
+      "primary_game_id": "honkai-star-rail",
+      "primary_why_ko": "턴제 전투에서 타격 지점 위 숫자, 치명타 강조, 약점 격파, 회복, 누적 합산(총 피해) 표시가 한 화면에 공존하는 모바일 퍼스트 사례. 학술 휴리스틱 분석·팬 UX 분석 등 텍스트 자료가 있음. 색·크기 위계 세부는 'plausible'.",
+      "contrast_game_id": "balatro",
+      "contrast_why_ko": "숫자를 '타격 피드백'이 아니라 '점수 계산 과정 설명'으로 쓰는 해법. 카드마다 칩·배수 숫자가 순차적으로 튀어나와 합산되며 왜 이 점수가 나왔는지를 보여주어(Medium 디자인 분석), 겹침 방지 대신 순차 재생으로 가독성을 확보하는 대조 사례."
+    },
+    {
+      "specimen_id": "reticle-hitmarker",
+      "primary_game_id": "destiny-2",
+      "primary_why_ko": "Bungie UI 리드의 GDC 2016 전용 UI 강연이 있는 FPS로, 무기별 조준점·적 조준 시 색 변화·적중/치명타(정밀)/처치 피드백 구분이라는 표본 핵심과 맞음. 히트마커 세부가 강연에서 직접 다뤄졌는지는 미확인이라 시각 묘사는 'plausible'.",
+      "contrast_game_id": "dead-space-2008",
+      "contrast_why_ko": "화면 중앙 조준점 대신 무기에서 나가는 레이저 조준선 등 다이어제틱 조준 표시를 쓴 해법(GDC 2013 강연이 조준 표시의 다이어제틱 구현을 다룸). 화면 고정 UI 대 월드 내 조준이라는 대비가 뚜렷함."
+    },
+    {
+      "specimen_id": "offscreen-waypoint",
+      "primary_game_id": "horizon-forbidden-west",
+      "primary_why_ko": "상단 나침반 띠에 목표·방위를 표시하고 월드 마커와 거리를 함께 쓰는 오픈월드 HUD 사례. PlayStation 공식 블로그와 Can I Play That 심층 리뷰로 HUD·접근성 옵션 텍스트 자료 확보 가능. 마커 클램프 동작 세부는 'plausible'.",
+      "contrast_game_id": "ghost-of-tsushima",
+      "contrast_why_ko": "나침반·웨이포인트 마커를 없애고 '가이딩 윈드'(바람 방향), 새, 연기로 목표를 안내하는 환경 신호 해법. Game Developer 디자인 분석과 개발자 인터뷰 보도가 있어 'HUD 없이 해결'하는 대조군으로 최적."
+    },
+    {
+      "specimen_id": "circular-minimap",
+      "primary_game_id": "genshin-impact",
+      "primary_why_ko": "좌상단 원형 미니맵에 플레이어 시야 원뿔, 아이콘, 범위 밖 목표 가장자리 표시가 있는 모바일·PC 공용 사례로 학생 접근성이 높음. 회전형/북쪽 고정형 여부와 아이콘 위계는 화면 미확인이라 'plausible'로 표기하고 검증 필요.",
+      "contrast_game_id": "ghost-of-tsushima",
+      "contrast_why_ko": "미니맵 자체를 제거하고 바람·환경 신호로 대체한 정반대 해법(개발자 인터뷰: 바람이 나침반·미니맵을 대신). '미니맵을 넣을 것인가'라는 설계 질문을 던지는 대조 사례."
+    },
+    {
+      "specimen_id": "quest-tracker-toasts",
+      "primary_game_id": "destiny-2",
+      "primary_why_ko": "추적 퀘스트·바운티 분리, 획득·진행 알림의 우선순위 큐 등 표본 핵심을 다룬 UI 변천 분석(Medium)과 Destiny 1→2 UX 개선 기사가 있어 텍스트 근거가 가장 풍부함.",
+      "contrast_game_id": "genshin-impact",
+      "contrast_why_ko": "모바일 화면 제약 때문에 추적 목표를 한 개만 짧게 보여주고 획득 알림을 측면에 간결하게 쌓는 해법으로, 정보 밀도가 높은 Destiny 2와 대비됨. 큐 표시 시간 세부는 'plausible'."
+    },
+    {
+      "specimen_id": "dialogue-choices",
+      "primary_game_id": "persona-5-royal",
+      "primary_why_ko": "화자 표시, 스타일화된 대화창, 선택지 포커스, 대화 로그를 갖춘 대표 JRPG. CEDEC 2017 UI 패널과 CEDEC Awards 2019 수상, UI 디자이너 인터뷰 등 A·B 신호가 가장 많음.",
+      "contrast_game_id": "hades",
+      "contrast_why_ko": "초상화 중심 대화창에 선택지는 드물게 쓰고, 화자별 자막 색 지정 같은 접근성 처리를 한 액션 게임의 해법. GDC 2021 대화 강연이 텍스트로 정리되어 있어, 연출 밀도가 높은 Persona와 '짧고 반복되는 대화' 설계를 비교하기 좋음."
+    },
+    {
+      "specimen_id": "inventory-grid-tooltip",
+      "primary_game_id": "destiny-2",
+      "primary_why_ko": "슬롯 그리드, 희귀도 색 구분, 장착품 비교 툴팁, 보관함 정렬이라는 표본 요소를 고루 갖춤. GDC 2016 강연과 보관함·인벤토리 개선 기사가 근거. 툴팁 위치 보정은 'plausible'.",
+      "contrast_game_id": "dredge-2023",
+      "contrast_why_ko": "아이템 크기·모양이 다른 테트리스식 공간 인벤토리로, 슬롯 수가 아닌 배치 자체가 퍼즐이 되는 해법. 공동 디자이너 딥다이브 글과 Apple Design Award 2025 Interaction 수상으로 근거가 탄탄하고 모바일(iOS)도 지원."
+    },
+    {
+      "specimen_id": "skill-cooldown-prompt",
+      "primary_game_id": "destiny-2",
+      "primary_why_ko": "수류탄·근접·슈퍼 능력의 충전 게이지, 준비 완료 표시, 입력 장치별 버튼 안내가 있는 콘솔·PC 겸용 사례. Destiny 1→2 HUD 개선 기사와 GDC 강연이 근거. 채움 방향·반짝임 세부는 'plausible'.",
+      "contrast_game_id": "prince-of-persia-the-lost-crown",
+      "contrast_why_ko": "콘솔 게임을 모바일 터치로 옮기며 버튼 안내·스킬 입력 UI를 재설계한 과정이 GDC UX 전용 강연(Ubisoft Da Nang)에 정리됨. '입력 장치별 버튼 아이콘'을 터치 버튼 자체로 바꾸는 다른 해법을 보여줌."
+    },
+    {
+      "specimen_id": "main-pause-menu",
+      "primary_game_id": "persona-5-royal",
+      "primary_why_ko": "메뉴 진입·전환 연출이 강하고 포커스 이동이 눈에 띄는 스타일리시 메뉴의 대표작. UI 디자이너(Masayoshi Sutoh) 강연·수상·인터뷰가 있어 설계 의도 텍스트 근거가 풍부함.",
+      "contrast_game_id": "nier-automata",
+      "contrast_why_ko": "안드로이드 OS처럼 보이는 절제된 단색 메뉴로, 화려한 전환 대신 일관된 시스템 화면을 택한 해법. UI 디자이너 본인이 쓴 PlatinumGames 공식 블로그 글이 1차 자료."
+    },
+    {
+      "specimen_id": "settings-accessibility",
+      "primary_game_id": "the-last-of-us-part-ii",
+      "primary_why_ko": "60개 이상 접근성 옵션, 프리셋, 고대비 모드, 자막 커스터마이징 등 표본 핵심을 모두 갖춘 기준 사례. TGA Innovation in Accessibility 최초 수상, AbleGamers 수상, PlayStation 공식 옵션 페이지 등 텍스트 근거가 가장 풍부함.",
+      "contrast_game_id": "prince-of-persia-the-lost-crown",
+      "contrast_why_ko": "TGA 2024 접근성 수상작인 2D 액션으로, 같은 설정 체계를 모바일 화면·터치로 옮기며 단순화한 사례(GDC 모바일 포팅 UX 강연). 대작 3D의 '방대한 옵션'과 대비되는 '플랫폼 전환 시 설정 재구성' 관점을 제공."
+    },
+    {
+      "specimen_id": "results-reward",
+      "primary_game_id": "persona-5-royal",
+      "primary_why_ko": "전투 후 경험치·돈·아이템 순차 표시, 레벨업 연출을 강한 그래픽 스타일로 처리한 결과 화면의 대표작. CEDEC Visual Arts 수상과 UI 인터뷰가 근거. 카운트업 타이밍은 'plausible'.",
+      "contrast_game_id": "balatro",
+      "contrast_why_ko": "라운드 종료 시 이자·남은 핸드 보너스를 한 줄씩 합산해 보여주는 미니멀 정산 화면. 보상 계산 과정을 순차 공개하는 방식이 Medium 분석에서 다뤄지며, GDC Choice Awards 3관왕과 Apple Design Award 2025 수상으로 신호가 강함."
+    },
+    {
+      "specimen_id": "diegetic-vitals",
+      "primary_game_id": "dead-space-2008",
+      "primary_why_ko": "RIG 수트 척추 게이지(체력)와 정체 에너지 표시를 캐릭터 몸체에 붙인 다이어제틱 체력 표시의 원형. GDC 2013 UI 진화 강연이 직접 다룸. 2023 리메이크는 같은 철학을 계승했다는 보도 수준이라 분석 대상은 2008 원작으로 명시.",
+      "contrast_game_id": "hardspace-shipbreaker",
+      "contrast_why_ko": "몸체가 아니라 헬멧 바이저·장비 화면에 산소·연료 등 자원을 띄우는 '완전 다이어제틱 인터페이스' 해법. GDC 2021 전용 UI 강연(Vidhi Shah)이 가독성·사용성과 서사의 균형을 정면으로 다뤄, 카메라 각도와 무관한 가독성 문제를 Dead Space와 비교하기 좋음."
+    }
+  ],
+  "games": [
+    {
+      "game_id": "hades",
+      "title": "Hades",
+      "title_ko": "하데스",
+      "version": "정식 발매판(2020, Supergiant Games) 기준",
+      "platforms": [
+        "PC",
+        "PlayStation",
+        "Xbox",
+        "Switch",
+        "iOS"
+      ],
+      "mobile": true,
+      "paradigms": [
+        "non-diegetic",
+        "meta"
+      ],
+      "visual_style": "손그림 페인터리 일러스트 + 굵은 외곽선 코믹 스타일",
+      "signals": [
+        {
+          "grade": "B",
+          "label": "GDC 2021 'Breathing Life into Greek Myth: The Dialogue of Hades' (Greg Kasavin, Darren Korb)",
+          "url": "https://gdcvault.com/play/1027149/Breathing-Life-into-Greek-Myth"
+        },
+        {
+          "grade": "B",
+          "label": "21st Game Developers Choice Awards 6개 부문 노미네이트",
+          "url": "https://gdconf.com/article/ghost-of-tsushima-hades-and-the-last-of-us-part-ii-each-receive-six-nominations-for-the-21st-annual-game-developers-choice-awards/"
+        },
+        {
+          "grade": "C",
+          "label": "화자별 자막 색 등 청각장애 관점 접근성 리뷰",
+          "url": "https://www.gameaccessibilitynexus.com/blog/2020/09/27/deaf-hoh-game-review-hades/"
+        },
+        {
+          "grade": "C",
+          "label": "Hades HUD 리디자인 분석",
+          "url": "https://medium.com/@bramhadalvi/hud-redesign-fdc332d05291"
+        }
+      ]
+    },
+    {
+      "game_id": "dead-space-2008",
+      "title": "Dead Space",
+      "title_ko": "데드 스페이스",
+      "version": "오리지널(2008, Visceral Games) 기준. 2023 리메이크는 동일 철학 계승(보도 기준, 화면 미확인)",
+      "platforms": [
+        "PC",
+        "PlayStation",
+        "Xbox"
+      ],
+      "mobile": false,
+      "paradigms": [
+        "diegetic"
+      ],
+      "visual_style": "SF 호러 + 청색 홀로그램 투영 UI",
+      "signals": [
+        {
+          "grade": "A",
+          "label": "GDC 2013 'Crafting Destruction: The Evolution of the Dead Space User Interface' (Dino Ignacio)",
+          "url": "https://www.gamedeveloper.com/design/video-designing-i-dead-space-i-s-immersive-user-interface"
+        },
+        {
+          "grade": "B",
+          "label": "Dead Space UI 디자인 분석(VR 관점)",
+          "url": "https://medium.com/inbeta/dead-space-ui-design-lessons-for-vr-39aa9e976ca8"
+        },
+        {
+          "grade": "C",
+          "label": "에디터 리스트: RIG 수트 확장형 비정지 디제틱 메뉴 평가",
+          "url": "https://hardcoregamer.com/best-unique-game-menu-designs/"
+        }
+      ]
+    },
+    {
+      "game_id": "honkai-star-rail",
+      "title": "Honkai: Star Rail",
+      "title_ko": "붕괴: 스타레일",
+      "version": "정식 발매판(2023~, HoYoverse) 기준",
+      "platforms": [
+        "PC",
+        "PlayStation",
+        "iOS",
+        "Android"
+      ],
+      "mobile": true,
+      "paradigms": [
+        "non-diegetic",
+        "spatial"
+      ],
+      "visual_style": "애니메이션 셀셰이딩 + SF 판타지",
+      "signals": [
+        {
+          "grade": "B",
+          "label": "Google Play Best of 2023 Best Game / 2024 Best Ongoing",
+          "url": "https://www.analyticsinsight.net/gaming/google-play-awards-best-apps-and-games-of-2024"
+        },
+        {
+          "grade": "B",
+          "label": "사용성 휴리스틱 기반 UI 분석 학술 논문",
+          "url": "https://www.researchgate.net/publication/387640372_Analysis_of_Interface_Design_in_the_Game_Honkai_Star_Rail_Using_the_Usability_Heuristics_Principles_of_UI"
+        },
+        {
+          "grade": "C",
+          "label": "팬 UX 분석(엄지 영역 등)",
+          "url": "https://medium.com/@donxu29/ui-noir-honkai-star-rail-23d4b43c01a"
+        },
+        {
+          "grade": "C",
+          "label": "GDC 2025 리드 디자이너 인터뷰",
+          "url": "https://www.gamersheroes.com/features/honkai-star-rail-gdc-2025-interview-chengnan-an-discusses-creation-community-and-more/"
+        }
+      ]
+    },
+    {
+      "game_id": "balatro",
+      "title": "Balatro",
+      "title_ko": "발라트로",
+      "version": "정식 발매판(2024, LocalThunk) 기준",
+      "platforms": [
+        "PC",
+        "PlayStation",
+        "Xbox",
+        "Switch",
+        "iOS",
+        "Android"
+      ],
+      "mobile": true,
+      "paradigms": [
+        "non-diegetic",
+        "spatial"
+      ],
+      "visual_style": "픽셀아트 + CRT 왜곡 사이키델릭",
+      "signals": [
+        {
+          "grade": "A",
+          "label": "25th GDC Choice Awards GOTY·혁신상·디자인상 수상",
+          "url": "https://www.playstack.com/news/balatro-gdc-awards-2025/"
+        },
+        {
+          "grade": "A",
+          "label": "Apple Design Award 2025 Delight and Fun(Game) 수상",
+          "url": "https://www.apple.com/newsroom/2025/06/apple-unveils-winners-and-finalists-of-the-2025-apple-design-awards/"
+        },
+        {
+          "grade": "C",
+          "label": "Medium 디자인 분석: 스코어링 순차 활성화 피드백",
+          "url": "https://medium.com/@yyh19971004/balatro-design-analysis-visual-packaging-and-interactive-feedback-cc6fa6a65370"
+        },
+        {
+          "grade": "C",
+          "label": "GMTK 서브스택 디자인 비평",
+          "url": "https://gmtk.substack.com/p/balatros-cursed-design-problem"
+        }
+      ]
+    },
+    {
+      "game_id": "destiny-2",
+      "title": "Destiny 2",
+      "title_ko": "데스티니 가디언즈",
+      "version": "Destiny(2014) UI 설계 강연 기준, Destiny 2(2017~)로 계승",
+      "platforms": [
+        "PC",
+        "PlayStation",
+        "Xbox"
+      ],
+      "mobile": false,
+      "paradigms": [
+        "non-diegetic",
+        "spatial"
+      ],
+      "visual_style": "클린 SF 미니멀 HUD",
+      "signals": [
+        {
+          "grade": "A",
+          "label": "GDC 2016 'Tenacious Design and The Interface of Destiny' (David Candland, Bungie)",
+          "url": "https://gdcvault.com/play/1023460/Tenacious-Design-and-The-Interface"
+        },
+        {
+          "grade": "B",
+          "label": "Destiny 1→2 UX 개선 정리 기사(퀘스트 추적·보관함·HUD)",
+          "url": "https://www.gamedeveloper.com/design/ux-enhancements-from-destiny-1-to-destiny-2"
+        },
+        {
+          "grade": "C",
+          "label": "추적 퀘스트·바운티 분리, 알림 우선순위 분석",
+          "url": "https://medium.com/@saoliveri95/ui-of-destiny-2-the-pursuit-for-the-perfect-pursuits-page-f733c3bea255"
+        },
+        {
+          "grade": "C",
+          "label": "UX 디자이너의 Destiny 2 사례 연구",
+          "url": "https://www.yiqizhao.design/work/destiny-2"
+        }
+      ]
+    },
+    {
+      "game_id": "hardspace-shipbreaker",
+      "title": "Hardspace: Shipbreaker",
+      "title_ko": "하드스페이스: 쉽브레이커",
+      "version": "정식 발매판(2022 1.0, Blackbird Interactive) 기준. 강연은 2021 UI 재설계 시점",
+      "platforms": [
+        "PC",
+        "Xbox",
+        "PlayStation"
+      ],
+      "mobile": false,
+      "paradigms": [
+        "diegetic"
+      ],
+      "visual_style": "산업용 노동자 SF + 헬멧·장비 투영 인터페이스",
+      "signals": [
+        {
+          "grade": "A",
+          "label": "GDC 2021 'Cutting Apart The Diegetic Interface of Hardspace: Shipbreaker' (Vidhi Shah)",
+          "url": "https://www.gdcvault.com/play/1027158/Cutting-Apart-The-Diegetic-Interface"
+        },
+        {
+          "grade": "B",
+          "label": "Xbox Wire: 몰입형 세계와 인터페이스 제작 과정 개발자 기고 (검색결과)",
+          "url": "https://news.xbox.com/en-us/2022/08/23/how-blackbird-interactive-crafted-an-immersive-future-for-hardspace-shipbreaker/"
+        },
+        {
+          "grade": "B",
+          "label": "Canadian Gaming Awards 2020 Best Game Design 수상 (위키 수상 기록, 검색결과)",
+          "url": "https://en.wikipedia.org/wiki/Hardspace:_Shipbreaker"
+        }
+      ]
+    },
+    {
+      "game_id": "horizon-forbidden-west",
+      "title": "Horizon Forbidden West",
+      "title_ko": "호라이즌 포비든 웨스트",
+      "version": "오리지널판(2022, Guerrilla Games) 기준",
+      "platforms": [
+        "PlayStation",
+        "PC"
+      ],
+      "mobile": false,
+      "paradigms": [
+        "non-diegetic",
+        "spatial"
+      ],
+      "visual_style": "사실적 자연 오픈월드 + 부족 문양 모티프 HUD",
+      "signals": [
+        {
+          "grade": "B",
+          "label": "PlayStation 공식 블로그: 접근성 기능 상세",
+          "url": "https://blog.playstation.com/2022/02/10/accessibility-features-in-horizon-forbidden-west/"
+        },
+        {
+          "grade": "B",
+          "label": "Can I Play That 접근성 심층 리뷰",
+          "url": "https://caniplaythat.com/2022/02/14/horizon-forbidden-west-accessibility-review-can-i-play-that/"
+        }
+      ]
+    },
+    {
+      "game_id": "ghost-of-tsushima",
+      "title": "Ghost of Tsushima",
+      "title_ko": "고스트 오브 쓰시마",
+      "version": "오리지널판(2020, Sucker Punch) 기준",
+      "platforms": [
+        "PlayStation",
+        "PC"
+      ],
+      "mobile": false,
+      "paradigms": [
+        "diegetic"
+      ],
+      "visual_style": "시네마틱 사실주의 + HUD 최소화(환경 신호)",
+      "signals": [
+        {
+          "grade": "B",
+          "label": "Game Developer 디자인 분석: 가이딩 윈드가 미니맵 대체",
+          "url": "https://www.gamedeveloper.com/game-platforms/ghost-of-tsushima-design-analysis"
+        },
+        {
+          "grade": "B",
+          "label": "Jason Connell 인터뷰 2차 보도: 미니멀 UI",
+          "url": "https://n4g.com/news/2345755/ghost-of-tsushima-devs-give-more-details-about-minimal-ui-open-world-and-photo-mode"
+        },
+        {
+          "grade": "B",
+          "label": "21st GDC Choice Awards 6개 부문 노미네이트",
+          "url": "https://gdconf.com/article/ghost-of-tsushima-hades-and-the-last-of-us-part-ii-each-receive-six-nominations-for-the-21st-annual-game-developers-choice-awards/"
+        },
+        {
+          "grade": "C",
+          "label": "HUD 없는 안내 방식 분석",
+          "url": "https://medium.com/@ludonodestudios/%EF%B8%8F-the-invisible-hand-how-ghost-of-tsushima-guides-players-without-a-traditional-hud-70f6772fcacc"
+        }
+      ]
+    },
+    {
+      "game_id": "genshin-impact",
+      "title": "Genshin Impact",
+      "title_ko": "원신",
+      "version": "정식 발매판(2020~, miHoYo/HoYoverse) 기준",
+      "platforms": [
+        "PC",
+        "PlayStation",
+        "iOS",
+        "Android"
+      ],
+      "mobile": true,
+      "paradigms": [
+        "non-diegetic",
+        "spatial"
+      ],
+      "visual_style": "애니메이션 셀셰이딩 오픈월드 판타지",
+      "signals": [
+        {
+          "grade": "A",
+          "label": "Apple Design Award 2021 Visuals and Graphics(Game) 수상",
+          "url": "https://www.thegamer.com/genshin-impact-wins-2021-apple-design-award-for-visuals-and-graphics/"
+        },
+        {
+          "grade": "B",
+          "label": "GDC 2021 'Genshin Impact: Crafting an Anime-Style Open World'",
+          "url": "https://www.gdcvault.com/play/1027538/-Genshin-Impact-Crafting-an"
+        },
+        {
+          "grade": "C",
+          "label": "Honkai: Star Rail과 비교한 UI 문제 분석",
+          "url": "https://medium.com/@acarenatnic/how-honkai-star-rail-fixes-genshin-impacts-ui-problem-6b386d6154f1"
+        }
+      ]
+    },
+    {
+      "game_id": "persona-5-royal",
+      "title": "Persona 5 Royal",
+      "title_ko": "페르소나 5 더 로열",
+      "version": "Royal판(2019~2020, Atlus) 기준. UI는 Persona 5(2016)에서 확립",
+      "platforms": [
+        "PlayStation",
+        "PC",
+        "Switch",
+        "Xbox"
+      ],
+      "mobile": false,
+      "paradigms": [
+        "non-diegetic"
+      ],
+      "visual_style": "적·흑·백 그래픽 팝 콜라주(강한 타이포그래피)",
+      "signals": [
+        {
+          "grade": "A",
+          "label": "CEDEC+KYUSHU 2017 'Creative method for UI in the Persona series' (Masayoshi Sutoh)",
+          "url": "https://personacentral.com/persona-5-panel-concept-development-ui/"
+        },
+        {
+          "grade": "A",
+          "label": "CEDEC Awards 2019 Visual Arts 부문 수상(UI 디자이너)",
+          "url": "https://personacentral.com/cedec-awards-2019-persona-5-masayoshi-sutoh-visual-arts/"
+        },
+        {
+          "grade": "B",
+          "label": "Masayoshi Sutoh 인터뷰: UI 색·레이아웃 의도",
+          "url": "https://www.siliconera.com/atlus-reveals-design-secrets-behind-persona-5s-distinctive-ui/"
+        },
+        {
+          "grade": "B",
+          "label": "UI/사운드 디자인 개발자 인터뷰",
+          "url": "https://personacentral.com/persona-5-interview-ui-design-sound-music/"
+        }
+      ]
+    },
+    {
+      "game_id": "dredge-2023",
+      "title": "DREDGE",
+      "title_ko": "드레지",
+      "version": "정식 발매판(2023, Black Salt Games) 기준",
+      "platforms": [
+        "PC",
+        "PlayStation",
+        "Xbox",
+        "Switch",
+        "iOS"
+      ],
+      "mobile": true,
+      "paradigms": [
+        "non-diegetic",
+        "spatial"
+      ],
+      "visual_style": "로우폴리 다크 해양 + 코즈믹 호러",
+      "signals": [
+        {
+          "grade": "A",
+          "label": "Apple Design Award 2025 Interaction(Game) 수상",
+          "url": "https://www.apple.com/newsroom/2025/06/apple-unveils-winners-and-finalists-of-the-2025-apple-design-awards/"
+        },
+        {
+          "grade": "B",
+          "label": "Game Developer 딥다이브: 공간 인벤토리 설계 (Joel Mason)",
+          "url": "https://www.gamedeveloper.com/design/deep-dive-the-surprising-depth-of-spatial-inventories-in-dredge"
+        },
+        {
+          "grade": "C",
+          "label": "DREDGE식 그리드 인벤토리 Unity 오픈소스 구현",
+          "url": "https://github.com/ferrouslights/Unity-Tetris-Grid-Inventory-System"
+        }
+      ]
+    },
+    {
+      "game_id": "prince-of-persia-the-lost-crown",
+      "title": "Prince of Persia: The Lost Crown",
+      "title_ko": "페르시아의 왕자: 로스트 크라운",
+      "version": "2024 발매판(콘솔·PC) + 모바일 포팅판(iOS·Android) 기준",
+      "platforms": [
+        "PC",
+        "PlayStation",
+        "Xbox",
+        "Switch",
+        "iOS",
+        "Android"
+      ],
+      "mobile": true,
+      "paradigms": [
+        "non-diegetic"
+      ],
+      "visual_style": "2D 횡스크롤 셀셰이딩 페르시아 신화",
+      "signals": [
+        {
+          "grade": "A",
+          "label": "GDC 'UX Mobile Porting Challenges in Prince of Persia: The Lost Crown Case Study' (Alexis Denance, Ubisoft Da Nang)",
+          "url": "https://gdcvault.com/play/1035691/UX-Mobile-Porting-Challenges-in"
+        },
+        {
+          "grade": "A",
+          "label": "TGA 2024 Innovation in Accessibility 수상 (검색결과 기반)",
+          "url": "https://www.gamedeveloper.com/marketing/game-accessibility-at-gdc-2024"
+        },
+        {
+          "grade": "C",
+          "label": "GDC 2026 접근성 세션 목록에서 모바일 포팅 UX 강연 언급",
+          "url": "https://ian-hamilton.com/game-accessibility-at-gdc-2026/"
+        }
+      ]
+    },
+    {
+      "game_id": "nier-automata",
+      "title": "NieR:Automata",
+      "title_ko": "니어: 오토마타",
+      "version": "정식 발매판(2017, PlatinumGames/Square Enix) 기준",
+      "platforms": [
+        "PC",
+        "PlayStation",
+        "Xbox",
+        "Switch"
+      ],
+      "mobile": false,
+      "paradigms": [
+        "non-diegetic"
+      ],
+      "visual_style": "베이지 단색 미니멀 + 가상 OS 인터페이스",
+      "signals": [
+        {
+          "grade": "B",
+          "label": "PlatinumGames 공식 블로그 'UI Design in NieR:Automata' (UI 디자이너 Hisayoshi Kijima)",
+          "url": "https://www.platinumgames.com/official-blog/article/9624"
+        },
+        {
+          "grade": "B",
+          "label": "GDC 2018 Yoko Taro·Takahisa Taura 제작 회고 강연(UI 전용 아님)",
+          "url": "https://www.gdcvault.com/play/1024894/A-Fun-Time-in-Which"
+        },
+        {
+          "grade": "C",
+          "label": "에디터 리스트: 메뉴가 안드로이드 OS로 기능",
+          "url": "https://hardcoregamer.com/best-unique-game-menu-designs/"
+        },
+        {
+          "grade": "C",
+          "label": "칩 장착 시스템·HUD 설계 UX 블로그",
+          "url": "https://www.iabdi.com/designblog/2022/6/1/nier-automata-chips"
+        }
+      ]
+    },
+    {
+      "game_id": "the-last-of-us-part-ii",
+      "title": "The Last of Us Part II",
+      "title_ko": "더 라스트 오브 어스 파트 II",
+      "version": "오리지널판(2020, Naughty Dog) 기준",
+      "platforms": [
+        "PlayStation"
+      ],
+      "mobile": false,
+      "paradigms": [
+        "non-diegetic"
+      ],
+      "visual_style": "사실주의 시네마틱 + 극소 HUD",
+      "signals": [
+        {
+          "grade": "A",
+          "label": "TGA 2020 Innovation in Accessibility 최초 수상(카테고리 신설 계기)",
+          "url": "https://www.thegamer.com/game-awards-accessibility-category-last-of-us-2/"
+        },
+        {
+          "grade": "A",
+          "label": "AbleGamers Video Game Accessibility Awards 2020 등 수상 목록",
+          "url": "https://en.wikipedia.org/wiki/List_of_accolades_received_by_The_Last_of_Us_Part_II"
+        },
+        {
+          "grade": "B",
+          "label": "Game Developer: 접근성을 개발 초기부터 설계",
+          "url": "https://www.gamedeveloper.com/design/prioritizing-accessibility-early-on-was-vital-for-i-the-last-of-us-part-2-i-s-robust-features"
+        },
+        {
+          "grade": "B",
+          "label": "PlayStation 공식 접근성 옵션 페이지",
+          "url": "https://www.playstation.com/en-us/games/the-last-of-us-part-ii/accessibility/"
+        }
+      ]
+    }
+  ],
+  "rejected": [
+    {
+      "title": "Metroid Prime Remastered / Metroid Prime 4: Beyond",
+      "reason_ko": "바이저 HUD는 diegetic-vitals·reticle의 좋은 대조군이지만 1차 자료가 UI 아티스트 개인 포트폴리오뿐이고 시각 묘사 대부분이 'plausible' 수준이다. 같은 역할은 GDC 전용 강연이 있는 Hardspace: Shipbreaker와 Dead Space가 더 탄탄하게 맡는다. 게임 수 상한(14) 관리도 이유."
+    },
+    {
+      "title": "League of Legends",
+      "reason_ko": "고정형 전체 맵 미니맵과 원형 쿨다운 연출은 대조 가치가 크지만, 신호가 B 기사 1개와 PBE 포럼 1개에 그친다. skill-cooldown은 Destiny 2와 Prince of Persia(터치 입력 대조)로 충당되어 상한 14개 안에서 제외."
+    },
+    {
+      "title": "Celeste",
+      "reason_ko": "Assist Mode는 settings-accessibility의 훌륭한 대조군이지만 GDC 강연 존재가 'unverified'이다. 같은 자리에 TGA 접근성 수상과 GDC UX 강연이 있고 모바일 조건까지 채우는 Prince of Persia: The Lost Crown을 택함."
+    },
+    {
+      "title": "Metaphor: ReFantazio",
+      "reason_ko": "메뉴·결과 화면 사례로 강하지만 같은 Atlus·Hashino 계열 UI 철학이라 Persona 5 Royal과 겹친다. 신호도 매체 인터뷰(B) 위주라 Persona 5 Royal 하나로 통합."
+    },
+    {
+      "title": "Clash Royale",
+      "reason_ko": "모바일 퍼스트이지만 GDC 강연이 카드 밸런스 중심이라 UI 신호가 약하다. 모바일 조건은 Honkai: Star Rail·Genshin Impact·Balatro·DREDGE·Prince of Persia로 이미 충족."
+    },
+    {
+      "title": "Monster Hunter: World",
+      "reason_ko": "체력 잔상·약점 데미지 숫자 색 구분의 교과서적 사례이나 신호가 커뮤니티 토론(C) 2개뿐이고 텍스트 근거가 얕아 Hades·Honkai: Star Rail에 밀림. 수업 보조 사례로 언급하는 것은 권장."
+    },
+    {
+      "title": "Diablo IV",
+      "reason_ko": "장착품 비교 툴팁(녹/적 증감) 사례로 적합하지만 신호가 전부 C(분석 블로그·포럼)라 GDC 강연이 있는 Destiny 2를 대표로 선택."
+    },
+    {
+      "title": "Mass Effect / Disco Elysium / Baldur's Gate 3",
+      "reason_ko": "대화 바퀴·스킬 체크 구슬·주사위 판정 등 대화 UI 대조군으로 교육 가치는 높으나 신호가 B 이하 2차 분석뿐이다. 게임 수 상한 때문에 Persona 5 Royal 대 Hades 조합을 택함."
+    },
+    {
+      "title": "Fallout 4 / Hollow Knight / Elden Ring / GoldenEye 007 / Until Dawn / Resident Evil 4 / Overwatch 2",
+      "reason_ko": "신호가 1개이거나 C등급 에디터 리스트·커뮤니티 자료뿐이라 독립 신호 2개 제약을 충족하기 어렵고(text_sources_rich=false 다수), 같은 역할을 더 탄탄한 후보가 맡음."
+    },
+    {
+      "title": "Into the Breach / Monument Valley / Hearthstone",
+      "reason_ko": "UI 철학 자료는 좋지만 13개 표본과 직접 대응하는 항목이 없거나 약함(후보 풀 note 기준)."
+    },
+    {
+      "title": "Forza Horizon 5 / God of War Ragnarök / Forza Motorsport / DOOM: The Dark Ages",
+      "reason_ko": "TGA 접근성 수상작이지만 settings-accessibility 자리는 The Last of Us Part II(최초 수상·자료 최다)가 대표를 맡는다. 나머지는 UI 세부 근거가 미확인이거나 신호가 1개뿐."
+    },
+    {
+      "title": "Death Stranding 2",
+      "reason_ko": "3D 보셀 맵 GDC 강연은 흥미롭지만 원형 미니맵·화면 밖 표시와 직접 대응이 약하고, 대조 역할은 Ghost of Tsushima가 더 명확함."
+    },
+    {
+      "title": "Infinity Nikki / Art of Fauna / stitch. / Railbound / Crayola Adventures / A Musical Story / Marvel Future Revolution",
+      "reason_ko": "Apple Design Award 수상(A) 신호 1개뿐이고 UI 전용 텍스트 자료가 부족하다. 모바일 조건은 이미 충족."
+    },
+    {
+      "title": "Call of Duty / Apex Legends",
+      "reason_ko": "히트마커·핑 시스템의 원형으로 유명하나 개발자 UI 강연·수상 근거를 찾지 못함(B 1개 또는 전부 C). reticle-hitmarker는 GDC 강연이 있는 Destiny 2로 대표."
+    },
+    {
+      "title": "Dead Space (2023 Remake) 별도 항목",
+      "reason_ko": "신호가 2008 원작 강연 요약 1개뿐이라 리메이크 단독 근거가 없다. 분석 버전을 2008 원작으로 명시해 하나의 game_id로 통합."
+    }
+  ],
+  "constraint_report_ko": "1) 게임 수: 서로 다른 게임 14개로 10~14 범위 충족(hades, dead-space-2008, honkai-star-rail, balatro, destiny-2, hardspace-shipbreaker, horizon-forbidden-west, ghost-of-tsushima, genshin-impact, persona-5-royal, dredge-2023, prince-of-persia-the-lost-crown, nier-automata, the-last-of-us-part-ii). 13개 표본 모두 대표와 비교 게임이 서로 다름. 쏠림 주의: Destiny 2가 대표 4회(reticle, quest, inventory, skill), Persona 5 Royal이 대표 3회를 맡음.\n2) 독립 신호 2개 이상: 14개 모두 충족해 예외는 0건. Hardspace는 후보 풀의 GDC 강연과 소개 기사가 같은 강연을 가리켜 독립성이 약했으므로, WebSearch로 Xbox Wire 개발자 기고(B)와 Canadian Gaming Awards 2020 Best Game Design 수상(B, 위키 기록·검색결과)을 보강함. Horizon Forbidden West는 B 2개(PlayStation 블로그, Can I Play That)로 최소 기준만 충족.\n3) 모바일: 6개(Honkai: Star Rail, Genshin Impact, Balatro, DREDGE, Prince of Persia 모바일판, Hades iOS)로 충족. 모바일 퍼스트 성격이 강한 작품은 Honkai: Star Rail과 Genshin Impact(모바일·PC 동시 출시). 단 Hades 모바일판은 Netflix 배포 iOS판으로, 출처 미확인('unverified')이라 모바일 계산에서 빼도 충족됨.\n4) 패러다임: diegetic(Dead Space, Hardspace, Ghost of Tsushima 환경 신호), non-diegetic(다수), spatial(Honkai: Star Rail 데미지 숫자, Destiny 2·Horizon 월드 마커, DREDGE 공간 인벤토리, Balatro 카드 위 점수), meta(Hades 저체력 화면 효과)로 4종 모두 등장. 단 Hades의 meta 효과는 화면 미확인이라 'plausible'.\n5) 비주얼 스타일: 페인터리 코믹, SF 호러 홀로그램, 애니메이션 셀셰이딩, 픽셀아트 CRT, 클린 SF 미니멀, 산업 SF, 사실주의 자연, 시네마틱 HUD 최소화, 그래픽 팝 콜라주, 로우폴리 다크, 2D 셀셰이딩, 단색 가상 OS 등 10종 이상으로 충족.\n6) 텍스트 자료: 선정 14개 모두 후보 풀 기준 text_sources_rich=true. text_sources_rich=false 후보는 전부 제외함.\n7) 대조 원칙: 바 대 몸체 게이지, 화면 조준점 대 레이저 조준선, 나침반 대 바람, 미니맵 대 미니맵 없음, 고밀도 추적 대 모바일 단일 추적, 슬롯 그리드 대 공간 퍼즐, 버튼 아이콘 대 터치 버튼, 화려한 전환 대 OS형 절제, 대작 옵션 대 포팅 재구성, 연출형 정산 대 미니멀 순차 합산으로 '다른 해법'을 맞춤. 가장 약한 대조는 settings-accessibility(TLOU2 대 Prince of Persia)로, 둘 다 '옵션이 풍부한' 쪽이라 대조축이 플랫폼 전환에 머묾. 더 강한 대조가 필요하면 Celeste Assist Mode로 교체를 검토할 것(게임 수 15개로 넘으므로 다른 게임 1개를 빼야 함).\n8) 버전 명시: 모든 게임에 버전 기재. Dead Space는 2008 원작으로 고정(리메이크 화면 미확인), Destiny는 2014 강연과 Destiny 2 계승 관계를 명시.\n9) 검증 한계: 데미지 숫자 색, 미니맵 회전 여부, 잔상 바 타이밍, 쿨다운 채움 방향 같은 시각 세부는 화면을 직접 보지 못해 'plausible'이고, 수상 사실 일부(Prince of Persia TGA 2024 등)는 검색결과 기반임. gameuidatabase.com과 interfaceingame.com에는 접근하지 않음."
+}

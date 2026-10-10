@@ -1,0 +1,97 @@
+# 표본 제작 가이드 (계약 v1)
+
+표본 하나를 새로 만들 때 따르는 규칙과 체크리스트. 기준 구현 두 개를 먼저 읽는다.
+
+| 기준 구현 | 보여 주는 것 |
+|---|---|
+| [`src/specimens/health-bar-trail`](../src/specimens/health-bar-trail) | 2D HUD · ref 로 DOM 직접 갱신 · 자동 데모 · 효과 끄기 · 번쩍임 제한 · CSS 애니메이션 배속/정지 |
+| [`src/specimens/offscreen-waypoint`](../src/specimens/offscreen-waypoint) | 3D Scene + HUD · `bus` 로 상태 공유 · WebGL 없을 때 2D 대체 · 드래그 입력 |
+
+## 1. 파일
+
+```
+src/specimens/<id>/index.tsx          default export = HUD 컴포넌트, export { meta } from './meta'
+                                      (3D 면) export { XxxScene as Scene } from './Scene'
+src/specimens/<id>/meta.ts            모든 글·조절 값·프리셋·핫스팟·Unity 가이드
+src/specimens/<id>/style.module.css   표본 전용 스타일 (전역 선택자 금지)
+src/unity/<id>/ugui/*.cs              UGUI 구현 (+ 테스트 입력 스크립트 권장)
+src/unity/<id>/uitk/*.uxml *.uss *.cs UI Toolkit 구현
+```
+
+- `<id>` 는 **영구 불변** kebab-case. `meta.id` 와 폴더명이 같아야 한다.
+- 다른 폴더(`src/app`, `src/core`, 다른 표본)는 수정하지 않는다. 공통 기능이 필요하면 요청으로 남긴다.
+
+## 2. 좌표와 크기
+
+- HUD 는 **논리 해상도 1920×1080** (세로 표본은 1080×1920) 픽셀로 그린다. 무대가 알아서 축소한다.
+  Unity Canvas Scaler 의 Reference Resolution 과 같은 개념이라 수치를 그대로 Unity 로 옮길 수 있다.
+- 글자는 최소 22px (프로젝터에서 축소돼도 읽히도록), 주요 수치는 28px 이상.
+- 루트 요소는 `position: absolute; inset: 0`.
+
+## 3. Props 사용 규칙 (`SpecimenProps`)
+
+| prop | 반드시 지킬 것 |
+|---|---|
+| `params` | `num/str/bool(p.params, key, 기본값)` 으로 읽는다. meta 의 모든 param 이 화면에 **눈에 띄는** 차이를 만들어야 한다 |
+| `juice` | `false` 면 연출(잔상·흔들림·보간·강조·소리 대신 시각 피드백 등)을 끈 **나쁜 예**. 단순히 아무것도 안 보이는 게 아니라 "흔한 실수"를 재현한다 |
+| `playing` | `false` 면 정지. JS 루프는 `useGameLoop(p.playing, p.timeScale, dt => …)`, CSS 애니메이션은 `data-paused` 로 `animation-play-state: paused` |
+| `timeScale` | 게임 시간 배속. `useGameLoop` 의 dt 에 이미 곱해져 있다. CSS 애니메이션 시간은 `calc(… / var(--ts))` |
+| `trigger` | `useTrigger(p.trigger, id => …)` — meta.events 의 id 마다 처리 |
+| `autoplay` | `useAutoplay(p.autoplay, p.playing, p.timeScale, 초, fn, p.trigger?.seq)` 로 사람이 없어도 핵심 상황이 순환하는 데모 |
+| `thumbnail` | 갤러리 카드용. 무거운 것(3D·많은 입자)은 생략 가능. 정지 상태에서도 **첫 화면이 의미 있게** 보여야 한다 |
+| `webgl` | 3D 표본에서 `false` 면 HUD 가 2D 대체 배경을 그린다 |
+| `bus` | HUD ↔ Scene 공유 객체 (마운트마다 새로 생성) |
+| `width/height/aspect` | 논리 해상도. 세로(9:16) 지원 표본은 레이아웃을 분기 |
+
+### 성능
+
+- 매 프레임 바뀌는 값은 `useRef` + DOM 직접 갱신 (`el.style.transform = …`). 프레임마다 `setState` 하지 않는다.
+- 값이 바뀌거나 정지 상태일 때도 한 번은 그려지게 `useLayoutEffect(() => paint())` 를 둔다.
+
+## 4. 해설 번호 (hotspots)
+
+- meta.hotspots 의 `part` 마다 HUD 안에 `data-part="<part>"` 요소가 **항상** 있어야 한다 (숨김 상태여도 DOM 에는 존재).
+- 번호는 요소의 위쪽 가운데에 붙는다. 넓은 요소(예: 바 전체) 대신 **설명하려는 부분만 감싼 영역**에 붙인다 (기준 구현의 `trail` 영역 참고).
+- 3~5개. `principle` 은 8개 원리 중 하나.
+
+## 5. 접근성 · 안전
+
+- 화면의 넓은 영역이 번쩍이는 효과는 `requestFlash()` 가 `true` 일 때만. 해당 표본은 `meta.flashes = true`.
+- 반복 맥동은 2Hz 이하.
+- 색만으로 상태를 전달하지 않는다 (모양·위치·글자와 함께).
+
+## 6. 콘텐츠 정책 (요약)
+
+- 원작 에셋·로고·캐릭터·전용 폰트·고유 문구 0. 원작에서 빌리는 시각 축은 **최대 2개** (`inspiredBy[].borrowed`).
+- 표본 제목·ID·프리셋 이름·CSS 클래스·변수명에 **게임명 금지**. 게임명은 `inspiredBy` 에만.
+- 비트맵 금지. 아이콘은 직접 그린 SVG/CSS.
+- 화면 속 텍스트(퀘스트명, 아이템명, 대사)는 원작과 무관한 새 문구로.
+
+## 7. meta.ts 글쓰기
+
+- 한국어, 수업에서 그대로 읽을 수 있게 짧게. `**굵게**`, `` `코드` `` 사용 가능.
+- `goals` 3~4개 ("~할 수 있다"), `mistakes` 3~5개, `timings` 는 근거 없으면 note 에 "권장값".
+- `unity.ugui / unity.uitk` 의 `hierarchy` 는 실제 파일과 일치해야 한다.
+
+## 8. Unity 코드
+
+- Unity 6.3 LTS · 새 Input System · TextMeshPro(UGUI).
+- 금지: `FindObjectOfType`, `Rigidbody.velocity`, 구 Input Manager (`Input.GetKey` 등).
+- UI Toolkit: `UIDocument` + UXML + USS. USS 에 없는 CSS 기능(gradient, filter, box-shadow 등)을 쓰지 않는다.
+- 각 파일 상단에 무엇을 하는지 한국어 주석. 외부 패키지(DOTween 등)는 쓰지 않는다.
+
+## 9. 검사 체크리스트
+
+```bash
+npx tsc --noEmit                                   # 내 파일 오류 0
+python tools/shot.py <id> default juice0 event:<이벤트> preset:<프리셋> spot:1 mobile
+python tools/check.py                              # (dist 빌드 후) 전체 규칙
+```
+
+- [ ] 기본 화면이 의미 있게 보인다 (썸네일 포함)
+- [ ] 이벤트 버튼마다 눈에 띄는 반응
+- [ ] 효과 끄기 = 설득력 있는 나쁜 예
+- [ ] 모든 param·preset 이 눈에 띄게 다르다
+- [ ] 해설 번호가 올바른 부분을 가리킨다
+- [ ] 모바일 폭(390px)에서 깨지지 않는다
+- [ ] 게임명·원작 고유 표현이 코드·화면에 없다

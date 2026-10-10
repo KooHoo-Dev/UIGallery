@@ -37,7 +37,8 @@ export function unityFiles(id: string, kind: 'ugui' | 'uitk'): UnityFile[] {
     })
     .sort((a, b) => order(a.name) - order(b.name) || a.name.localeCompare(b.name))
 }
-const order = (n: string) => (n.endsWith('.uxml') ? 0 : n.endsWith('.uss') ? 1 : 2)
+/* 보여 주는 순서: UXML → USS → 본 스크립트 → 테스트용(Demo) 스크립트 */
+const order = (n: string) => (n.endsWith('.uxml') ? 0 : n.endsWith('.uss') ? 1 : /demo/i.test(n) ? 3 : 2)
 
 /* 아직 구현되지 않은 MVP 표본 — 구현되면 자동으로 목록에서 빠진다 */
 const PLANNED_ALL: PlannedSpecimen[] = [

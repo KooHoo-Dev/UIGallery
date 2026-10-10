@@ -1,0 +1,469 @@
+{
+  "specimen_id": "damage-numbers",
+  "name_ko": "데미지 숫자",
+  "name_en": "Damage Numbers",
+  "group": "A",
+  "paradigm": "spatial",
+  "one_liner_ko": "맞은 자리 위에 숫자를 띄워 '얼마나, 어떤 종류로' 맞았는지 바로 알려주고, 여러 번 맞으면 겹치지 않게 쌓은 뒤 총합으로 정리한다.",
+  "learning_goals_ko": [
+    "월드 좌표(3D 타격 지점)를 스크린/캔버스 좌표로 바꿔 UI를 붙이는 방법을 설명하고 구현할 수 있다.",
+    "일반·치명타·약점·회복 숫자를 크기·색·모션 세 축으로 위계화해 한눈에 구분되게 설계할 수 있다.",
+    "다단 히트에서 숫자가 겹치지 않도록 흩뿌림·스택·순차 재생 중 하나를 골라 그 이유를 말할 수 있다.",
+    "개별 숫자를 '누적 합산(총 피해)'으로 정리해 인지 부하를 줄이는 흐름을 구현할 수 있다.",
+    "자주 생성·삭제되는 UI를 UnityEngine.Pool.ObjectPool로 재사용해 GC 스파이크를 막을 수 있다."
+  ],
+  "anatomy": [
+    {
+      "part_id": "anchor",
+      "name_ko": "타격 앵커",
+      "role_ko": "월드 공간의 타격 지점(보통 적 머리 위 소켓). 매 프레임 스크린 좌표로 변환되어 숫자의 출발점이 된다. 화면에는 보이지 않는다."
+    },
+    {
+      "part_id": "number_label",
+      "name_ko": "숫자 라벨",
+      "role_ko": "피해량 자체. 굵은 숫자 전용 폰트에 외곽선이나 그림자를 더해 어떤 배경 위에서도 읽히게 한다."
+    },
+    {
+      "part_id": "crit_mark",
+      "name_ko": "치명타 표식",
+      "role_ko": "치명타일 때만 붙는 보조 기호(예: 별 모양 섬광). 크기 확대와 함께 '특별한 한 방'임을 알린다."
+    },
+    {
+      "part_id": "type_glyph",
+      "name_ko": "속성·약점 글리프",
+      "role_ko": "숫자 옆 작은 아이콘. 어떤 속성으로 때렸는지, 약점을 찔렀는지(실드 깨짐)를 색 말고 모양으로도 전달해 색각 이상 사용자도 구분할 수 있게 한다."
+    },
+    {
+      "part_id": "heal_label",
+      "name_ko": "회복 라벨",
+      "role_ko": "아군 위에 뜨는 '+' 접두 숫자. 피해와 의미가 반대이므로 색·부호·움직임(위로 부드럽게)을 모두 다르게 한다."
+    },
+    {
+      "part_id": "total_panel",
+      "name_ko": "누적 합산 패널",
+      "role_ko": "한 번의 행동(다단 히트·광역기)이 끝나면 개별 숫자를 모아 '총 피해'로 한 번 더 보여주는 영역. 개별 숫자보다 크고 오래 머문다."
+    },
+    {
+      "part_id": "pool",
+      "name_ko": "오브젝트 풀",
+      "role_ko": "화면 밖에서 대기 중인 숫자 라벨 묶음. 생성/파괴 대신 꺼냈다 돌려놓아 메모리 할당을 없앤다. 무대에서는 '풀 잔량' 카운터로 보여준다."
+    }
+  ],
+  "states": [
+    {
+      "name": "pooled",
+      "trigger_ko": "초기 상태 또는 페이드아웃 완료 후 풀에 반환",
+      "visual_ko": "비활성. 화면에 없음. 풀 카운터 +1."
+    },
+    {
+      "name": "spawn_pop",
+      "trigger_ko": "피격/회복 이벤트 수신 → 풀에서 꺼냄",
+      "visual_ko": "앵커 위치에서 스케일 0.5→오버슈트(예: 1.3)→1.0으로 튀어나옴. 치명타는 오버슈트가 더 크고 짧은 흔들림이 붙는다."
+    },
+    {
+      "name": "rise_hold",
+      "trigger_ko": "팝 완료 직후",
+      "visual_ko": "정해진 거리만큼 위로 감속하며 올라가 잠시 머문다. 스택 모드에서는 이전 숫자가 위로 밀려 올라가 자리를 비켜준다."
+    },
+    {
+      "name": "sequence_step",
+      "trigger_ko": "순차 재생 모드에서 앞 숫자의 등장 완료",
+      "visual_ko": "다음 숫자가 일정 간격 뒤에 하나씩 등장. 각 등장마다 합산 패널 값이 조금씩 올라가 '계산 과정'이 보인다."
+    },
+    {
+      "name": "merge_to_total",
+      "trigger_ko": "한 행동의 마지막 히트 종료 + 누적 합산 켜짐",
+      "visual_ko": "개별 숫자들이 합산 패널 쪽으로 빨려 들어가며 작아지고, 합산 숫자가 최종값까지 카운트업한 뒤 한 번 펀치."
+    },
+    {
+      "name": "fade_out",
+      "trigger_ko": "수명(lifetime) 만료",
+      "visual_ko": "투명도 1→0, 살짝 작아지며 사라짐. 끝나면 pooled로 돌아감."
+    }
+  ],
+  "params": [
+    {
+      "key": "layout",
+      "label_ko": "겹침 방지 방식",
+      "type": "select",
+      "default": "stack",
+      "options": [
+        "scatter",
+        "stack",
+        "sequence"
+      ],
+      "affects_ko": "scatter=무작위 좌우 오프셋으로 흩뿌림, stack=새 숫자가 아래에 들어오고 이전 숫자를 위로 밀어 올림, sequence=한 번에 하나씩 순서대로 등장하며 합산(계산 과정 설명형)"
+    },
+    {
+      "key": "crit_scale",
+      "label_ko": "치명타 크기 배율",
+      "type": "range",
+      "min": 1,
+      "max": 2.5,
+      "step": 0.1,
+      "default": "1.6",
+      "unit": "×",
+      "affects_ko": "치명타 숫자가 일반 숫자보다 얼마나 커지는지. 1.0이면 위계가 사라지고, 2.5면 화면을 덮는다."
+    },
+    {
+      "key": "rise_distance",
+      "label_ko": "상승 거리",
+      "type": "range",
+      "min": 0,
+      "max": 120,
+      "step": 10,
+      "default": "60",
+      "unit": "px",
+      "affects_ko": "숫자가 생겨난 뒤 위로 떠오르는 거리. 0이면 제자리에 고정(계산식 표시에 적합)."
+    },
+    {
+      "key": "lifetime",
+      "label_ko": "표시 시간",
+      "type": "range",
+      "min": 400,
+      "max": 2000,
+      "step": 100,
+      "default": "900",
+      "unit": "ms",
+      "affects_ko": "숫자 하나가 화면에 머무는 총 시간. 짧으면 깔끔하지만 놓치기 쉽고, 길면 다단 히트에서 화면이 숫자로 가득 찬다."
+    },
+    {
+      "key": "pop_overshoot",
+      "label_ko": "등장 펀치(오버슈트)",
+      "type": "range",
+      "min": 1,
+      "max": 1.6,
+      "step": 0.05,
+      "default": "1.3",
+      "unit": "×",
+      "affects_ko": "등장 순간 목표 크기보다 얼마나 더 커졌다 돌아오는지. 1.0이면 밋밋하게 나타나 타격감이 줄어든다."
+    },
+    {
+      "key": "stagger_ms",
+      "label_ko": "다단 히트 간격",
+      "type": "range",
+      "min": 0,
+      "max": 400,
+      "step": 20,
+      "default": "80",
+      "unit": "ms",
+      "affects_ko": "연속 히트 숫자 사이의 등장 간격. 0이면 동시에 터져 겹치고, 300ms 이상이면 하나하나 세어지는 '계산 리듬'이 생긴다."
+    },
+    {
+      "key": "show_total",
+      "label_ko": "누적 합산 표시",
+      "type": "toggle",
+      "default": "true",
+      "affects_ko": "행동이 끝난 뒤 개별 숫자를 모아 총 피해를 크게 보여줄지 여부."
+    },
+    {
+      "key": "color_mode",
+      "label_ko": "색 체계",
+      "type": "select",
+      "default": "semantic",
+      "options": [
+        "semantic",
+        "mono",
+        "colorblind_safe"
+      ],
+      "affects_ko": "semantic=종류별 색(일반 흰색·치명타 주황·약점 속성색·회복 초록), mono=모두 흰색(위계는 크기만으로), colorblind_safe=파랑/주황 대비 + 글리프 강제 표시"
+    }
+  ],
+  "presets": [
+    {
+      "id": "turn_based_multihit",
+      "name_ko": "턴제 다단 히트 + 총합 정리",
+      "genre_ko": "턴제 RPG",
+      "values_json": "{\"layout\":\"stack\",\"crit_scale\":\"1.6\",\"rise_distance\":\"60\",\"lifetime\":\"1100\",\"pop_overshoot\":\"1.3\",\"stagger_ms\":\"80\",\"show_total\":\"true\",\"color_mode\":\"semantic\"}",
+      "look_ko": "히트마다 숫자가 아래에서 쌓이며 위로 밀려 올라가고, 치명타는 확실히 크게 튄다. 행동이 끝나면 숫자들이 총합 패널로 모여 큰 숫자 하나로 정리된다."
+    },
+    {
+      "id": "action_brawl_minimal",
+      "name_ko": "난전용 짧고 가벼운 숫자",
+      "genre_ko": "실시간 액션 / 핵앤슬래시",
+      "values_json": "{\"layout\":\"scatter\",\"crit_scale\":\"1.3\",\"rise_distance\":\"40\",\"lifetime\":\"600\",\"pop_overshoot\":\"1.15\",\"stagger_ms\":\"0\",\"show_total\":\"false\",\"color_mode\":\"semantic\"}",
+      "look_ko": "숫자가 작고 빨리 사라지며 좌우로 흩어진다. 화면을 가리지 않는 대신 개별 값은 '느낌'만 전달한다. 총합은 띄우지 않는다."
+    },
+    {
+      "id": "score_breakdown_sequence",
+      "name_ko": "점수 계산 과정 설명형(순차 합산)",
+      "genre_ko": "덱빌딩 / 퍼즐 스코어링",
+      "values_json": "{\"layout\":\"sequence\",\"crit_scale\":\"1.4\",\"rise_distance\":\"0\",\"lifetime\":\"1600\",\"pop_overshoot\":\"1.4\",\"stagger_ms\":\"340\",\"show_total\":\"true\",\"color_mode\":\"colorblind_safe\"}",
+      "look_ko": "숫자가 제자리에서 하나씩 '톡, 톡' 튀어나오고, 그때마다 합산 값이 올라간다. 겹침을 공간이 아니라 시간으로 해결해 '왜 이 점수가 나왔는지'를 읽게 해준다."
+    }
+  ],
+  "events": [
+    {
+      "id": "hit_normal",
+      "label_ko": "일반 피격"
+    },
+    {
+      "id": "hit_crit",
+      "label_ko": "치명타"
+    },
+    {
+      "id": "hit_weakness",
+      "label_ko": "약점 격파"
+    },
+    {
+      "id": "multi_hit",
+      "label_ko": "다단 히트(5연타)"
+    },
+    {
+      "id": "heal",
+      "label_ko": "회복"
+    },
+    {
+      "id": "aoe_burst",
+      "label_ko": "광역기(적 3명 동시)"
+    }
+  ],
+  "timings": [
+    {
+      "event_ko": "등장 팝(스케일 0.5→오버슈트→1.0)",
+      "duration_ms": 140,
+      "easing": "cubic-bezier(0.34, 1.56, 0.64, 1) (easeOutBack)",
+      "note_ko": "권장값. 150ms 안팎이면 '맞은 순간'과 같은 박자로 느껴진다."
+    },
+    {
+      "event_ko": "치명타 흔들림(좌우 3~4px)",
+      "duration_ms": 160,
+      "easing": "linear (감쇠 사인)",
+      "note_ko": "권장값. 팝과 동시에 시작하며 화면 전체가 아니라 숫자만 흔든다."
+    },
+    {
+      "event_ko": "상승 이동",
+      "duration_ms": 700,
+      "easing": "cubic-bezier(0.22, 1, 0.36, 1) (easeOutQuint)",
+      "note_ko": "권장값. 처음엔 빠르고 끝에서 멈추듯 감속해 머무는 시간에 읽힌다."
+    },
+    {
+      "event_ko": "페이드아웃",
+      "duration_ms": 250,
+      "easing": "ease-in (easeInQuad)",
+      "note_ko": "권장값. lifetime의 마지막 구간에서 시작."
+    },
+    {
+      "event_ko": "다단 히트 숫자 간 간격(stagger)",
+      "duration_ms": 80,
+      "easing": "step",
+      "note_ko": "권장값. 순차 설명형에서는 300~400ms로 늘린다."
+    },
+    {
+      "event_ko": "총합으로 빨려 들어가기",
+      "duration_ms": 300,
+      "easing": "cubic-bezier(0.55, 0, 1, 0.45) (easeInCubic)",
+      "note_ko": "권장값. 끝으로 갈수록 빨라져 '흡수되는' 느낌."
+    },
+    {
+      "event_ko": "총합 카운트업",
+      "duration_ms": 450,
+      "easing": "cubic-bezier(0.16, 1, 0.3, 1) (easeOutExpo)",
+      "note_ko": "권장값. 끝나는 순간 1.15× 펀치 120ms를 한 번 더 준다."
+    },
+    {
+      "event_ko": "회복 숫자 상승",
+      "duration_ms": 900,
+      "easing": "ease-out (easeOutSine)",
+      "note_ko": "권장값. 피해보다 느리고 부드럽게 올라가 '공격'과 다른 감정을 준다."
+    }
+  ],
+  "hotspots": [
+    {
+      "n": 1,
+      "part_id": "anchor",
+      "title_ko": "숫자는 '맞은 자리'에서 태어난다",
+      "body_ko": "숫자를 화면 구석 로그가 아니라 타격 지점 위에 띄우면 눈을 옮기지 않아도 '누가 얼마나 맞았는지'를 바로 연결할 수 있다. 광역기에서 적 3명 위에 각각 숫자가 뜨는 이유다.",
+      "principle": "즉각 피드백"
+    },
+    {
+      "n": 2,
+      "part_id": "crit_mark",
+      "title_ko": "크기 > 색 > 기호 순서의 위계",
+      "body_ko": "치명타는 크기로 먼저 튀고, 색으로 종류를 알리고, 기호로 한 번 더 확인시킨다. 한 축만 쓰면 바쁜 장면에서 놓치기 쉽다. 세 축이 같은 방향을 가리켜야 위계가 선다.",
+      "principle": "시각 위계"
+    },
+    {
+      "n": 3,
+      "part_id": "type_glyph",
+      "title_ko": "색만으로 구분하지 않는다",
+      "body_ko": "약점·속성을 색으로만 표시하면 색각 이상 사용자나 밝은 배경에서 정보가 사라진다. 작은 글리프와 '+' 부호 같은 모양 단서를 함께 두면 색을 꺼도 의미가 남는다.",
+      "principle": "접근성"
+    },
+    {
+      "n": 4,
+      "part_id": "total_panel",
+      "title_ko": "다섯 개 숫자 대신 하나의 답",
+      "body_ko": "다단 히트의 숫자를 머릿속으로 더하게 하지 않고, 행동이 끝나면 총합으로 정리해준다. 개별 숫자는 '타격감', 총합은 '결과 판단'을 맡아 역할이 나뉜다.",
+      "principle": "인지 부하"
+    },
+    {
+      "n": 5,
+      "part_id": "number_label",
+      "title_ko": "겹침은 공간이나 시간으로 푼다",
+      "body_ko": "동시에 여러 숫자가 나오면 스택(공간)으로 밀어내거나 순차 재생(시간)으로 하나씩 보여준다. 어느 쪽이든 '같은 자리에 두 숫자가 겹치는 순간'을 없애는 것이 핵심이다.",
+      "principle": "가독성"
+    }
+  ],
+  "principles": [
+    "숫자의 출발점은 항상 타격 앵커 — 월드→스크린 변환을 매 프레임 갱신해 대상이 움직여도 따라간다.",
+    "종류(일반·치명타·약점·회복)마다 크기·색·모션·기호 중 최소 두 축을 다르게 한다.",
+    "겹침은 오프셋/스택(공간) 또는 순차 재생(시간)으로 반드시 해결한다.",
+    "개별 숫자는 짧게, 총합은 크고 길게 — 정보의 중요도와 체류 시간을 맞춘다.",
+    "숫자 UI는 대량·고빈도로 생성되므로 처음부터 풀링을 전제로 설계한다.",
+    "효과(오버슈트·흔들림)는 치명타처럼 드문 사건에 몰아줄수록 의미가 커진다."
+  ],
+  "mistakes": [
+    {
+      "title_ko": "모든 숫자를 같은 크기·같은 색으로",
+      "body_ko": "일반과 치명타가 똑같이 보이면 플레이어는 빌드가 잘 작동하는지 알 수 없다. 최소한 크기 배율과 색 하나는 달라야 한다."
+    },
+    {
+      "title_ko": "다단 히트 숫자가 한 점에 겹침",
+      "body_ko": "같은 프레임에 같은 위치로 스폰하면 숫자가 포개져 '8̶8̶8' 같은 덩어리가 된다. stagger 간격이나 스택 밀어내기를 넣어야 한다."
+    },
+    {
+      "title_ko": "Instantiate/Destroy를 히트마다 호출",
+      "body_ko": "광역 다단기 한 번에 수십 개 객체가 생성·파괴되어 GC 스파이크로 프레임이 튄다. ObjectPool로 미리 만들어 재사용한다."
+    },
+    {
+      "title_ko": "카메라 뒤 대상도 숫자를 띄움",
+      "body_ko": "WorldToScreenPoint는 카메라 뒤의 점에도 좌표를 돌려준다. z가 0 이하이면 숨기지 않으면 화면 반대편에 엉뚱한 숫자가 나타난다."
+    },
+    {
+      "title_ko": "숫자가 터치/클릭을 가로챔",
+      "body_ko": "숫자 라벨의 Raycast Target(또는 UITK picking)을 끄지 않으면, 모바일에서 숫자가 떠 있는 동안 아래 버튼이 눌리지 않는다."
+    }
+  ],
+  "juice_off_ko": "모든 숫자가 같은 흰색·같은 크기로 오버슈트 없이 '툭' 나타났다가 그 자리에서 즉시 사라진다. 다단 히트는 한 점에 포개져 읽을 수 없고, 치명타·약점·회복이 구분되지 않으며, 총합도 나오지 않아 결과를 머릿속으로 더해야 한다.",
+  "stage": {
+    "aspect": "both",
+    "needs_3d": false,
+    "scene_ko": "가로(16:9)·세로(9:16) 모두 지원하는 2D 전투 무대. 왼쪽(세로 모드는 아래)에 아군 3명, 오른쪽(세로 모드는 위)에 적 3명을 단순한 원작과 무관한 실루엣으로 배치하고, 각 캐릭터 머리 위에 보이지 않는 앵커를 둔다. 적은 천천히 좌우로 흔들려 '움직이는 대상을 따라가는 숫자'를 보여준다. 하단에 이벤트 버튼(일반 피격·치명타·약점 격파·다단 히트·회복·광역기)과 '효과 끄기' 토글, 오른쪽 위에 풀 잔량 카운터를 둔다. 3D 엔진 없이 CSS transform으로 구현."
+  },
+  "unity_ugui": {
+    "hierarchy": "BattleScene\n├─ Main Camera\n├─ Enemies\n│  └─ Enemy_A\n│     └─ DamageAnchor (빈 Transform, 머리 위)\n└─ Canvas_DamageNumbers (Canvas: Screen Space - Overlay, Sort Order 50)\n   ├─ [CanvasScaler: Scale With Screen Size 1920x1080, Match 0.5]\n   ├─ [DamageNumberSpawner.cs]  ← ObjectPool<DamageNumber> 보유\n   ├─ NumberLayer (RectTransform: Stretch 전체)\n   │  └─ (런타임 풀링) DamageNumber.prefab\n   │     ├─ [CanvasGroup] blocksRaycasts=false\n   │     ├─ Label (TextMeshProUGUI, Raycast Target 끔)\n   │     └─ Glyph (Image, Raycast Target 끔)\n   └─ TotalPanel\n      ├─ [CanvasGroup]\n      └─ TotalLabel (TextMeshProUGUI)",
+    "components_ko": [
+      "Canvas: 숫자 전용으로 분리(Screen Space - Overlay). 숫자가 매 프레임 움직여도 HUD 캔버스가 다시 빌드되지 않게 한다. GraphicRaycaster는 제거하거나 꺼둔다.",
+      "CanvasScaler: Scale With Screen Size(1920x1080, Match 0.5)로 모바일 가로·세로에서 글자 크기를 유지.",
+      "TextMeshProUGUI: 숫자 전용 폰트 에셋, Outline 또는 Underlay(그림자)로 대비 확보, Raycast Target 끔, Auto Size 끔(고정 크기 + 스케일로 위계).",
+      "CanvasGroup: 페이드용 alpha, blocksRaycasts=false, interactable=false.",
+      "DamageNumber.cs: Play(value, kind, screenPos) 메서드에서 AnimationCurve(스케일·상승·알파)를 unscaledDeltaTime 또는 deltaTime으로 재생하고, 끝나면 풀에 Release.",
+      "DamageNumberSpawner.cs: UnityEngine.Pool.ObjectPool<DamageNumber>(createFunc, actionOnGet, actionOnRelease, actionOnDestroy, collectionCheck:true, defaultCapacity:32, maxSize:128).",
+      "좌표 변환: Camera.WorldToScreenPoint(anchor.position) → RectTransformUtility.ScreenPointToLocalPointInRectangle(NumberLayer, screenPos, null, out local). Overlay 캔버스는 cam 인자에 null.",
+      "테스트 입력: 새 Input System의 InputAction(예: Attack=Keyboard Space / Gamepad South)을 [SerializeField] InputActionReference로 받아 performed 콜백에서 스폰."
+    ],
+    "steps_ko": [
+      "숫자 전용 Canvas를 만들고 CanvasScaler·Sort Order를 설정한다. GraphicRaycaster는 제거한다.",
+      "DamageNumber 프리팹(CanvasGroup + TMP Label + Glyph Image)을 만들고 Raycast Target을 모두 끈다.",
+      "DamageKind enum(Normal, Crit, Weakness, Heal)과 종류별 스타일(ScriptableObject: 색, 크기 배율, 오버슈트, 글리프 스프라이트)을 만든다.",
+      "Spawner에 ObjectPool<DamageNumber>를 구성하고 Awake에서 defaultCapacity만큼 미리 Get/Release해 워밍업한다(TMP 숫자 글리프도 이때 아틀라스에 올라간다).",
+      "Spawn(anchor, value, kind): 풀에서 꺼내 앵커를 기억시키고, LateUpdate에서 WorldToScreenPoint → ScreenPointToLocalPointInRectangle로 anchoredPosition을 갱신한다. z<=0이면 숨긴다.",
+      "겹침 방지: 같은 앵커의 활성 숫자 리스트를 두고, 새 숫자가 오면 기존 숫자의 스택 오프셋을 위로 한 칸 올린다(stack). 또는 stagger 간격으로 코루틴 큐 재생(sequence).",
+      "행동 단위로 ActionId를 받아 피해를 누적하고, 마지막 히트 후 TotalPanel에 카운트업(Mathf.Lerp + easeOutExpo 커브)과 펀치 스케일을 재생한다.",
+      "애니메이션 종료 시 pool.Release(this)로 반환한다. 씬 전환 시 pool.Clear()."
+    ],
+    "pitfalls_ko": [
+      "FindObjectOfType로 스포너를 찾지 말 것(금지 API). 직렬화 참조나 이벤트 채널(ScriptableObject)로 연결한다.",
+      "같은 객체를 두 번 Release하면 collectionCheck가 예외를 던진다. 코루틴 중복 실행(예: 페이드 도중 재사용)을 막기 위해 Get 시 진행 중인 코루틴을 반드시 정지한다.",
+      "Screen Space - Camera 캔버스로 바꾸면 ScreenPointToLocalPointInRectangle의 cam 인자에 캔버스 카메라를 넣어야 한다. null 그대로 두면 위치가 어긋난다.",
+      "Time.timeScale=0(일시정지·히트스톱) 중에도 숫자가 움직여야 하면 unscaledDeltaTime을 쓴다. 반대로 함께 멈춰야 하면 deltaTime.",
+      "Update에서 좌표를 갱신하면 카메라 이동보다 한 프레임 늦어 숫자가 떨린다. LateUpdate에서 갱신한다.",
+      "TMP 동적 폰트 아틀라스에 처음 쓰는 숫자가 들어가는 순간 프레임이 튈 수 있다. 0~9, +, 쉼표를 미리 포함한 정적 아틀라스를 권장."
+    ]
+  },
+  "unity_uitk": {
+    "structure": "UIDocument (PanelSettings: Scale With Screen Size 1920x1080, Match 0.5, Sort Order 50)\n└─ DamageNumbers.uxml\n   <ui:UXML>\n     <ui:VisualElement name=\"damage-root\" class=\"dmg-root\" picking-mode=\"Ignore\">\n       <ui:VisualElement name=\"number-layer\" class=\"dmg-layer\" picking-mode=\"Ignore\" />\n       <ui:VisualElement name=\"total-panel\" class=\"dmg-total\" picking-mode=\"Ignore\">\n         <ui:Label name=\"total-label\" class=\"dmg-total__label\" text=\"0\" picking-mode=\"Ignore\" />\n       </ui:VisualElement>\n     </ui:VisualElement>\n   </ui:UXML>\n└─ 런타임 생성(풀링) 요소: Label.dmg + .dmg--crit / .dmg--weak / .dmg--heal 클래스, 자식 VisualElement.dmg__glyph",
+    "uss_notes_ko": [
+      ".dmg-root, .dmg-layer { position: absolute; left:0; top:0; right:0; bottom:0; } — 전체를 덮지만 picking-mode=Ignore라 입력을 막지 않는다.",
+      ".dmg { position: absolute; -unity-font-definition: url('...숫자폰트.asset'); font-size: 40px; -unity-text-outline-width: 2px; -unity-text-outline-color: rgba(0,0,0,0.8); translate: -50% -100%; } — 기준점을 앵커 중앙 위로.",
+      ".dmg--crit { font-size: 64px; color: #FFB347; } .dmg--weak { color: var(--element-color); } .dmg--heal { color: #7CE38B; } — 종류는 클래스로만 바꾸고 C#에서 색을 직접 넣지 않는다(일관성).",
+      "이동·크기는 left/top 대신 style.translate와 style.scale을 써서 레이아웃 재계산을 피한다.",
+      ".dmg--enter { scale: 1.3 1.3; } .dmg { transition-property: scale, opacity, translate; transition-duration: 140ms, 250ms, 700ms; transition-timing-function: ease-out-back, ease-in, ease-out-cubic; } — USS 트랜지션으로 팝·상승·페이드 처리.",
+      "색 체계 전환(semantic/mono/colorblind_safe)은 dmg-root에 .theme-mono, .theme-cb 클래스를 붙이고 USS 변수(--dmg-crit 등)를 덮어써서 구현."
+    ],
+    "steps_ko": [
+      "PanelSettings를 만들고 Scale With Screen Size로 설정한 뒤 UIDocument에 UXML을 연결한다.",
+      "C#에서 rootVisualElement.Q(\"number-layer\")를 캐싱하고 ObjectPool<Label>을 만든다(createFunc에서 new Label + AddToClassList(\"dmg\") + pickingMode=Ignore + layer.Add, actionOnRelease에서 style.display=None).",
+      "스폰 시 RuntimePanelUtils.CameraTransformWorldToPanel(panel, anchor.position, camera)로 패널 좌표를 구해 style.translate에 넣는다. 카메라 뒤(z<=0)인지는 camera.WorldToScreenPoint로 먼저 검사해 숨긴다.",
+      "종류 클래스(.dmg--crit 등)와 .dmg--enter를 붙인 뒤, 다음 프레임에 schedule.Execute(...)로 .dmg--enter를 제거해 오버슈트 트랜지션이 실제로 재생되게 한다.",
+      "상승은 목표 translate를 지정해 트랜지션으로 처리하고, lifetime 뒤 opacity를 0으로 바꾼다. TransitionEndEvent(opacity)를 받으면 pool.Release.",
+      "움직이는 대상은 LateUpdate에서 활성 라벨들의 앵커 좌표를 다시 변환해 갱신한다(이때 상승 오프셋은 별도 변수로 더한다).",
+      "스택 모드는 같은 앵커의 활성 라벨들에 '층 번호 × 줄 높이' 오프셋을 더하고, 총합 패널은 total-label.text를 카운트업 코루틴(또는 schedule.Execute().Every(16))으로 갱신한다.",
+      "테스트 입력은 새 Input System InputAction(performed 콜백)으로 받는다. 구 Input Manager(Input.GetKey 등)는 쓰지 않는다."
+    ],
+    "pitfalls_ko": [
+      "요소를 Add한 같은 프레임에 클래스를 바꾸면 '시작 값'이 없어서 트랜지션이 재생되지 않는다. 한 프레임 미루는 것을 잊지 말 것.",
+      "panel 좌표는 왼쪽 위가 원점이고, Screen 좌표는 왼쪽 아래가 원점이다. WorldToScreenPoint 결과를 그대로 style에 넣으면 위아래가 뒤집힌다. CameraTransformWorldToPanel을 쓰면 자동으로 처리된다.",
+      "style.left/top으로 움직이면 매 프레임 레이아웃이 다시 계산된다. translate/scale(트랜스폼 계열)을 사용한다.",
+      "라벨에 pickingMode=Ignore를 빼먹으면 모바일에서 숫자가 터치를 가로챈다. 동적으로 만든 요소는 UXML 속성이 적용되지 않으니 C#에서 직접 설정한다.",
+      "TransitionEndEvent는 속성마다 따로 발생한다. 어떤 속성 이벤트에서 Release할지 하나로 정하지 않으면 두 번 반환되어 풀 예외가 난다.",
+      "풀에서 다시 꺼낼 때 이전 종류 클래스(.dmg--crit 등)를 RemoveFromClassList로 초기화하지 않으면 일반 피해가 치명타처럼 보인다."
+    ]
+  },
+  "inspired_by": [
+    {
+      "game_id": "honkai-star-rail",
+      "title": "Honkai: Star Rail (붕괴: 스타레일)",
+      "credit": "© COGNOSPHERE PTE. LTD. / HoYoverse",
+      "borrowed_axes": [
+        "색 체계",
+        "레이아웃 구조"
+      ],
+      "what_learned_ko": "턴제 전투에서 타격 지점 위 개별 숫자와 행동 종료 후 총 피해 정리가 한 화면에 함께 있는 구조, 그리고 치명타·약점(속성)·회복을 색과 크기로 나누는 위계 방식을 패턴으로 일반화했다. 색·크기의 세부 수치는 직접 확인하지 못해 'plausible'로 다룬다. 분석 대상: 글로벌 정식 서비스판(2023년 4월 출시 이후 라이브 버전)."
+    },
+    {
+      "game_id": "balatro",
+      "title": "Balatro",
+      "credit": "© Playstack Ltd. / LocalThunk",
+      "borrowed_axes": [
+        "모션 리듬"
+      ],
+      "what_learned_ko": "숫자를 타격 피드백이 아니라 '점수 계산 과정 설명'으로 쓰는 해법. 칩×배수 값이 하나씩 순서대로 튀어나와 합산되는 리듬을 '순차 재생(sequence)' 레이아웃과 stagger_ms 파라미터로 옮겼다. 겹침을 공간이 아니라 시간으로 푸는 대조 사례. 분석 대상: 2024년 2월 PC·콘솔 정식 출시판 기준(세부 연출 타이밍은 'unverified')."
+    }
+  ],
+  "original_ko": "원작 에셋·스타일을 쓰지 않고 새로 만든다. (1) 캐릭터: 원작 캐릭터 대신 단색 기하 실루엣(원·삼각·마름모)으로 아군/적을 표현. (2) 속성 글리프: 원작 속성 아이콘(물리·화염 등) 대신 자체 제작한 5종 추상 기호(점·물결·번개 꺾임·눈송이 육각·나선)를 쓰고, 약점 격파는 '금 간 방패' 대신 '깨진 마름모' 모티프로 표현. (3) 치명타 표식: 'CRIT' 같은 원작 텍스트 대신 4갈래 별 섬광 아이콘. (4) 타이포: 원작 전용 폰트 대신 OFL 라이선스 숫자용 굵은 고정폭 계열 웹폰트(예: Google Fonts의 Rubik Mono One 또는 Archivo Black)를 사용. (5) 카피: 총합 패널은 '총 피해' 대신 '이번 턴 합계', 순차 모드는 '계산 중…' 등 자체 문구. (6) 색: 원작 팔레트를 복제하지 않고 갤러리 공통 토큰(일반 흰색, 치명타 주황, 회복 초록, 색각 안전 모드 파랑/주황)으로 정의. (7) 순차 모드는 카드·포커 요소 없이 '기본값 + 보너스 × 배율' 세 칸 계산식으로 일반화.",
+  "references": [
+    {
+      "label": "Honkai: Star Rail 공식 사이트",
+      "url": "https://hsr.hoyoverse.com",
+      "type": "official"
+    },
+    {
+      "label": "Honkai: Star Rail — Wikipedia (턴제 전투·약점 시스템 개요)",
+      "url": "https://en.wikipedia.org/wiki/Honkai:_Star_Rail",
+      "type": "T2"
+    },
+    {
+      "label": "Balatro 공식 사이트 (개발 LocalThunk, 퍼블리셔 Playstack)",
+      "url": "https://www.playbalatro.com/",
+      "type": "official"
+    },
+    {
+      "label": "Balatro — Wikipedia (출시일, Chips×Mult 점수 구조)",
+      "url": "https://en.wikipedia.org/wiki/Balatro",
+      "type": "T2"
+    },
+    {
+      "label": "Unity Scripting API: Camera.WorldToScreenPoint",
+      "url": "https://docs.unity3d.com/ScriptReference/Camera.WorldToScreenPoint.html",
+      "type": "official"
+    },
+    {
+      "label": "Unity Scripting API: RectTransformUtility.ScreenPointToLocalPointInRectangle",
+      "url": "https://docs.unity3d.com/ScriptReference/RectTransformUtility.ScreenPointToLocalPointInRectangle.html",
+      "type": "official"
+    },
+    {
+      "label": "Unity Scripting API: UnityEngine.Pool.ObjectPool<T>",
+      "url": "https://docs.unity3d.com/ScriptReference/Pool.ObjectPool_1.html",
+      "type": "official"
+    },
+    {
+      "label": "Unity Scripting API: RuntimePanelUtils.CameraTransformWorldToPanel",
+      "url": "https://docs.unity3d.com/ScriptReference/UIElements.RuntimePanelUtils.CameraTransformWorldToPanel.html",
+      "type": "official"
+    }
+  ],
+  "confidence_notes_ko": "[검증됨] Unity API 설명(ObjectPool 생성자 인자, Overlay 캔버스에서 ScreenPointToLocalPointInRectangle의 cam=null, WorldToScreenPoint의 z가 카메라와의 거리이고 뒤쪽 점도 화면 밖 좌표를 돌려준다는 점, CameraTransformWorldToPanel 동작)은 docs.unity3d.com에서 확인했다. Balatro의 개발·퍼블리셔·출시일(2024-02-20 PC·콘솔)과 Chips×Mult 점수 구조는 공식 사이트·Wikipedia에서 확인했다. Honkai: Star Rail이 턴제·속성 약점 기반 전투라는 점은 Wikipedia에서 확인했다. [plausible] HSR의 타격 지점 위 숫자, 치명타 강조, 약점 격파 표시, 회복 숫자, 총 피해 표시의 공존, 그리고 색·크기 위계는 오케스트레이터 근거 레코드 설명과 일반적 관찰에 기댄 것이다. 이번 실행에서는 화면을 직접 보지 못했다(공식 뉴스 페이지는 내용이 로딩되지 않았고, 팬 위키는 402 응답이라 재시도하지 않음). [unverified] Balatro에서 칩·배수 숫자가 카드마다 순차적으로 튀어나오는 연출의 정확한 간격과 이징, 그리고 오케스트레이터가 언급한 Medium 디자인 분석 글은 이번 세션의 웹 검색 한도가 소진되어 URL을 확보·확인하지 못했다. 그래서 references에서 뺐다. 모든 timings 수치는 업계 통상값을 바탕으로 한 '권장값'이며, 두 게임의 실측값이 아니다."
+}

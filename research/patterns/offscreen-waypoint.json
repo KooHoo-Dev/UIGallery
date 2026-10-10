@@ -1,0 +1,467 @@
+{
+  "specimen_id": "offscreen-waypoint",
+  "name_ko": "화면 밖 목표 표시 + 나침반 띠",
+  "name_en": "Offscreen Waypoint & Compass Band",
+  "group": "B",
+  "paradigm": "spatial",
+  "one_liner_ko": "목표가 보이면 그 월드 위치에, 안 보이면 화면 가장자리에 붙는 화살표 마커와 거리, 그리고 상단 나침반 띠로 '어디로 가야 하는지'를 늘 한눈에 알려 준다.",
+  "learning_goals_ko": [
+    "월드 좌표를 화면 좌표로 바꾸고, 화면 안·화면 밖·카메라 뒤를 구분하는 판정을 직접 구현할 수 있다.",
+    "화면 밖 목표를 안전 영역 가장자리에 고정(클램프)하고 화살표를 목표 방향으로 회전시킬 수 있다.",
+    "카메라 정면 기준 각도를 나침반 띠의 가로 위치로 바꾸는 매핑을 이해한다.",
+    "안내 강도(풀 가이드 / 탐험 우선 / HUD 없는 환경 신호)가 플레이 경험을 어떻게 바꾸는지 비교하고 설명할 수 있다.",
+    "밝은 배경에서도 읽히는 마커(배경판·외곽선·최소 크기)를 접근성 관점에서 설계할 수 있다."
+  ],
+  "anatomy": [
+    {
+      "part_id": "compass-band",
+      "name_ko": "나침반 띠",
+      "role_ko": "화면 상단의 가로 띠. 카메라가 보는 방향을 중앙에 두고 좌우로 방위와 눈금을 흘려 보여 준다."
+    },
+    {
+      "part_id": "compass-heading",
+      "name_ko": "방위 글자·눈금",
+      "role_ko": "N·E·S·W와 15도 간격 눈금. 카메라 회전에 따라 좌우로 스크롤된다."
+    },
+    {
+      "part_id": "compass-poi",
+      "name_ko": "나침반 POI·목표 아이콘",
+      "role_ko": "주변 관심 지점과(옵션에 따라) 목표의 방향을 띠 위 아이콘으로 표시한다."
+    },
+    {
+      "part_id": "compass-zone-glow",
+      "name_ko": "목표 구역 강조",
+      "role_ko": "목표 구역 안에 들어오면 띠 전체가 강조색으로 은은하게 빛나 '거의 다 왔다'를 알린다."
+    },
+    {
+      "part_id": "world-marker",
+      "name_ko": "월드 마커",
+      "role_ko": "목표가 화면 안에 있을 때 목표 위치 위에 떠서 따라다니는 아이콘."
+    },
+    {
+      "part_id": "edge-arrow",
+      "name_ko": "가장자리 화살표",
+      "role_ko": "목표가 화면 밖이거나 카메라 뒤일 때 안전 영역 가장자리에 고정되어 목표 쪽을 가리키는 화살표."
+    },
+    {
+      "part_id": "distance-label",
+      "name_ko": "거리 표시",
+      "role_ko": "마커 아래 남은 거리(m). 줄어드는 숫자가 진행감을 준다."
+    },
+    {
+      "part_id": "marker-backplate",
+      "name_ko": "마커 배경판",
+      "role_ko": "아이콘·숫자 뒤의 반투명 어두운 판. 밝은 하늘·눈밭에서도 대비를 확보한다."
+    },
+    {
+      "part_id": "ambient-cue",
+      "name_ko": "환경 신호(바람 줄기)",
+      "role_ko": "HUD 없는 모드에서 목표 방향으로 흐르는 바람·잎 파티클. 마커 대신 월드 안에서 방향을 알린다."
+    }
+  ],
+  "states": [
+    {
+      "name": "on-screen",
+      "trigger_ko": "목표가 카메라 앞(z>0)이고 화면 좌표가 안전 영역 안",
+      "visual_ko": "월드 마커가 목표 위에 떠 있고 아래에 거리 표시. 화살표 꼬리는 숨김."
+    },
+    {
+      "name": "off-screen",
+      "trigger_ko": "목표가 카메라 앞이지만 안전 영역 밖",
+      "visual_ko": "마커가 화살표로 바뀌어 화면 테두리에 고정되고, 화살촉이 목표 방향으로 회전. 거리 숫자는 화살표 안쪽에 유지."
+    },
+    {
+      "name": "behind-camera",
+      "trigger_ko": "목표가 카메라 뒤(z<0)",
+      "visual_ko": "화면 중심 기준으로 좌표를 뒤집은 뒤 클램프해 반대쪽 가장자리(주로 아래)에 화살표 표시. 뒤집지 않으면 엉뚱한 쪽을 가리킴."
+    },
+    {
+      "name": "compass-idle",
+      "trigger_ko": "상시",
+      "visual_ko": "상단 띠에 방위·눈금·주변 POI 아이콘. 목표 아이콘 표시 여부는 파라미터로 결정."
+    },
+    {
+      "name": "zone-highlight",
+      "trigger_ko": "플레이어가 목표 구역 반경 안에 진입",
+      "visual_ko": "나침반 띠 테두리와 배경이 강조색으로 은은하게 빛남."
+    },
+    {
+      "name": "arrived",
+      "trigger_ko": "목표 도착 반경 안",
+      "visual_ko": "마커가 한 번 펄스하며 커졌다 사라지고 거리 표시가 없어짐."
+    },
+    {
+      "name": "hud-recall",
+      "trigger_ko": "최소 HUD 상태에서 호출 입력",
+      "visual_ko": "숨겨져 있던 마커·거리·나침반이 몇 초간 나타났다가 페이드아웃."
+    },
+    {
+      "name": "ambient-only",
+      "trigger_ko": "환경 신호 모드 선택",
+      "visual_ko": "마커·거리·나침반 없음. 바람 줄기 파티클이 화면을 가로질러 목표 방향으로 흐름."
+    }
+  ],
+  "params": [
+    {
+      "key": "guidance_level",
+      "label_ko": "안내 강도",
+      "type": "select",
+      "default": "guided",
+      "options": [
+        "guided",
+        "explorer",
+        "ambient"
+      ],
+      "affects_ko": "guided=월드/가장자리 마커+거리+나침반 목표 아이콘, explorer=나침반 방위·POI만 표시하고 목표 마커 숨김, ambient=HUD 없이 바람 줄기 환경 신호로만 방향 안내"
+    },
+    {
+      "key": "edge_padding",
+      "label_ko": "가장자리 여백",
+      "type": "range",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "default": "48",
+      "unit": "px",
+      "affects_ko": "화살표가 붙는 안전 영역의 안쪽 여백. 작으면 테두리에 붙어 잘리고, 크면 화면 중앙을 가림"
+    },
+    {
+      "key": "edge_shape",
+      "label_ko": "클램프 경계 모양",
+      "type": "select",
+      "default": "rect",
+      "options": [
+        "rect",
+        "ellipse"
+      ],
+      "affects_ko": "rect는 화면 네 변을 따라, ellipse는 타원 둘레를 따라 화살표가 이동. 타원은 모서리에서 화살표가 튀는 현상이 적음"
+    },
+    {
+      "key": "show_distance",
+      "label_ko": "거리 표시",
+      "type": "toggle",
+      "default": "true",
+      "affects_ko": "마커 아래 남은 거리 숫자 표시 여부"
+    },
+    {
+      "key": "compass_fov",
+      "label_ko": "나침반 표시 각도",
+      "type": "range",
+      "min": 90,
+      "max": 360,
+      "step": 15,
+      "default": "180",
+      "unit": "deg",
+      "affects_ko": "나침반 띠 폭에 담기는 시야각. 좁을수록 눈금 간격이 넓어 정밀하지만 뒤쪽 목표는 띠 끝에 고정됨"
+    },
+    {
+      "key": "compass_shows_objective",
+      "label_ko": "나침반에 목표 아이콘",
+      "type": "toggle",
+      "default": "true",
+      "affects_ko": "끄면 나침반에는 주변 POI만 나오고 목표는 월드 마커로만 안내(나침반과 웨이포인트의 역할 분리)"
+    },
+    {
+      "key": "marker_backplate",
+      "label_ko": "마커 배경판",
+      "type": "toggle",
+      "default": "true",
+      "affects_ko": "아이콘·숫자 뒤 반투명 어두운 판. 끄면 밝은 배경에서 마커가 묻힘"
+    },
+    {
+      "key": "marker_scale",
+      "label_ko": "마커 크기",
+      "type": "range",
+      "min": 0.75,
+      "max": 2,
+      "step": 0.25,
+      "default": "1",
+      "unit": "x",
+      "affects_ko": "마커·화살표·거리 글자의 배율. 저시력 대응 옵션"
+    }
+  ],
+  "presets": [
+    {
+      "id": "openworld-full-guide",
+      "name_ko": "오픈월드 풀 가이드",
+      "genre_ko": "오픈월드 액션 어드벤처",
+      "values_json": "{\"guidance_level\":\"guided\",\"edge_padding\":\"48\",\"edge_shape\":\"ellipse\",\"show_distance\":\"true\",\"compass_fov\":\"180\",\"compass_shows_objective\":\"false\",\"marker_backplate\":\"true\",\"marker_scale\":\"1\"}",
+      "look_ko": "상단 나침반은 주변 POI만, 목표는 월드 마커+거리로 안내. 화면 밖으로 돌면 타원 둘레를 따라 화살표가 미끄러지듯 이동."
+    },
+    {
+      "id": "explorer-minimal",
+      "name_ko": "탐험 우선 미니멀",
+      "genre_ko": "탐험·생존 게임",
+      "values_json": "{\"guidance_level\":\"explorer\",\"edge_padding\":\"64\",\"edge_shape\":\"rect\",\"show_distance\":\"false\",\"compass_fov\":\"120\",\"compass_shows_objective\":\"true\",\"marker_backplate\":\"true\",\"marker_scale\":\"1\"}",
+      "look_ko": "월드 마커와 거리는 사라지고 좁은 나침반 띠의 목표 아이콘만 방향을 알려 줌. 길은 플레이어가 스스로 찾음."
+    },
+    {
+      "id": "ambient-no-hud",
+      "name_ko": "환경 신호 무(無)HUD",
+      "genre_ko": "몰입형 시네마틱 오픈월드",
+      "values_json": "{\"guidance_level\":\"ambient\",\"edge_padding\":\"48\",\"edge_shape\":\"ellipse\",\"show_distance\":\"false\",\"compass_fov\":\"180\",\"compass_shows_objective\":\"false\",\"marker_backplate\":\"false\",\"marker_scale\":\"1\"}",
+      "look_ko": "HUD 요소가 모두 사라지고 바람 줄기 파티클이 목표 쪽으로 흘러 화면 자체가 길잡이가 됨."
+    }
+  ],
+  "events": [
+    {
+      "id": "turn-around",
+      "label_ko": "뒤돌기(카메라 180° 회전)"
+    },
+    {
+      "id": "set-new-objective",
+      "label_ko": "새 목표 지정"
+    },
+    {
+      "id": "enter-zone",
+      "label_ko": "목표 구역 진입"
+    },
+    {
+      "id": "arrive",
+      "label_ko": "목표 도착"
+    },
+    {
+      "id": "hud-recall",
+      "label_ko": "HUD 잠깐 호출"
+    },
+    {
+      "id": "bright-scene",
+      "label_ko": "눈밭·역광 배경 전환"
+    }
+  ],
+  "timings": [
+    {
+      "event_ko": "화면 안→가장자리 전환 시 마커 위치 보간",
+      "duration_ms": 120,
+      "easing": "ease-out",
+      "note_ko": "권장값. 순간 점프를 막되 추적 지연이 느껴지지 않을 만큼 짧게"
+    },
+    {
+      "event_ko": "가장자리 화살표 회전 스무딩",
+      "duration_ms": 80,
+      "easing": "linear (각도 lerp)",
+      "note_ko": "권장값. 카메라 흔들림에 화살표가 떨리지 않게 하는 최소치"
+    },
+    {
+      "event_ko": "새 목표 지정 시 마커 등장",
+      "duration_ms": 250,
+      "easing": "cubic-bezier(0.34,1.56,0.64,1) (살짝 튀는 back-out)",
+      "note_ko": "권장값"
+    },
+    {
+      "event_ko": "거리 숫자 갱신 주기",
+      "duration_ms": 250,
+      "easing": "step",
+      "note_ko": "권장값. 매 프레임 갱신하면 숫자가 깜빡여 읽기 어려움"
+    },
+    {
+      "event_ko": "목표 구역 진입 시 나침반 강조 글로우",
+      "duration_ms": 400,
+      "easing": "ease-in-out",
+      "note_ko": "권장값. 출처는 금색 강조 존재만 확인, 타이밍은 출처 없음"
+    },
+    {
+      "event_ko": "목표 도착 펄스 후 소멸",
+      "duration_ms": 300,
+      "easing": "ease-out",
+      "note_ko": "권장값. scale 1→1.4, opacity 1→0"
+    },
+    {
+      "event_ko": "HUD 호출 후 유지 시간",
+      "duration_ms": 3000,
+      "easing": "none (hold)",
+      "note_ko": "권장값. 출처는 '몇 초간'이라고만 서술"
+    },
+    {
+      "event_ko": "HUD 호출 종료 페이드아웃",
+      "duration_ms": 400,
+      "easing": "ease-in",
+      "note_ko": "권장값"
+    }
+  ],
+  "hotspots": [
+    {
+      "n": 1,
+      "part_id": "edge-arrow",
+      "title_ko": "화면 밖이어도 방향은 사라지지 않는다",
+      "body_ko": "목표가 시야를 벗어나도 화살표가 가장자리에 남아 목표 쪽을 가리킨다. 플레이어는 카메라를 어느 쪽으로 돌려야 할지 즉시 안다.",
+      "principle": "즉각 피드백"
+    },
+    {
+      "n": 2,
+      "part_id": "compass-band",
+      "title_ko": "나침반과 웨이포인트의 역할 분리",
+      "body_ko": "나침반은 주변 POI의 방향을, 월드 마커는 지금 목표를 맡는다. 한 곳에 모든 아이콘을 몰지 않아 무엇이 '지금 할 일'인지 섞이지 않는다.",
+      "principle": "시각 위계"
+    },
+    {
+      "n": 3,
+      "part_id": "compass-zone-glow",
+      "title_ko": "구역 진입을 띠 색으로 알린다",
+      "body_ko": "목표 구역에 들어오면 띠가 강조색으로 빛난다. 새 아이콘을 띄우지 않고 기존 요소의 상태만 바꿔 정보량을 늘리지 않는다.",
+      "principle": "인지 부하"
+    },
+    {
+      "n": 4,
+      "part_id": "marker-backplate",
+      "title_ko": "배경판이 가독성을 지킨다",
+      "body_ko": "얇은 글자·작은 아이콘·배경 없는 마커는 밝은 장면에서 읽기 어렵다는 리뷰 지적이 있다. 반투명 배경판과 크기 옵션으로 이를 막는다.",
+      "principle": "접근성"
+    },
+    {
+      "n": 5,
+      "part_id": "ambient-cue",
+      "title_ko": "안내 강도는 플레이어가 고른다",
+      "body_ko": "풀 가이드부터 HUD 없는 환경 신호까지 선택지를 주면, 효율을 원하는 사람과 발견감을 원하는 사람이 같은 게임을 각자 즐긴다.",
+      "principle": "몰입"
+    }
+  ],
+  "principles": [
+    "화면 안에서는 월드에 붙이고, 화면 밖에서는 가장자리에 붙인다: 마커는 어떤 경우에도 '방향'을 잃지 않는다.",
+    "카메라 뒤(z<0) 판정은 별도 처리한다: 좌표를 뒤집지 않으면 화살표가 반대쪽을 가리킨다.",
+    "클램프 경계는 화면 끝이 아니라 안전 영역+여백이다: 노치·TV 오버스캔·다른 HUD와 겹치지 않게.",
+    "나침반은 '주변 맥락', 웨이포인트는 '지금 목표': 역할이 겹치면 우선순위가 흐려진다.",
+    "안내 강도는 옵션으로 열어 둔다: 같은 패턴이 몰입형 무HUD부터 풀 가이드까지 확장된다.",
+    "마커는 어떤 배경 위에서도 읽혀야 한다: 배경판·외곽선·최소 크기·크기 배율 옵션."
+  ],
+  "mistakes": [
+    {
+      "title_ko": "카메라 뒤 목표를 처리하지 않음",
+      "body_ko": "WorldToScreenPoint는 카메라 뒤 목표에도 좌표를 돌려주며, 이 좌표는 거울처럼 뒤집혀 있다. z<0일 때 중심 기준으로 뒤집지 않으면 뒤에 있는 목표를 앞쪽 화살표로 가리킨다."
+    },
+    {
+      "title_ko": "화면 끝에 딱 붙여 잘리는 화살표",
+      "body_ko": "여백 없이 Screen.width/height로 클램프하면 화살표 절반이 잘리고 노치·오버스캔 영역에 숨는다. Screen.safeArea와 여백을 기준으로 클램프한다."
+    },
+    {
+      "title_ko": "캔버스 좌표와 스크린 좌표 혼동",
+      "body_ko": "CanvasScaler가 있는데 스크린 픽셀을 anchoredPosition에 그대로 넣으면 해상도마다 위치가 어긋난다. RectTransformUtility로 캔버스 로컬 좌표로 변환한다."
+    },
+    {
+      "title_ko": "매 프레임 흔들리는 마커와 거리 숫자",
+      "body_ko": "카메라가 움직인 뒤가 아니라 Update에서 계산하면 한 프레임 늦어 떨리고, 거리 문자열을 매 프레임 만들면 숫자가 깜빡이고 GC가 생긴다. LateUpdate에서 계산하고 거리 표시는 일정 주기·정수 변화 시에만 갱신한다."
+    },
+    {
+      "title_ko": "나침반에 모든 아이콘을 몰아넣음",
+      "body_ko": "목표·POI·적·동료를 모두 띠에 올리면 아이콘이 겹쳐 아무것도 읽히지 않는다. 우선순위를 정하고 같은 각도에 겹치면 묶거나 낮은 순위를 숨긴다."
+    }
+  ],
+  "juice_off_ko": "화면 밖 판정과 클램프를 끈 상태: 목표가 시야를 벗어나는 순간 마커가 그냥 사라지고, 뒤돌면 엉뚱한 위치에 거꾸로 나타난다. 거리 숫자는 매 프레임 소수점까지 깜빡이고, 배경판이 없어 눈밭 배경에서 하얀 아이콘이 묻힌다. 나침반은 목표 구역에 들어가도 아무 변화가 없다.",
+  "stage": {
+    "aspect": "16:9",
+    "needs_3d": false,
+    "scene_ko": "탑다운 미니 월드(작은 지도 위 플레이어와 목표 점)와 그 옆의 1인칭 화면 뷰를 함께 보여 준다. 학생이 드래그·키로 플레이어의 시선 각도를 돌리면 화면 뷰의 시야각(FOV) 안팎으로 목표가 들어가고 나가며, 월드 마커↔가장자리 화살표 전환과 상단 나침반 스크롤이 실시간으로 바뀐다. 3D 없이 각도·거리 계산만으로 원근 투영을 흉내 낸다."
+  },
+  "unity_ugui": {
+    "hierarchy": "HUDCanvas (Canvas: Screen Space - Overlay, CanvasScaler: Scale With Screen Size 1920x1080, Match 0.5)\n├─ SafeArea (RectTransform, SafeAreaFitter 스크립트)\n│  ├─ CompassBand (RectMask2D, Image 배경)\n│  │  ├─ HeadingStrip (RectTransform, N/E/S/W·눈금 TextMeshProUGUI 반복 배치)\n│  │  ├─ PoiIcons (빈 RectTransform, 아이콘 풀)\n│  │  ├─ ObjectiveIcon (Image)\n│  │  └─ ZoneGlow (Image, CanvasGroup alpha 0)\n│  └─ WaypointLayer (RectTransform stretch, 모든 Graphic raycastTarget 끔)\n│     └─ WaypointMarker (RectTransform, CanvasGroup, WaypointMarker 스크립트)\n│        ├─ Backplate (Image, 반투명 검정)\n│        ├─ Icon (Image)\n│        ├─ Arrow (Image, pivot 0.5/0, 화면 밖일 때만 활성)\n│        └─ Distance (TextMeshProUGUI)\nWaypointSystem (MonoBehaviour: Camera, Transform target, InputActionReference hudRecall 직렬화)",
+    "components_ko": [
+      "Canvas Screen Space - Overlay: RectTransformUtility.ScreenPointToLocalPointInRectangle의 camera 인자는 null",
+      "CanvasScaler Scale With Screen Size: 해상도와 무관하게 여백·크기 유지",
+      "SafeAreaFitter(직접 작성): Screen.safeArea를 anchorMin/anchorMax로 변환해 노치 영역 회피",
+      "RectMask2D: 나침반 띠 바깥으로 넘친 눈금·아이콘 잘라내기",
+      "CanvasGroup: 마커·글로우 페이드, blocksRaycasts 끔",
+      "TextMeshProUGUI: 거리 표시는 SetText(\"{0}m\", value)로 가비지 없이 갱신",
+      "InputActionReference(새 Input System): HUD 호출 액션, OnEnable에서 Enable·performed 구독"
+    ],
+    "steps_ko": [
+      "WaypointSystem에 Camera와 목표 Transform을 인스펙터로 연결한다(FindObjectOfType 금지, 필요하면 FindFirstObjectByType 대신 직렬화 참조).",
+      "LateUpdate에서 Vector3 sp = cam.WorldToScreenPoint(target.position + Vector3.up * offset)를 구한다(카메라 이동 이후 계산).",
+      "sp.z < 0이면 카메라 뒤: sp.x = Screen.width - sp.x; sp.y = Screen.height - sp.y로 중심 기준으로 뒤집고 offscreen 처리로 강제한다.",
+      "안전 영역 Rect를 여백만큼 줄인 inner Rect를 만들고, sp가 inner 안이고 z>0이면 on-screen, 아니면 off-screen으로 판정한다.",
+      "off-screen이면 중심 c에서 dir = (sp - c)를 구하고, rect 경계는 t = min(halfW/|dir.x|, halfH/|dir.y|), ellipse 경계는 dir.normalized에 반지름을 곱해 가장자리 점을 계산한다.",
+      "Arrow의 localEulerAngles.z = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90으로 회전하고 Mathf.LerpAngle로 스무딩한다.",
+      "스크린 좌표를 RectTransformUtility.ScreenPointToLocalPointInRectangle(WaypointLayer, sp, null, out local)로 변환해 anchoredPosition에 넣는다.",
+      "거리는 Vector3.Distance(player, target)를 정수로 반올림해 값이 바뀔 때 또는 0.25초마다만 TMP SetText로 갱신한다.",
+      "나침반: 카메라 forward와 목표 방향을 XZ 평면에 투영하고 Vector3.SignedAngle(fwd, toTarget, Vector3.up)로 각도를 구해 x = angle / (fov * 0.5f) * (bandWidth * 0.5f)로 배치, |angle| > fov/2면 띠 끝에 고정한다.",
+      "방위 띠는 카메라 yaw에 비례해 HeadingStrip을 가로 이동(또는 RawImage.uvRect.x 스크롤)시킨다.",
+      "목표 구역 진입 시 ZoneGlow의 CanvasGroup.alpha를 코루틴이나 트윈으로 0→1(400ms)로 올린다.",
+      "hudRecall.action.performed에 HUD 표시 3초 유지 후 페이드아웃 코루틴을 연결한다."
+    ],
+    "pitfalls_ko": [
+      "WorldToScreenPoint는 카메라 뒤 좌표도 반환한다. z<0 뒤집기를 빼먹으면 화살표가 반대 방향을 가리킨다.",
+      "Screen Space - Camera 캔버스로 바꾸면 ScreenPointToLocalPointInRectangle의 camera 인자에 UI 카메라를 넘겨야 한다.",
+      "Cinemachine 사용 시 카메라는 LateUpdate에서 갱신되므로 Script Execution Order를 늦추거나 CinemachineCore 업데이트 이후에 계산해야 떨림이 없다.",
+      "마커 Image의 raycastTarget을 켜 두면 화면 밖 화살표가 다른 UI 클릭을 가로챈다.",
+      "거리 문자열을 매 프레임 string 연결로 만들면 GC 스파이크가 생긴다.",
+      "Rigidbody.velocity, Input.GetKey 등 구 API 대신 Rigidbody.linearVelocity와 Input System 액션을 사용한다."
+    ]
+  },
+  "unity_uitk": {
+    "structure": "UIDocument (PanelSettings: Scale With Screen Size 1920x1080)\nHud.uxml\n<ui:UXML>\n  <ui:VisualElement name=\"root\" class=\"hud-root\">\n    <ui:VisualElement name=\"compass\" class=\"compass\">\n      <ui:VisualElement name=\"heading-strip\" class=\"compass__strip\"/>\n      <ui:VisualElement name=\"compass-objective\" class=\"compass__icon\"/>\n      <ui:VisualElement name=\"zone-glow\" class=\"compass__glow\"/>\n    </ui:VisualElement>\n    <ui:VisualElement name=\"waypoint-layer\" class=\"waypoint-layer\">\n      <ui:VisualElement name=\"marker\" class=\"marker\">\n        <ui:VisualElement name=\"arrow\" class=\"marker__arrow\"/>\n        <ui:VisualElement name=\"icon\" class=\"marker__icon\"/>\n        <ui:Label name=\"distance\" class=\"marker__distance\" text=\"120m\"/>\n      </ui:VisualElement>\n    </ui:VisualElement>\n  </ui:VisualElement>\n</ui:UXML>\nWaypointHud.cs: UIDocument.rootVisualElement.Q로 요소를 찾아 LateUpdate에서 위치·회전 갱신",
+    "uss_notes_ko": [
+      ".hud-root, .waypoint-layer { position: absolute; left:0; top:0; right:0; bottom:0; } 그리고 picking-mode는 UXML에서 Ignore로 지정해 클릭을 가로채지 않게 한다.",
+      ".compass { position: absolute; top: 24px; left: 30%; right: 30%; height: 36px; overflow: hidden; background-color: rgba(0,0,0,0.45); border-radius: 4px; }",
+      ".marker { position: absolute; width: 56px; height: 56px; translate: -50% -50%; background-color: rgba(0,0,0,0.55); border-radius: 28px; } 배경판은 marker 자체 배경으로 처리",
+      ".marker__distance { -unity-font-style: bold; -unity-text-outline-width: 1px; -unity-text-outline-color: black; font-size: 18px; } 얇은 글자 가독성 문제 방지",
+      ".compass__glow { opacity: 0; transition-property: opacity; transition-duration: 0.4s; transition-timing-function: ease-in-out; } 진입 시 .compass--zone 클래스를 붙여 opacity 1",
+      "위치는 style.left/top 대신 style.translate로 갱신하면 레이아웃 재계산 없이 변환만 바뀌어 가볍다."
+    ],
+    "steps_ko": [
+      "UIDocument에 Hud.uxml과 PanelSettings를 지정하고 WaypointHud 스크립트에서 rootVisualElement.Q<VisualElement>(\"marker\") 등으로 참조를 캐시한다.",
+      "LateUpdate에서 cam.WorldToScreenPoint로 z를 확인해 카메라 뒤면 앞의 UGUI와 같은 방식으로 좌표를 뒤집는다.",
+      "패널 좌표 변환은 RuntimePanelUtils.CameraTransformWorldToPanel(panel, worldPos, cam)을 쓰거나, 스크린 좌표를 RuntimePanelUtils.ScreenToPanel(panel, new Vector2(sp.x, Screen.height - sp.y))로 바꾼다(UITK는 y축이 아래로 증가).",
+      "panel 크기(root.layout)에서 여백을 뺀 inner Rect로 on/off-screen을 판정하고 가장자리 점을 계산한다.",
+      "marker.style.translate = new Translate(x, y)로 이동하고, arrow.style.rotate = new Rotate(new Angle(deg, AngleUnit.Degree))로 회전, off-screen일 때만 arrow.style.display = DisplayStyle.Flex로 켠다.",
+      "나침반은 SignedAngle 결과로 compass-objective의 style.translate x를 계산하고, heading-strip은 yaw에 비례해 translate한다.",
+      "목표 구역 진입·이탈 시 compass.EnableInClassList(\"compass--zone\", inZone)으로 USS 트랜지션을 구동한다.",
+      "거리 Label은 값이 바뀔 때만 text를 갱신한다."
+    ],
+    "pitfalls_ko": [
+      "UITK 패널 좌표는 y가 위에서 아래로 증가한다. 스크린 좌표를 그대로 쓰면 마커가 상하 반전된다.",
+      "PanelSettings의 스케일 모드 때문에 패널 크기와 Screen 크기가 다르다. 반드시 ScreenToPanel 등으로 변환한다.",
+      "style.left/top을 매 프레임 바꾸면 레이아웃 패스가 돌아 비용이 커진다. translate를 쓴다.",
+      "rootVisualElement는 OnEnable 이후에 유효하다. Awake에서 Q를 호출하면 null이 나올 수 있다.",
+      "USS transition은 display 변경에는 동작하지 않는다. 페이드는 opacity로, 숨김은 페이드 끝난 뒤 display none으로 처리한다."
+    ]
+  },
+  "inspired_by": [
+    {
+      "game_id": "horizon-forbidden-west",
+      "title": "Horizon Forbidden West",
+      "credit": "© Sony Interactive Entertainment LLC (Created and developed by Guerrilla)",
+      "borrowed_axes": [
+        "레이아웃 구조",
+        "색 체계"
+      ],
+      "what_learned_ko": "2022년 PS4/PS5 오리지널판 기준. 상단 나침반은 주변 POI를, 켜고 끌 수 있는 웨이포인트는 목표와 거리를 맡는 역할 분리, 메인 퀘스트 구역에서 나침반이 금색으로 빛나는 상태 강조, 최소 안내와 마커 안내 중 선택하는 옵션 구조를 배웠다. 출시 시점 리뷰가 지적한 얇은 글자·작은 아이콘·배경 없음의 가독성 약점은 반면교사로 삼아 배경판과 크기 옵션을 추가했다. 화면 밖 클램프 동작은 출처로 확인되지 않아 일반 패턴으로 재구성했다."
+    },
+    {
+      "game_id": "ghost-of-tsushima",
+      "title": "Ghost of Tsushima",
+      "credit": "© Sony Interactive Entertainment LLC",
+      "borrowed_axes": [
+        "모션 리듬"
+      ],
+      "what_learned_ko": "이번 작업에서는 이 게임에 대한 근거 조사를 수행하지 못했다(미검증). 바람 방향 등 환경 신호로 목표를 안내하는 해법이 널리 알려져 있다는 기억에 기대어 'HUD 없이 해결'하는 대조군 아이디어로만 참고했고, ambient 프리셋은 원작 화면을 재현하지 않는 독자 구현이다."
+    }
+  ],
+  "original_ko": "원작의 아이콘·글꼴·색 팔레트·문구를 쓰지 않는다. 마커는 원작과 무관한 단순 다이아몬드+원형 배경판 조합의 자체 아이콘, 화살표는 둥근 삼각형으로 새로 그린다. 나침반 띠는 반투명 검정 바탕에 흰 눈금, 목표 구역 강조색은 금색 대신 갤러리 공용 강조색(청록 계열)을 쓴다. 방위는 영문 N/E/S/W와 한국어 '거리 120m' 같은 교육용 카피로 표기한다. 환경 신호는 원작의 바람 연출을 재현하지 않고, 2D 무대 위를 흐르는 얇은 선형 파티클(잎사귀 모양 아님)로 방향만 추상화한다. 원작에 없는 것으로 마커 배경판 토글, 마커 크기 배율, 사각/타원 클램프 경계 전환, 화면 안/밖/카메라 뒤 판정 디버그 오버레이를 추가한다.",
+  "references": [
+    {
+      "label": "PlayStation Blog - Accessibility features in Horizon Forbidden West (2022-02-10)",
+      "url": "https://blog.playstation.com/2022/02/10/accessibility-features-in-horizon-forbidden-west/",
+      "type": "T1"
+    },
+    {
+      "label": "Can I Play That - Horizon Forbidden West accessibility review (2022-02-14)",
+      "url": "https://caniplaythat.com/2022/02/14/horizon-forbidden-west-accessibility-review-can-i-play-that/",
+      "type": "T2"
+    },
+    {
+      "label": "Kotaku - Horizon Forbidden West settings guide (길찾기·거리 추정)",
+      "url": "https://kotaku.com/horizon-forbidden-west-settings-accessibility-easy-loot-1848558649",
+      "type": "T2"
+    },
+    {
+      "label": "gamepressure - Horizon Forbidden West HUD",
+      "url": "https://www.gamepressure.com/horizon-forbidden-west/hud/z6f628",
+      "type": "T2"
+    },
+    {
+      "label": "Unity Scripting API - Camera.WorldToScreenPoint (6000.3)",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Camera.WorldToScreenPoint.html",
+      "type": "official-docs"
+    }
+  ],
+  "confidence_notes_ko": "분석 대상은 Horizon Forbidden West 2022년 2월 PS4/PS5 오리지널판이며 PC판·Complete Edition·패치 변경점은 검증하지 않았다. 나침반이 상단에 있고 POI를 보여 주며 메인 퀘스트 구역에서 금색으로 빛난다는 점, 웨이포인트+거리, 안내 수준 선택, HUD 커스터마이즈, 웨이포인트 가독성 문제는 텍스트 출처(PlayStation Blog, Can I Play That, Kotaku, gamepressure)로 확인했다. 단 이는 화면을 직접 본 것이 아니므로 시각 주장 전반은 'plausible'이다. 나침반에 목적지 아이콘이 나오는지는 Can I Play That(안 나옴)과 gamepressure(나옴)가 상충해 파라미터(compass_shows_objective)로 열어 두었다. 화면 밖 마커의 가장자리 클램프 동작·모양·애니메이션은 어떤 출처에서도 확인되지 않아 일반 패턴으로 구성했으며 원작 동작으로 소개하면 안 된다. Ghost of Tsushima는 근거 조사가 수행되지 않았고(웹 검색 예산 소진으로 추가 확인 불가), 바람 안내 해법 언급은 기억에만 기댄 'unverified'이므로 수업에서 원작 사실로 단정하지 말 것. 모든 타이밍 수치는 출처가 없는 권장값이다. Unity 측 WorldToScreenPoint의 z가 카메라 거리라는 점은 Unity 6000.3 문서로 확인했고, 카메라 뒤 좌표 뒤집기 처리는 통상 구현 관행이다."
+}
