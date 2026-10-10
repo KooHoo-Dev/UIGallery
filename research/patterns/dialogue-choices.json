@@ -8,8 +8,9 @@
   "learning_goals_ko": [
     "화자 표시(이름표·초상화)를 다른 요소보다 먼저 읽히게 시각 위계를 설계한다.",
     "타자기 효과에서 입력 한 번이 '문장 완성'과 '다음 줄'을 동시에 처리하지 않도록 2단계 입력 규칙을 구현한다.",
-    "자동 진행·빨리감기·대화 로그를 함께 제공해 읽는 속도가 다른 플레이어를 모두 수용한다.",
-    "선택지 포커스와 제한시간을 Input System 기반 내비게이션으로 구현하고, 포커스를 잃지 않게 관리한다.",
+    "자동 진행·빨리감기·대화 로그·글자 크기 배율을 함께 제공해 읽는 속도가 다른 플레이어를 모두 수용한다.",
+    "선택지가 열리면 첫 항목에 포커스를 잡고, 마우스 클릭 같은 상황에서도 포커스를 잃지 않게 관리한다(uGUI EventSystem / UI Toolkit Focus).",
+    "제한시간 선택지를 줄어드는 막대와 기본 선택 확정으로 구현하고, 시간 계산을 일시정지(timeScale)와 분리한다.",
     "연출 밀도가 높은 대화(소셜 JRPG형)와 짧고 반복되는 대화(로그라이트형)의 설계 차이를 params로 전환하며 비교한다."
   ],
   "anatomy": [
@@ -21,7 +22,7 @@
     {
       "part_id": "speaker_tag",
       "name_ko": "화자 이름표",
-      "role_ko": "지금 말하는 사람을 가장 먼저 알려 주는 요소. 아직 소개되지 않은 인물은 '???' 같은 모호한 호칭으로 표시한다."
+      "role_ko": "지금 말하는 사람을 가장 먼저 알려 주는 요소. 아직 소개되지 않은 인물은 '???'나 '낯선 목소리' 같은 모호한 호칭으로 표시한다."
     },
     {
       "part_id": "portrait",
@@ -56,7 +57,7 @@
     {
       "part_id": "timer_bar",
       "name_ko": "제한시간 바",
-      "role_ko": "선택지에 시간 제한이 있을 때 남은 시간을 줄어드는 막대로 표시한다. 0이면 숨긴다."
+      "role_ko": "선택지에 시간 제한이 있을 때 남은 시간을 줄어드는 막대로 표시한다. 제한시간이 0(무제한)이면 숨긴다."
     },
     {
       "part_id": "log_panel",
@@ -72,7 +73,7 @@
     },
     {
       "name": "opening",
-      "trigger_ko": "'대사 시작' 이벤트",
+      "trigger_ko": "'대사 시작'(start_dialogue) 이벤트",
       "visual_ko": "패널이 아래에서 미끄러져 올라오며 페이드 인, 이어서 이름표·초상화가 나타난다."
     },
     {
@@ -82,33 +83,38 @@
     },
     {
       "name": "line_complete",
-      "trigger_ko": "타이핑 종료 또는 타이핑 중 '넘기기' 입력(문장 즉시 완성)",
+      "trigger_ko": "타이핑 종료 또는 타이핑 중 '넘기기'(advance) 입력(문장 즉시 완성)",
       "visual_ko": "전체 문장이 보이고 ▼ 표시가 위아래로 천천히 움직인다. 다음 입력을 기다린다."
     },
     {
       "name": "auto_wait",
-      "trigger_ko": "자동 진행 켜짐 + 문장 완성",
+      "trigger_ko": "자동 진행(auto_advance) 켜짐 + 문장 완성",
       "visual_ko": "자동 진행 배지가 켜지고, 글자 수에 비례한 대기 후 다음 줄로 넘어간다."
     },
     {
       "name": "fast_forward",
-      "trigger_ko": "빨리감기 버튼을 누르고 있는 동안",
+      "trigger_ko": "빨리감기(hold_fast_forward)를 누르고 있는 동안",
       "visual_ko": "타이핑을 생략하고 줄이 빠르게 넘어간다. 빨리감기 배지가 표시된다. 선택지에서는 자동으로 멈춘다."
     },
     {
       "name": "choice_open",
-      "trigger_ko": "분기 지점 도달",
-      "visual_ko": "선택지가 짧은 시차를 두고 순서대로 나타나고, 첫 항목에 포커스가 자동으로 잡힌다. 제한시간이 있으면 타이머 바가 줄어들기 시작한다."
+      "trigger_ko": "분기 지점 도달(open_choices)",
+      "visual_ko": "선택지가 짧은 시차를 두고 순서대로 나타나고, 첫 항목에 포커스가 자동으로 잡힌다. 포커스 이동(move_focus) 시 강조가 옮겨 간다. 제한시간이 있으면 타이머 바가 줄어들기 시작한다."
     },
     {
       "name": "choice_timeout",
       "trigger_ko": "제한시간 0 도달",
-      "visual_ko": "타이머 바가 빈 상태로 깜박이고, 미리 정한 기본 선택지(또는 '침묵')가 확정된다."
+      "visual_ko": "타이머 바가 빈 상태로 깜박이고, 미리 정한 기본 선택지(또는 '침묵')가 확정 대상으로 정해진다. 곧바로 choice_confirmed로 넘어간다."
+    },
+    {
+      "name": "choice_confirmed",
+      "trigger_ko": "선택 확정(confirm_choice) 입력 또는 choice_timeout",
+      "visual_ko": "확정한 항목이 한 번 번쩍이고 나머지 항목이 먼저 페이드아웃한 뒤 선택지 목록이 닫힌다. 선택 결과에 맞는 다음 줄로 이어진다."
     },
     {
       "name": "log_view",
-      "trigger_ko": "'로그 열기' 입력",
-      "visual_ko": "대화 진행이 일시정지되고 화면 위에 반투명 로그 패널이 열린다. 최신 대사가 맨 아래에 보인다."
+      "trigger_ko": "'로그 열기'(toggle_log) 입력",
+      "visual_ko": "대화 진행이 일시정지되고 화면 위에 반투명 로그 패널이 열린다. 최신 대사가 맨 아래에 보인다. 다시 toggle_log를 누르면 이전 상태로 돌아간다."
     },
     {
       "name": "closed",
@@ -167,13 +173,13 @@
       "step": 1,
       "default": "6",
       "unit": "도",
-      "affects_ko": "패널과 이름표·선택지 버튼의 사선 기울기. 0이면 정돈된 사각형, 클수록 역동적이지만 가독성은 낮아진다."
+      "affects_ko": "패널과 이름표·선택지 버튼 '틀'의 사선 기울기(웹: 컨테이너 skewX, 글자는 역방향 skew로 똑바로 유지). 0이면 정돈된 사각형, 클수록 역동적이지만 가독성은 낮아진다."
     },
     {
       "key": "accent_color",
       "label_ko": "강조색",
       "type": "color",
-      "default": "#E8384F",
+      "default": "#FF6A3D",
       "affects_ko": "이름표 배경, 포커스된 선택지, 타이머 바에 쓰는 단일 강조색. 나머지는 흑백으로 유지해 대비를 만든다."
     },
     {
@@ -193,14 +199,14 @@
       "id": "stylish-social-rpg",
       "name_ko": "연출형 소셜 RPG",
       "genre_ko": "스토리 중심 JRPG·소셜 시뮬레이션",
-      "values_json": "{\"type_cps\":\"45\",\"auto_advance\":\"false\",\"speaker_layout\":\"이름표+얼굴 아이콘\",\"choice_timer_s\":\"0\",\"panel_skew\":\"9\",\"accent_color\":\"#E8384F\",\"text_scale\":\"100\"}",
+      "values_json": "{\"type_cps\":\"45\",\"auto_advance\":\"false\",\"speaker_layout\":\"이름표+얼굴 아이콘\",\"choice_timer_s\":\"0\",\"panel_skew\":\"9\",\"accent_color\":\"#FF6A3D\",\"text_scale\":\"100\"}",
       "look_ko": "강한 사선 패널과 단일 강조색+흑백의 고대비. 이름표에 얼굴 아이콘이 붙고, 선택지는 시간 제한 없이 천천히 고른다. 대사가 길고 등장인물이 많은 게임에 맞는다."
     },
     {
       "id": "fast-run-roguelite",
       "name_ko": "짧은 대화 반복형",
       "genre_ko": "로그라이트·액션 RPG",
-      "values_json": "{\"type_cps\":\"90\",\"auto_advance\":\"false\",\"speaker_layout\":\"큰 측면 초상화\",\"choice_timer_s\":\"0\",\"panel_skew\":\"0\",\"accent_color\":\"#C9A227\",\"text_scale\":\"100\"}",
+      "values_json": "{\"type_cps\":\"90\",\"auto_advance\":\"false\",\"speaker_layout\":\"큰 측면 초상화\",\"choice_timer_s\":\"0\",\"panel_skew\":\"0\",\"accent_color\":\"#5FB49C\",\"text_scale\":\"100\"}",
       "look_ko": "사각 패널에 큰 초상화가 옆에서 솟고, 글자가 빠르게 나와 몇 번 넘기면 끝난다. 선택지는 드물게 나오는 예/아니오 정도. 죽고 재도전하는 템포를 끊지 않는 데 초점."
     },
     {
@@ -227,6 +233,14 @@
     {
       "id": "open_choices",
       "label_ko": "선택지 열기"
+    },
+    {
+      "id": "move_focus",
+      "label_ko": "선택지 포커스 이동 (위/아래)"
+    },
+    {
+      "id": "confirm_choice",
+      "label_ko": "선택 확정"
     },
     {
       "id": "toggle_log",
@@ -256,7 +270,7 @@
       "event_ko": "선택지 순차 등장 (항목당 시차)",
       "duration_ms": 180,
       "easing": "ease-out, 항목 간 stagger 50ms",
-      "note_ko": "권장값. 4개 기준 전체 약 330ms 안에 끝나야 기다림이 느껴지지 않는다."
+      "note_ko": "권장값. 4개 기준 전체 약 330ms(180 + 50×3) 안에 끝나야 기다림이 느껴지지 않는다."
     },
     {
       "event_ko": "선택지 포커스 이동 강조",
@@ -288,7 +302,7 @@
       "n": 1,
       "part_id": "speaker_tag",
       "title_ko": "이름표가 먼저 읽힌다",
-      "body_ko": "강조색 배경의 이름표가 본문보다 위·앞에 놓여 '누가'를 먼저 알려 준다. 등장인물이 많을수록 얼굴 아이콘까지 붙이면 이름을 읽기 전에 식별된다. 아직 소개되지 않은 인물은 '???'로 표시해 스포일러를 피한다(Persona 5 Royal 접근성 리뷰에서 확인된 방식).",
+      "body_ko": "강조색 배경의 이름표가 본문보다 위·앞에 놓여 '누가'를 먼저 알려 준다. 등장인물이 많을수록 얼굴 아이콘까지 붙이면 다수 인물의 대사를 빠르게 구분할 수 있다. 아직 소개되지 않은 인물은 모호한 호칭으로 표시해 스포일러를 피한다(참고 게임의 접근성 리뷰에서 확인된 방식. 이 갤러리는 '???'로 표현).",
       "principle": "시각 위계"
     },
     {
@@ -309,15 +323,22 @@
       "n": 4,
       "part_id": "log_panel",
       "title_ko": "놓친 대사를 되돌려 본다",
-      "body_ko": "자동 진행 토글과 대화 로그를 함께 두면 읽는 속도가 느린 플레이어도 맥락을 잃지 않는다. 농·난청 플레이어 리뷰는 Persona 5 Royal의 이 조합을 긍정적으로 평가했다. 반면 자막 크기 조절이 없는 점은 한계로 지적했다.",
+      "body_ko": "자동 진행 토글(끄면 넘길 때까지 문장이 남음)과 대화 로그를 함께 두면 읽는 속도가 느린 플레이어도 맥락을 잃지 않는다. 농·난청 플레이어 접근성 리뷰가 참고 게임의 이 조합을 긍정적으로 평가했다. 반면 자막 크기 조절이 없는 점은 한계로 지적했다. 이 갤러리는 그 빈자리를 text_scale로 채운다.",
       "principle": "접근성"
     },
     {
       "n": 5,
       "part_id": "timer_bar",
       "title_ko": "시간 압박은 막대 하나로",
-      "body_ko": "남은 시간을 숫자 대신 줄어드는 막대로 보여 주면 글을 읽으면서 주변 시야로도 파악된다. 제한시간이 0이면 막대를 아예 숨겨, 압박이 없는 장면에서 불필요한 정보를 줄인다.",
+      "body_ko": "남은 시간을 숫자 대신 줄어드는 막대로 보여 주면 글을 읽으면서 주변 시야로도 파악된다. 제한시간이 0이면 막대를 아예 숨겨, 압박이 없는 장면에서 불필요한 정보를 줄인다(갤러리 고유 설계, 참고 게임의 확인된 기능 아님).",
       "principle": "인지 부하"
+    },
+    {
+      "n": 6,
+      "part_id": "body_text",
+      "title_ko": "자주 보는 대화는 짧고 빠르게",
+      "body_ko": "선택지를 고르지 않아도 반복 플레이에서 쌓인 사건에 따라 대사가 달라지면, 플레이어는 매 회차 서사가 진행된다고 느낀다. 이때 대화 UI의 역할은 빨리 읽고 넘기게 하는 것이다. 타자기 속도를 높이고 대사를 짧게 끊으면 죽고 재도전하는 본 게임 템포를 덜 방해한다(연쇄 이벤트 기반 대사 구조는 출처로 확인, 템포 효과는 설계 해석).",
+      "principle": "템포 유지"
     }
   ],
   "principles": [
@@ -348,72 +369,82 @@
     {
       "title_ko": "글자 크기를 키우면 패널이 터진다",
       "body_ko": "고정 높이 패널에 글자 배율만 올리면 본문이 넘쳐 잘린다. 줄 수 제한과 패널 높이 자동 조정, 또는 줄 나누기 규칙을 함께 설계해야 한다."
+    },
+    {
+      "title_ko": "일시정지하면 타이머나 타이핑이 멈추거나 계속 간다",
+      "body_ko": "게임 시간(timeScale)에 묶인 대기를 쓰면 일시정지 메뉴를 열었을 때 의도와 다르게 동작한다. 로그를 열었을 때는 타이머가 멈춰야 하는지 먼저 정하고, 대화 시간은 게임 시간과 분리해 계산한다."
     }
   ],
   "juice_off_ko": "패널이 등장 애니메이션 없이 툭 나타나고, 문장이 한 번에 통째로 찍힌다. ▼ 표시가 없어서 입력을 기다리는지 알 수 없다. 이름표는 본문과 같은 색·크기의 '이름:' 텍스트라 화자가 묻히고, 선택지는 회색 버튼이 나란히 있을 뿐 포커스 표시가 없다. 타이머는 구석의 숫자 '5, 4, 3…'이라 본문을 읽는 동안 눈에 들어오지 않는다.",
   "stage": {
     "aspect": "16:9",
     "needs_3d": false,
-    "scene_ko": "단색 배경(어두운 방 실루엣 정도)의 가상 장면. 하단에 대화 패널, 왼쪽에 오리지널 캐릭터 2명(간단한 도형 초상화)이 번갈아 말한다. 6~8줄 짧은 대본 뒤 3개 선택지 분기가 나오고, 고른 답에 따라 한 줄 반응이 달라진다. 우상단에 로그 버튼, 우하단에 자동/빨리감기 배지."
+    "scene_ko": "단색 배경(어두운 방 실루엣 정도)의 가상 장면. 하단에 대화 패널, 왼쪽에 오리지널 캐릭터 2명(간단한 도형 초상화)이 번갈아 말한다. 6~8줄 짧은 대본 뒤 3개 선택지 분기가 나오고, 고른 답에 따라 한 줄 반응이 달라진다. 첫 줄의 한 인물은 아직 소개 전이라 '???'로 표시되다가 다음 줄부터 이름이 나온다. 우상단에 로그 버튼, 우하단에 자동/빨리감기 배지."
   },
   "unity_ugui": {
-    "hierarchy": "DialogueCanvas (Canvas: Screen Space - Overlay, CanvasScaler: Scale With Screen Size 1920x1080, Match 0.5)\n├─ DialogueRoot (RectTransform 하단 앵커, CanvasGroup, DialogueView.cs)\n│  ├─ Portrait (Image, Preserve Aspect)\n│  ├─ Panel (Image 9-slice, 회전 Z = -skew 로 사선 표현 가능)\n│  │  ├─ SpeakerTag (Image 강조색)\n│  │  │  ├─ FaceIcon (Image)\n│  │  │  └─ SpeakerName (TextMeshProUGUI)\n│  │  ├─ BodyText (TextMeshProUGUI, Overflow: Truncate 또는 Page)\n│  │  ├─ NextIndicator (Image, Animator 또는 코드 트윈)\n│  │  └─ ModeBadge (TextMeshProUGUI: AUTO / FF)\n│  └─ ChoiceGroup (VerticalLayoutGroup, CanvasGroup)\n│     ├─ TimerBar (Image: Type Filled, Horizontal)\n│     └─ ChoiceButton x N (Button + TextMeshProUGUI, Navigation: Explicit)\n├─ LogPanel (CanvasGroup, 기본 비활성)\n│  └─ ScrollRect\n│     └─ Viewport/Content (VerticalLayoutGroup + ContentSizeFitter)\n│        └─ LogEntry 프리팹 (화자 + 본문 TextMeshProUGUI)\n└─ EventSystem (EventSystem + InputSystemUIInputModule)",
+    "hierarchy": "DialogueCanvas (Canvas: Screen Space - Overlay, CanvasScaler: Scale With Screen Size 1920x1080, Match 0.5)\n├─ DialogueRoot (RectTransform 하단 앵커, CanvasGroup, DialogueView.cs)\n│  ├─ Portrait (Image, Preserve Aspect)\n│  ├─ Panel (Image 9-slice, 사선은 사선 스프라이트 또는 SkewMeshEffect.cs[BaseMeshEffect 상속]로 표현)\n│  │  ├─ SpeakerTag (Image 강조색)\n│  │  │  ├─ FaceIcon (Image)\n│  │  │  └─ SpeakerName (TextMeshProUGUI)\n│  │  ├─ BodyText (TextMeshProUGUI, Overflow: Truncate 또는 Page)\n│  │  ├─ NextIndicator (Image, Animator 또는 코드 트윈)\n│  │  └─ ModeBadge (TextMeshProUGUI: AUTO / FF)\n│  └─ ChoiceGroup (VerticalLayoutGroup, CanvasGroup)\n│     ├─ TimerBar (Image: Type Filled, Fill Method Horizontal)\n│     └─ ChoiceButton x N (Button + TextMeshProUGUI, Navigation: Vertical 또는 Explicit)\n├─ LogPanel (CanvasGroup, 기본 숨김)\n│  └─ ScrollRect\n│     └─ Viewport/Content (VerticalLayoutGroup + ContentSizeFitter)\n│        └─ LogEntry 프리팹 (화자 + 본문 TextMeshProUGUI)\n└─ EventSystem (EventSystem + InputSystemUIInputModule)",
     "components_ko": [
+      "TextMeshProUGUI: Unity 6부터 TextMesh Pro는 Unity UI(com.unity.ugui) 패키지에 포함되어 있다. 처음 쓸 때 'TMP Essential Resources'를 임포트한다.",
       "TextMeshProUGUI.maxVisibleCharacters: 문자열은 한 번에 넣고 보이는 글자 수만 늘린다. 리치 텍스트 태그가 깨지지 않고 레이아웃이 매 글자 다시 계산되지 않는다.",
-      "InputActionAsset의 'Dialogue' 액션 맵: Advance(Button: Space/Enter/패드 South), FastForward(Button, Hold 상호작용 대신 IsPressed() 폴링), ToggleLog(Button). UI 맵은 InputSystemUIInputModule이 Navigate/Submit에 사용.",
+      "InputActionAsset의 'Dialogue' 액션 맵: Advance(Button: Space/Enter/패드 South), FastForward(Button, Hold 상호작용 대신 InputAction.IsPressed() 폴링), ToggleLog(Button). UI 맵은 InputSystemUIInputModule이 Navigate/Submit에 사용.",
       "EventSystem.current.SetSelectedGameObject(첫 버튼): 선택지가 열릴 때 포커스를 강제로 잡는다.",
-      "Button의 Navigation을 Explicit로 두고 위/아래만 연결(마지막→처음 순환 여부 결정).",
-      "Image(Filled) fillAmount로 타이머 바 구현, Time.unscaledDeltaTime으로 감소시켜 일시정지와 분리.",
+      "Button의 Navigation: 세로 목록이면 Vertical로 충분하다. 끝에서 처음으로 순환시키거나 특정 연결이 필요하면 Explicit로 두고 Select On Up/Down을 직접 지정한다.",
+      "Image(Type: Filled) fillAmount로 타이머 바 구현, Time.unscaledDeltaTime으로 감소시켜 일시정지와 분리.",
       "CanvasGroup.alpha / interactable / blocksRaycasts로 패널·선택지·로그 표시 전환.",
-      "ScrollRect.verticalNormalizedPosition = 0 으로 로그를 최신 줄 위치로 이동(Canvas.ForceUpdateCanvases() 후)."
+      "ScrollRect.verticalNormalizedPosition = 0 으로 로그를 최신 줄 위치로 이동(Canvas.ForceUpdateCanvases() 후).",
+      "사선 패널(선택): BaseMeshEffect를 상속해 ModifyMesh(VertexHelper)에서 위쪽 정점의 x를 높이×tan(skew)만큼 밀면 RectTransform 회전 없이 평행사변형이 된다."
     ],
     "steps_ko": [
-      "DialogueLine 데이터(화자 ID, 표시 이름, 초상화, 본문, 선택지 목록)를 ScriptableObject 또는 TSV로 정의한다.",
-      "DialogueView에 상태 enum(Hidden, Typing, LineComplete, ChoiceOpen, LogView)을 두고 상태별로 입력 처리를 분기한다.",
+      "DialogueLine 데이터(화자 ID, 표시 이름, 소개 여부, 초상화, 본문, 선택지 목록, 기본 선택 인덱스)를 ScriptableObject 또는 TSV로 정의한다.",
+      "DialogueView에 상태 enum(Hidden, Opening, Typing, LineComplete, AutoWait, ChoiceOpen, ChoiceConfirmed, LogView, Closed)을 두고 상태별로 입력 처리를 분기한다. 빨리감기는 별도 bool 플래그로 다룬다.",
       "타이핑 코루틴: text에 전체 문장을 넣고 ForceMeshUpdate() 후 textInfo.characterCount를 총 글자 수로 쓴다. maxVisibleCharacters를 cps에 맞춰 증가시키고, 문장부호 뒤에는 추가 대기를 넣는다.",
       "Advance 입력 처리: Typing이면 maxVisibleCharacters = 총 글자 수로 완성 후 LineComplete. LineComplete면 다음 줄. 입력을 처리한 프레임에는 return으로 끝내 이중 처리를 막는다.",
       "FastForward가 눌려 있으면 타이핑을 즉시 완성하고 짧은 간격(예: 0.08초)으로 다음 줄을 진행한다. ChoiceOpen에 진입하면 빨리감기를 무시한다.",
       "선택지 열기: 버튼을 생성/재사용하고 순차 페이드인한 뒤 SetSelectedGameObject(첫 버튼). 열린 직후 0.2초 동안 Submit을 무시한다.",
-      "제한시간이 있으면 타이머 코루틴에서 fillAmount를 줄이고, 0이 되면 기본 선택 인덱스로 OnChoice()를 호출한다.",
-      "각 줄을 출력할 때 로그 리스트에 추가하고, ToggleLog로 LogPanel을 열면 대화 진행을 멈춘다. 닫으면 이전 선택 대상을 다시 선택한다.",
+      "제한시간이 있으면 타이머 코루틴에서 fillAmount를 줄이고, 0이 되면 기본 선택 인덱스로 OnChoice()를 호출한다. OnChoice()는 버튼 onClick과 타임아웃이 함께 쓰는 단일 진입점으로 만들고 ChoiceConfirmed로 전환한다.",
+      "각 줄을 출력할 때 로그 리스트에 추가하고, ToggleLog로 LogPanel을 열면 대화 진행과 타이머를 멈춘다. 닫으면 이전 선택 대상을 다시 선택한다.",
       "자동 진행이 켜져 있으면 LineComplete에서 '기본 대기 + 글자 수 x 계수' 후 자동으로 Advance를 호출한다.",
-      "포커스 강조는 Button의 Transition을 None으로 두고, ISelectHandler/IDeselectHandler를 구현한 스크립트에서 색·스케일을 트윈한다."
+      "포커스 강조는 Button의 Transition을 None으로 두고, ISelectHandler/IDeselectHandler를 구현한 스크립트에서 색·스케일을 트윈한다.",
+      "글자 배율: 본문·선택지·로그 TextMeshProUGUI의 fontSize에 배율을 곱하고, Panel에 VerticalLayoutGroup + ContentSizeFitter(Vertical Fit: Preferred Size)를 두어 높이가 따라 늘게 한다."
     ],
     "pitfalls_ko": [
+      "Player Settings > Active Input Handling이 'Input System Package (New)' 또는 'Both'가 아니면 InputSystemUIInputModule과 액션이 동작하지 않는다.",
       "대화 중 Advance가 Player 액션 맵의 '점프/공격'과 같은 키라면 대화 시작 시 Player 맵을 Disable하고 Dialogue 맵만 Enable한다. 끝나면 되돌린다.",
       "maxVisibleCharacters에 string.Length를 쓰면 리치 텍스트 태그 글자 수까지 세서 끝에서 멈춘 것처럼 보인다. textInfo.characterCount를 써야 한다.",
       "text를 매 글자 잘라 넣으면(Substring) 태그가 깨지고 레이아웃 리빌드가 매 프레임 일어난다.",
       "한글 폰트는 TMP Font Asset을 Dynamic으로 만들거나 자주 쓰는 글자를 미리 아틀라스에 굽는다. 그렇지 않으면 처음 등장하는 글자에서 지연이나 누락이 생긴다.",
       "Time.timeScale = 0으로 일시정지할 때 WaitForSeconds를 쓰면 타이핑이 멈춘다. WaitForSecondsRealtime이나 unscaledDeltaTime을 쓴다.",
       "마우스 클릭으로 선택이 해제되는 문제: Update에서 currentSelectedGameObject가 null이면 마지막 선택지를 다시 선택한다.",
-      "오브젝트 탐색에 구식 API를 쓰지 말고 인스펙터 참조 또는 FindFirstObjectByType을 사용한다."
+      "RectTransform을 Z축으로 회전하면 '기울어진' 패널이 될 뿐 사선(skew)이 아니다. 글자까지 함께 기울어 읽기 어려워지므로 사선은 스프라이트나 메시 이펙트로 처리한다.",
+      "오브젝트 탐색에 구식 FindObjectOfType를 쓰지 말고 인스펙터 참조 또는 FindFirstObjectByType을 사용한다(6.3에서 지원되지만 무거우므로 매 프레임 호출 금지)."
     ]
   },
   "unity_uitk": {
-    "structure": "UIDocument (PanelSettings: Scale With Screen Size 1920x1080)\nDialogue.uxml\n<ui:VisualElement name=\"dialogue-root\" class=\"dlg-root dlg-root--hidden\">\n  <ui:VisualElement name=\"portrait\" class=\"dlg-portrait\" />\n  <ui:VisualElement name=\"panel\" class=\"dlg-panel\">\n    <ui:VisualElement name=\"speaker-tag\" class=\"dlg-speaker\">\n      <ui:VisualElement name=\"face-icon\" class=\"dlg-face\" />\n      <ui:Label name=\"speaker-name\" class=\"dlg-speaker__name\" />\n    </ui:VisualElement>\n    <ui:Label name=\"body\" class=\"dlg-body\" enable-rich-text=\"true\" />\n    <ui:VisualElement name=\"next\" class=\"dlg-next\" />\n    <ui:Label name=\"mode-badge\" class=\"dlg-badge\" />\n  </ui:VisualElement>\n  <ui:VisualElement name=\"choices\" class=\"dlg-choices\">\n    <ui:VisualElement name=\"timer\" class=\"dlg-timer\"><ui:VisualElement name=\"timer-fill\" class=\"dlg-timer__fill\" /></ui:VisualElement>\n    <!-- Button 을 코드로 생성: class=\"dlg-choice\" -->\n  </ui:VisualElement>\n  <ui:VisualElement name=\"log\" class=\"dlg-log dlg-log--hidden\">\n    <ui:ScrollView name=\"log-scroll\" mode=\"Vertical\" />\n  </ui:VisualElement>\n</ui:VisualElement>",
+    "structure": "UIDocument (PanelSettings: Scale Mode = Scale With Screen Size, Reference Resolution 1920x1080)\nDialogue.uxml\n<ui:VisualElement name=\"dialogue-root\" class=\"dlg-root dlg-root--hidden\">\n  <ui:VisualElement name=\"portrait\" class=\"dlg-portrait\" />\n  <ui:VisualElement name=\"panel\" class=\"dlg-panel\">\n    <ui:VisualElement name=\"speaker-tag\" class=\"dlg-speaker\">\n      <ui:VisualElement name=\"face-icon\" class=\"dlg-face\" />\n      <ui:Label name=\"speaker-name\" class=\"dlg-speaker__name\" />\n    </ui:VisualElement>\n    <ui:Label name=\"body\" class=\"dlg-body\" enable-rich-text=\"true\" />\n    <ui:VisualElement name=\"next\" class=\"dlg-next\" />\n    <ui:Label name=\"mode-badge\" class=\"dlg-badge\" />\n  </ui:VisualElement>\n  <ui:VisualElement name=\"choices\" class=\"dlg-choices\">\n    <ui:VisualElement name=\"timer\" class=\"dlg-timer\"><ui:VisualElement name=\"timer-fill\" class=\"dlg-timer__fill\" /></ui:VisualElement>\n    <!-- Button 을 코드로 생성: class=\"dlg-choice\" -->\n  </ui:VisualElement>\n  <ui:VisualElement name=\"log\" class=\"dlg-log dlg-log--hidden\">\n    <ui:ScrollView name=\"log-scroll\" mode=\"Vertical\" />\n  </ui:VisualElement>\n</ui:VisualElement>",
     "uss_notes_ko": [
       ".dlg-root 에 transition-property: translate, opacity; transition-duration: 0.22s; transition-timing-function: ease-out-cubic; 을 두고, --hidden 클래스(translate: 0 40px; opacity: 0)를 토글해 등장/퇴장시킨다.",
       ".dlg-choice:focus 에 강조색 배경과 scale: 1.04 1.04 를 주고 transition-duration: 0.1s 로 포커스 피드백을 만든다. :hover 도 같은 스타일로 맞춰 마우스·패드 경험을 일치시킨다.",
-      "USS에는 skew가 없다. 사선 패널은 rotate 를 살짝 준 컨테이너+역회전한 내용물, 사선 9-slice 이미지, 또는 generateVisualContent(Painter2D)로 다각형을 그려 구현한다.",
+      "USS 변형에는 translate·rotate·scale만 있고 skew가 없다. 사선 패널은 사선 9-slice 이미지, 또는 generateVisualContent(Painter2D)로 평행사변형을 그려 구현한다. rotate는 글자까지 기울이므로 사선 대용으로 쓰지 않는다.",
       "타이머 바는 .dlg-timer__fill 의 width 를 % 로 갱신하거나 scale 의 X 값을 줄인다(transform-origin: left). scale 쪽이 레이아웃 재계산이 없다.",
-      "글자 배율은 루트에 font-size 를 두고 하위 요소를 em 대신 상속 값으로 맞추거나, 배율별 클래스(.text-scale-140 등)를 루트에 붙인다.",
-      ".dlg-next 의 상하 반복은 USS 트랜지션만으로는 무한 반복이 안 되므로 schedule.Execute(...).Every(350) 로 클래스를 번갈아 토글한다."
+      "USS 길이 단위는 px과 %뿐이고 em/rem이 없다. 글자 배율은 루트에 font-size 를 두고 하위 요소가 상속받게 하거나, 배율별 클래스(.text-scale-140 등)를 루트에 붙인다.",
+      ".dlg-next 의 상하 반복은 USS 트랜지션만으로는 무한 반복이 안 되므로 schedule.Execute(...).Every(350) 로 클래스를 번갈아 토글한다(왕복 700ms)."
     ],
     "steps_ko": [
       "UIDocument의 rootVisualElement에서 Q<Label>(\"body\") 등으로 요소 참조를 잡는다.",
-      "타자기 효과: 전체 문장을 미리 파싱해 표시 가능한 글자 목록을 만들고, schedule.Execute(Tick).Every(간격)으로 보이는 글자 수를 늘리며 text를 갱신한다. 태그 깨짐을 피하려면 아직 보이지 않는 부분을 투명 처리 태그로 감싸는 방식을 검토한다.",
+      "타자기 효과: UI Toolkit의 TextElement에는 maxVisibleCharacters 같은 속성이 없다. 문장을 '보이는 부분 + <alpha=#00>남은 부분' 형태로 만들어 text를 갱신하면 줄바꿈 위치가 처음부터 고정되어 글자가 튀지 않는다. schedule.Execute(Tick).Every(간격)으로 경계 위치를 한 글자씩 옮긴다. 원문에 다른 리치 텍스트 태그가 있으면 태그 안쪽에서 끊지 않도록 미리 파싱한다.",
       "InputActionAsset의 Dialogue 맵을 코드에서 Enable하고 Advance/FastForward/ToggleLog 콜백을 상태 머신에 연결한다.",
-      "선택지 열기: Button을 생성해 choices에 추가하고 focusable = true, 첫 버튼에 Focus()를 호출한다. 클릭과 Submit 모두 clicked 이벤트로 처리된다.",
+      "선택지 열기: Button을 생성해 choices에 추가하고 focusable = true, 첫 버튼에 Focus()를 호출한다. 마우스 클릭은 clicked로 받고, 패드·키보드 확정이 clicked로 들어오는지 실제로 확인한 뒤 필요하면 NavigationSubmitEvent를 직접 등록한다.",
       "포커스 이동은 기본 NavigationMoveEvent로 동작한다. 순환 이동이 필요하면 RegisterCallback<NavigationMoveEvent>에서 직접 다음 버튼에 Focus()한다.",
       "로그: 줄마다 Label을 ScrollView에 추가하고, 열 때 schedule.Execute로 한 프레임 뒤 ScrollTo(마지막 요소)를 호출한다.",
       "자동 진행·빨리감기 배지는 클래스 토글로 표시하고, 상태 전환 함수 한 곳에서만 클래스를 바꾼다."
     ],
     "pitfalls_ko": [
-      "Label.text를 매 글자 Substring으로 바꾸면 <b>, <color> 같은 리치 텍스트 태그가 중간에 잘려 그대로 노출될 수 있다.",
+      "Label.text를 매 글자 Substring으로 바꾸면 <b>, <color> 같은 리치 텍스트 태그가 중간에 잘려 그대로 노출될 수 있고, 줄바꿈 위치가 매 글자 바뀌어 단어가 윗줄·아랫줄을 오간다.",
       "선택지 생성 직후 같은 프레임에 Focus()를 호출하면 아직 패널에 붙지 않아 실패할 수 있다. schedule.Execute로 한 프레임 미루거나 AttachToPanelEvent 이후에 호출한다.",
       "Button의 기본 USS(:focus, :hover)가 커스텀 스타일을 덮지 않도록 선택자 우선순위를 확인한다.",
-      "UIDocument 패널이 여러 개면 포커스가 다른 패널로 넘어갈 수 있다. 대화 중에는 sortingOrder를 올리고 다른 패널의 picking을 막는다.",
-      "USS transition은 display: none 전환에는 동작하지 않는다. 사라지는 연출이 필요하면 opacity/translate로 숨기고 트랜지션 종료(TransitionEndEvent) 후 display를 바꾼다."
+      "UIDocument 패널이 여러 개면 포커스가 다른 패널로 넘어갈 수 있다. 대화 중에는 sortingOrder를 올리고 다른 패널 요소의 pickingMode나 focusable을 막는다.",
+      "USS transition은 display: none 전환에는 동작하지 않는다. 사라지는 연출이 필요하면 opacity/translate로 숨기고 트랜지션 종료(TransitionEndEvent) 후 display를 바꾼다.",
+      "schedule.Execute는 게임 시간(timeScale)과 무관하게 돈다. 로그를 열었을 때 타이핑·타이머를 멈추려면 스케줄 항목을 Pause()하거나 상태 검사로 직접 건너뛴다."
     ]
   },
   "inspired_by": [
@@ -425,20 +456,19 @@
         "색 체계",
         "형태·기울기"
       ],
-      "what_learned_ko": "강조색 하나와 흑백 고대비로 위계를 만드는 배색 전략(개발자 패널 보도), 사선 패널이 주는 역동성을 배웠다. 대화 UI에서는 이름표+얼굴 화자 표시, 미소개 인물 모호 호칭, 자동 진행 토글과 로그의 조합을 참고했다(접근성 리뷰로 확인). 자막 크기 조절이 없다는 한계는 이 갤러리에서 text_scale 파라미터로 보완한다."
+      "what_learned_ko": "강조색 하나와 흑백 고대비로 위계를 만드는 배색 전략(개발자 패널 보도, 원작 P5 대상), 사선 형태가 주는 역동성(디자인 블로그 해석)을 배웠다. 색은 '단일 강조색+흑백'이라는 규칙만 가져오고 색상 자체는 빨강 계열을 피했다. 대화 UI에서는 이름표+얼굴 화자 표시, 미소개 인물 모호 호칭, 자동 진행 토글과 로그의 조합을 참고했다(Royal판 접근성 리뷰로 확인). 자막 크기 조절이 없다는 한계는 이 갤러리에서 text_scale 파라미터로 보완한다."
     },
     {
       "game_id": "hades",
       "title": "Hades",
       "credit": "© Supergiant Games",
       "borrowed_axes": [
-        "레이아웃 구조",
         "모션 리듬"
       ],
-      "what_learned_ko": "명시적 선택지 없이 누적된 사건에 따라 대사가 이어지는 서사 구조를 배웠다. 덕분에 대화 UI는 짧고 빠르게 넘기는 데 집중할 수 있다(Wikipedia: 연쇄 이벤트 기반 약 10시간 대사). 큰 측면 초상화 배치와 빠른 진행 템포는 기억에 기댄 해석이라 unverified이며, '짧은 대화 반복형' 프리셋으로 표현했다."
+      "what_learned_ko": "명시적 선택지 없이 누적된 사건에 따라 대사가 이어지는 서사 구조를 배웠다(Wikipedia: 연쇄 이벤트 기반 약 10시간 대사, Steam: 수천 개 고유 스토리 이벤트). 그래서 대화 UI는 짧고 빠르게 넘기는 템포에 집중해도 된다는 해석을 '짧은 대화 반복형' 프리셋의 빠른 진행 리듬으로 옮겼다. 하단 대화 상자+측면 초상화 배치는 기억에만 기댄 것이라 빌려 온 축으로 삼지 않았다. 큰 측면 초상화는 비주얼 노벨 등에서 널리 쓰이는 일반 관례로 취급한다."
     }
   ],
-  "original_ko": "원작의 상징인 신문 오려붙이기풍 서체와 예고장 모티프는 쓰지 않는다. 서사와 묶인 표현이라 떼어 내면 의미가 사라지기 때문이다. 대신 기울기 각도(panel_skew)라는 조절 가능한 기하 규칙으로만 역동성을 재현한다. 강조색 기본값은 원작의 빨강을 그대로 쓰지 않은 독자 코랄 레드(#E8384F)이고, 프리셋마다 다른 색을 쓴다. 캐릭터, 초상화, 대본은 모두 오리지널이다(단순 도형 초상화, 가상의 두 인물). 제한시간 타이머 바는 두 대표 게임의 확인된 기능이 아니라, 표본 정의('선택지 시간 제한')를 실습하려고 새로 설계한 요소다. 빨리감기 배지, 선택지 진입 시 확정 입력 0.2초 무시, 글자 크기 배율에 맞춘 패널 높이 자동 조정, 로그 열 때 최신 줄 자동 스크롤도 원작 재현이 아닌 갤러리 고유 설계다.",
+  "original_ko": "참고 게임의 상징인 신문 오려붙이기풍 서체와 예고장 모티프는 쓰지 않는다. 서사와 묶인 표현이라 떼어 내면 의미가 사라지기 때문이다. 대신 기울기 각도(panel_skew)라는 조절 가능한 기하 규칙으로만 역동성을 재현한다. '단일 강조색+흑백' 규칙은 가져오되 강조색 기본값은 빨강 계열이 아닌 주황(#FF6A3D)이고, 프리셋마다 다른 색(주황·청록·하늘색)을 쓴다. 캐릭터, 초상화, 대본은 모두 오리지널이다(단순 도형 초상화, 가상의 두 인물). 제한시간 타이머 바는 두 참고 게임의 확인된 기능이 아니라, 표본 정의('선택지 시간 제한')를 실습하려고 새로 설계한 요소다. 빨리감기 배지, 선택지 진입 시 확정 입력 0.2초 무시, 글자 크기 배율에 맞춘 패널 높이 자동 조정, 로그 열 때 최신 줄 자동 스크롤, 확정 플래시 연출도 원작 재현이 아닌 갤러리 고유 설계다.",
   "references": [
     {
       "label": "Persona 5 CEDEC+KYUSHU 2017 패널: 콘셉트와 UI 개발 (Persona Central)",
@@ -449,6 +479,11 @@
       "label": "Persona 5 UI 디자인 인터뷰 (Famitsu 번역, Persona Central)",
       "url": "https://personacentral.com/persona-5-interview-ui-design-sound-music/",
       "type": "T1"
+    },
+    {
+      "label": "The UI Design of Persona 5 (디자인 분석 블로그)",
+      "url": "https://jiaxinwen.wordpress.com/2017/04/27/the-ui-design-of-persona-5/",
+      "type": "T3"
     },
     {
       "label": "Persona 5 Royal 농·난청 접근성 리뷰 (Can I Play That)",
@@ -489,7 +524,46 @@
       "label": "Unity Manual: USS transitions",
       "url": "https://docs.unity3d.com/Manual/UIE-Transitions.html",
       "type": "official"
+    },
+    {
+      "label": "Unity 6.3 Manual: UI Toolkit supported rich text tags",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/Manual/UIE-supported-tags.html",
+      "type": "official"
+    },
+    {
+      "label": "Unity 6.3 Scripting API: UIElements.TextElement",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/UIElements.TextElement.html",
+      "type": "official"
+    },
+    {
+      "label": "Unity 6.3 Scripting API: Object.FindFirstObjectByType",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Object.FindFirstObjectByType.html",
+      "type": "official"
+    },
+    {
+      "label": "Unity UI 2.0 Manual: Navigation Options",
+      "url": "https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/script-SelectableNavigation.html",
+      "type": "official"
     }
   ],
-  "confidence_notes_ko": "분석 대상 버전: Persona 5 Royal(일본 2019/글로벌 2020)과 Hades(2020 정식판, Hades II 아님). \n\n확인됨(출처 있음): P5R의 화자 이름표+주요 인물 얼굴 표시, 미소개 인물 모호 호칭, 자동 진행 토글(끄면 자막 유지), 대화 로그, 전투 중 우상단 보충 자막, 자막 크기 조절 불가·컷신 자막 작음(Can I Play That, T2). P5 UI의 빨강 지배·보조색 최소화 배색(CEDEC 패널 보도, T1, 원작 P5 대상이며 Royal 계승은 전제). Hades의 완전 더빙과 수천 개 스토리 이벤트(Steam, T1), 연쇄 이벤트 기반 약 10시간 대사(Wikipedia, T2). \n\nplausible: P5R 대화 패널의 정확한 위치·형태, 사선 패널과 굵은 테두리 처리(T3 블로그 해석), 선택지 포커스 강조 방식. \n\nunverified(기억 또는 근거 없음): 두 게임의 타자기 효과 여부, 빨리감기 조작과 속도, 로그 버튼 매핑, Hades의 하단 대화 상자+측면 초상화 배치와 선물 수락/거절 프롬프트. assignments.json이 Hades 선정 이유로 든 '화자별 자막 색 지정'과 'GDC 2021 대화 강연'은 이번 검증 레코드에 근거가 없어 카드 본문에 쓰지 않았다. \n\n제한시간 선택지는 두 게임 모두에서 핵심 기능으로 확인되지 않았다. 표본 정의를 실습하려고 넣은 갤러리 고유 요소다. timings 전부는 업계 통상 권장값이며 원작 측정치가 아니다. Unity 구현 레시피(TMP maxVisibleCharacters, InputSystemUIInputModule, USS transition 등)는 일반 지식에 기반했고, Unity 문서 링크는 이번 세션에서 다시 열어 확인하지 않았다. 특히 UI Toolkit 타자기 효과의 리치 텍스트 처리 방식은 Unity 6.3에서 직접 시험해 볼 필요가 있다. gameuidatabase.com과 interfaceingame.com에는 접근하지 않았다."
+  "confidence_notes_ko": "분석 대상 버전: Persona 5 Royal(일본 2019/글로벌 2020. 개발자 발언 출처는 원작 P5 2016 대상이며 Royal 계승은 전제)과 Hades(2020 정식판, Hades II 아님).\n\n확인됨(출처 있음): P5R의 화자 이름표+주요 인물 얼굴 표시, 미소개 인물 모호 호칭(구체 표기가 '???'인지는 미확인), 자동 진행 토글(끄면 자막 유지), 대화 로그, 전투 중 우상단 보충 자막, 자막 크기 조절 불가·컷신 자막 작음(Can I Play That, T2). P5 UI의 빨강 지배·보조색 최소화 배색(CEDEC 패널 보도, T1). Hades의 완전 더빙과 수천 개 스토리 이벤트(Steam, T1), 연쇄 이벤트 기반 약 10시간 대사(Wikipedia, T2).\n\nplausible: P5R 대화 패널의 정확한 위치·형태, 사선 패널과 굵은 테두리 처리(T3 블로그 해석), 선택지 포커스 강조 방식. Hades의 짧은 대화가 템포를 지킨다는 효과는 설계 해석이며 측정 자료가 없다.\n\nunverified(기억 또는 근거 없음): 두 게임의 타자기 효과 여부, 빨리감기 조작과 속도, 로그 버튼 매핑, Hades의 하단 대화 상자+측면 초상화 배치와 선물 수락/거절 프롬프트. 그래서 Hades에서는 '레이아웃 구조' 축을 빌려 온 축에서 뺐다. assignments.json이 Hades 선정 이유로 든 '화자별 자막 색 지정'과 'GDC 2021 대화 강연'은 검증 레코드에 근거가 없어 카드 본문에 쓰지 않았다.\n\n제한시간 선택지는 두 게임 모두에서 핵심 기능으로 확인되지 않았다. 표본 정의를 실습하려고 넣은 갤러리 고유 요소다. timings 전부는 업계 통상 권장값이며 원작 측정치가 아니다.\n\nUnity 6.3 확인(이번 검수에서 공식 문서 열람): FindFirstObjectByType은 6.3에서 지원(비권장 아님, 성능 경고만 있음). UI Toolkit 리치 텍스트는 <alpha>, <color> 태그를 지원. UIElements.TextElement에는 maxVisibleCharacters 같은 속성이 없어 alpha 태그 방식으로 레시피를 바꿨다. uGUI Navigation 모드는 None/Horizontal/Vertical/Automatic/Explicit. 미확인: UI Toolkit Button이 패드·키보드 Submit(NavigationSubmitEvent)에서 clicked를 발생시키는지는 Button 문서에 명시가 없어 직접 시험하도록 단계에 적었다. TMP가 Unity 6부터 com.unity.ugui에 포함된 점, InputAction.IsPressed(), BaseMeshEffect.ModifyMesh는 일반 지식 기반이다. gameuidatabase.com과 interfaceingame.com에는 접근하지 않았다.",
+  "critic_changes_ko": [
+    "[과잉 모방] 강조색 기본값과 '연출형 소셜 RPG' 프리셋 색을 #E8384F(빨강 계열)에서 #FF6A3D(주황)로 바꿨다. '단일 강조색+흑백' 규칙만 빌리고, 원작의 빨강 색조까지 겹치지 않게 했다. original_ko도 이에 맞게 고쳤다.",
+    "[과잉 모방] '짧은 대화 반복형' 프리셋 색을 #C9A227(금색)에서 #5FB49C(청록)로 바꿨다. Hades의 색 체계 축을 빌리지 않았는데 색이 겹쳐 보일 여지를 없앰다.",
+    "[과잉 모방·근거] Hades의 borrowed_axes를 ['레이아웃 구조','모션 리듬']에서 ['모션 리듬']으로 줄였다. 측면 초상화 배치는 unverified 기억이므로 빌린 축으로 삼지 않고 일반 관례로 취급했다. what_learned_ko도 고쳐 썼다.",
+    "[과잉 모방] 핫스폿 1·4·5 본문에서 게임명을 빼고 '참고 게임'으로 바꿨다. 게임 출처 표기는 inspired_by와 references에 남겼다.",
+    "[원리 반영] 핫스폿 1의 '???' 표기를 P5R의 확인된 방식처럼 쓴 부분을 바로잡았다. 출처는 '모호한 호칭'까지만 확인되었고, '???'는 갤러리의 표현으로 명시했다.",
+    "[원리 반영] Hades 근거 레코드의 why_it_works(선택 없이 쌓이는 서사, 짧은 대화가 템포 유지)가 핫스폿에 없어서 핫스폿 6(body_text, 템포 유지)을 추가했다. 설계 해석임을 표기했다.",
+    "[원리 반영] 핫스폿 4에 '자동 진행을 끄면 문장이 남는다'는 확인된 동작과 text_scale 보완 관계를 넣었다. 핫스폿 5에는 갤러리 고유 설계라는 표기를 더했다.",
+    "[구현 가능성] 선택 확정 이벤트가 없어 choice_open 이후 흐름이 끊겨 있었다. events에 move_focus·confirm_choice를 추가하고, states에 choice_confirmed를 추가했다. choice_timeout은 choice_confirmed로 이어지게 했다. 각 state trigger에 대응 event id를 적었다.",
+    "[구현 가능성] panel_skew 설명에 웹 구현법(컨테이너 skewX + 글자 역방향 skew)을 넣었다. 모든 프리셋 값이 params 범위 안에 있는지 다시 확인했다(문제 없음).",
+    "[Unity uGUI] 'Panel 회전 Z = -skew로 사선 표현'은 회전이지 skew가 아니라서 틀린 안내였다. 사선 스프라이트 또는 BaseMeshEffect.ModifyMesh로 정점을 미는 방식으로 바꾸고 pitfall을 추가했다.",
+    "[Unity uGUI] Unity 6부터 TMP가 com.unity.ugui에 포함된 점과 Active Input Handling 설정 pitfall을 추가했다. Navigation은 세로 목록이면 Vertical로 충분하다고 고쳤다.",
+    "[Unity uGUI] 상태 enum을 states 목록(Opening, AutoWait, ChoiceConfirmed, Closed 포함)과 맞췄다. OnChoice 단일 진입점, 글자 배율용 ContentSizeFitter 단계를 추가했다. FindFirstObjectByType이 6.3에서 지원됨을 문서로 확인해 표기했다.",
+    "[Unity UI Toolkit] TextElement에 maxVisibleCharacters가 없음을 문서로 확인했다. 타자기 레시피를 '<alpha=#00> 태그로 남은 부분 숨기기'로 구체화했다(6.3 지원 태그 문서로 확인). 줄바꿈이 튀는 문제를 pitfall에 추가했다.",
+    "[Unity UI Toolkit] USS에 em/rem 단위가 없다는 점을 바로 썼다. rotate를 사선 대용으로 쓰지 말라는 설명을 넣었다. Button의 Submit→clicked 동작은 문서 근거가 없어 직접 확인하라는 단계로 바꿨다. schedule이 timeScale과 무관하다는 pitfall을 추가했다.",
+    "[교육성] 학습 목표 4(포커스와 제한시간을 한 문장에 섞음)를 '포커스 관리'와 '제한시간·일시정지 분리' 두 목표로 나눴다. 일시정지와 타이머 관련 흔한 실수를 mistakes에 추가했다.",
+    "[교육성] stage 대본에 미소개 인물 '???' 표시가 이름으로 바뀌는 장면을 넣어 핫스폿 1을 시연할 수 있게 했다.",
+    "[출처] references에 이미 인용 중인 T3 디자인 블로그와, 이번 검수에서 확인한 Unity 6.3 문서 4건을 추가했다. confidence_notes_ko에 Unity 문서 확인 결과와 남은 미확인 항목을 갱신했다."
+  ]
 }

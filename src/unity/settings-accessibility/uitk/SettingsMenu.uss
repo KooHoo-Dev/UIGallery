@@ -1,0 +1,143 @@
+/* 설정·접근성 메뉴 — Panel Settings 1920×1080 기준 픽셀.
+   USS 에 없는 것(gradient, box-shadow, filter, calc, rem)은 쓰지 않는다.
+   글자 크기 배율은 C# 에서 .scaled 라벨의 style.fontSize 로 넣는다. */
+
+:root {
+    --c-gold: rgb(243, 197, 82);
+    --c-text: rgb(238, 241, 246);
+    --c-muted: rgb(155, 165, 182);
+    --c-line: rgba(255, 255, 255, 0.12);
+    --c-panel: rgba(19, 23, 32, 0.92);
+    /* 역할 색 — 색각 모드 클래스가 같은 변수를 다시 정의한다 */
+    --c-ally: rgb(69, 182, 255);
+    --c-enemy: rgb(255, 74, 90);
+    --c-item: rgb(255, 210, 63);
+    --c-voice2: rgb(124, 240, 162);   /* 두 번째 화자(도윤) 이름·방향 화살표 */
+}
+
+.settings {
+    flex-grow: 1;
+    padding: 34px 72px 26px 72px;
+    background-color: rgb(11, 15, 21);
+    color: var(--c-text);
+}
+.settings.cb-protan { --c-ally: rgb(59, 130, 255); --c-enemy: rgb(242, 179, 0); --c-item: rgb(244, 244, 244); --c-voice2: rgb(169, 220, 255); }
+.settings.cb-deutan { --c-ally: rgb(47, 116, 255); --c-enemy: rgb(255, 136, 0); --c-item: rgb(255, 240, 154); --c-voice2: rgb(180, 214, 255); }
+.settings.cb-tritan { --c-ally: rgb(22, 196, 178); --c-enemy: rgb(255, 59, 124); --c-item: rgb(255, 255, 255); --c-voice2: rgb(255, 193, 216); }
+
+.head { height: 104px; justify-content: flex-end; border-bottom-width: 2px; border-color: var(--c-line); padding-bottom: 16px; }
+.eyebrow { font-size: 22px; color: var(--c-gold); -unity-font-style: bold; }
+.title { font-size: 48px; -unity-font-style: bold; }
+
+.panel-left { position: absolute; left: 72px; top: 164px; bottom: 116px; width: 800px; }
+.panel-right { position: absolute; left: 920px; right: 72px; top: 164px; bottom: 116px; }
+
+/* 프리셋 바 */
+.preset-head { flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.sec-label { font-size: 22px; color: var(--c-muted); -unity-font-style: bold; }
+.preset-state { font-size: 22px; padding: 6px 18px; border-width: 2px; border-color: var(--c-line); border-radius: 20px; color: var(--c-muted); }
+.preset-state.is-preset { background-color: var(--c-gold); border-color: var(--c-gold); color: rgb(36, 26, 0); }
+.preset-state.is-modified { border-color: var(--c-gold); color: var(--c-gold); }
+.preset-state.is-custom { border-color: rgb(143, 216, 255); color: rgb(143, 216, 255); }
+.preset-row { flex-direction: row; margin-bottom: 18px; }
+.preset-btn {
+    flex-grow: 1; height: 68px; margin: 0 6px 0 0; font-size: 24px; -unity-font-style: bold;
+    background-color: rgba(255, 255, 255, 0.05); border-width: 2px; border-color: var(--c-line); border-radius: 10px; color: var(--c-text);
+}
+.preset-btn.active { border-color: var(--c-gold); color: var(--c-gold); background-color: rgba(243, 197, 82, 0.16); }
+
+/* 탭 */
+.tabs { flex-direction: row; border-bottom-width: 2px; border-color: var(--c-line); margin-bottom: 18px; }
+.tab {
+    flex-grow: 1; height: 66px; font-size: 25px; -unity-font-style: bold; color: var(--c-muted);
+    background-color: rgba(0, 0, 0, 0); border-width: 0; border-bottom-width: 5px; border-color: rgba(0, 0, 0, 0);
+    flex-direction: row; justify-content: center; align-items: center;
+}
+.tab.selected { color: var(--c-text); border-color: var(--c-gold); }
+.badge {
+    min-width: 30px; height: 30px; margin-left: 8px; border-radius: 15px; font-size: 22px;
+    background-color: var(--c-gold); color: rgb(36, 26, 0); -unity-text-align: middle-center; -unity-font-style: bold;
+}
+.badge.zero { visibility: hidden; }
+
+/* 옵션 행 */
+.option-list { flex-grow: 1; }
+.option-row {
+    flex-direction: row; flex-wrap: wrap; align-items: center; min-height: 84px; padding: 14px 16px 14px 46px; margin-bottom: 8px;
+    border-radius: 10px; border-width: 2px; border-color: rgba(0, 0, 0, 0); background-color: rgba(255, 255, 255, 0.035);
+    transition-property: background-color, border-color; transition-duration: 0.12s;
+}
+.option-row.focused { background-color: rgba(243, 197, 82, 0.16); border-color: rgba(243, 197, 82, 0.75); border-left-width: 8px; border-left-color: var(--c-gold); }
+.option-row.flash { background-color: rgba(243, 197, 82, 0.4); border-color: var(--c-gold); }
+.option-row.hidden-tab { display: none; }
+.row-label { flex-grow: 1; flex-shrink: 1; font-size: 26px; white-space: normal; -unity-font-style: bold; }
+
+/* 변경 표시 점: 기본값과 다른 행에서만 보인다 */
+.change-dot { position: absolute; left: 17px; top: 35px; width: 14px; height: 14px; border-radius: 7px; background-color: var(--c-gold); display: none; }
+.option-row.changed .change-dot { display: flex; }
+
+/* ◀ 값 ▶ */
+.step-selector { flex-direction: row; align-items: center; flex-shrink: 0; }
+.step-selector:focus .step-arrow { color: var(--c-gold); }
+.step-arrow { width: 44px; height: 44px; font-size: 24px; background-color: rgba(0, 0, 0, 0); border-width: 0; color: rgba(255, 255, 255, 0.4); }
+.step-value { min-width: 180px; font-size: 24px; -unity-text-align: middle-center; -unity-font-style: bold; }
+
+/* 고대비: 메뉴 테두리와 포커스도 굵게 (장면은 URP Volume 이 맡는다) */
+.settings.high-contrast .option-row { border-color: rgba(255, 255, 255, 0.5); border-width: 4px; }
+.settings.high-contrast .option-row.focused { border-color: rgb(255, 224, 102); border-width: 6px; }
+.settings.high-contrast .preset-btn { border-width: 4px; border-color: rgba(255, 255, 255, 0.6); }
+
+/* 모션 줄이기: transition 은 상속되지 않으므로 대상마다 하위 선택자로 끈다 */
+.settings.reduce-motion .option-row,
+.settings.reduce-motion .subtitle,
+.settings.reduce-motion .scrim,
+.settings.reduce-motion .dialog { transition-duration: 0s; }
+
+/* 미리보기 + 자막 */
+.preview {
+    height: 522px; border-radius: 12px; border-width: 2px; border-color: rgba(255, 255, 255, 0.2);
+    -unity-background-scale-mode: scale-and-crop; justify-content: flex-end; align-items: center; padding-bottom: 26px; overflow: hidden;
+}
+.subtitle {
+    flex-direction: row; flex-wrap: wrap; justify-content: center; max-width: 880px; padding: 6px 18px 8px 18px; border-radius: 6px;
+    transition-property: background-color, opacity; transition-duration: 0.12s;
+}
+.subtitle.bg-off { background-color: rgba(6, 8, 14, 0); }
+.subtitle.bg-default { background-color: rgba(6, 8, 14, 0.5); }
+.subtitle.bg-heavy { background-color: rgba(6, 8, 14, 0.86); }
+.speaker { font-size: 30px; color: var(--c-ally); -unity-font-style: bold; margin-right: 8px; }
+.speaker.voice2 { color: var(--c-voice2); }   /* 화자마다 다른 색 — PlayLine 에서 클래스로 바꾼다 */
+.line { font-size: 30px; color: rgb(255, 255, 255); white-space: normal; }
+.line.yellow { color: rgb(255, 228, 92); }
+.line.sky { color: rgb(166, 230, 255); }
+.arrow { font-size: 26px; color: var(--c-voice2); margin: 0 8px; }   /* 화면 밖 화자(도윤) 색 */
+.hidden { display: none; }
+
+.description-panel { flex-grow: 1; margin-top: 20px; padding: 20px 26px; border-radius: 12px; background-color: var(--c-panel); border-width: 2px; border-color: var(--c-line); }
+.description-title { font-size: 30px; -unity-font-style: bold; margin-bottom: 10px; }
+.description { font-size: 23px; white-space: normal; color: var(--c-text); }
+
+.footer { position: absolute; left: 72px; right: 72px; bottom: 26px; height: 64px; border-top-width: 2px; border-color: var(--c-line); justify-content: center; }
+.hints { font-size: 22px; color: rgb(205, 211, 221); }
+
+.reset-btn {
+    align-self: flex-start; height: 62px; padding: 0 22px; margin-top: 12px; font-size: 24px; -unity-font-style: bold;
+    background-color: rgba(255, 255, 255, 0.06); border-width: 2px; border-color: var(--c-line); border-radius: 10px; color: var(--c-text);
+}
+
+/* 확인 창 — 0.96 → 1.0 확대 + 페이드 */
+.scrim { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgba(4, 6, 10, 0.74); justify-content: center; align-items: center; }
+.dialog {
+    width: 920px; padding: 40px 48px 34px 48px; border-radius: 14px; background-color: rgb(21, 26, 36);
+    border-width: 2px; border-top-width: 5px; border-color: rgba(255, 255, 255, 0.25); border-top-color: var(--c-gold);
+    scale: 1 1; opacity: 1; transition-property: scale, opacity; transition-duration: 0.18s; transition-timing-function: ease-out;
+}
+.dialog.opening { scale: 0.96 0.96; opacity: 0; }
+.dialog-title { font-size: 38px; -unity-font-style: bold; margin-bottom: 14px; }
+.dialog-body { font-size: 24px; color: var(--c-muted); white-space: normal; }
+.dialog-buttons { flex-direction: row; margin-top: 28px; }
+.dlg-btn {
+    flex-grow: 1; height: 76px; margin-right: 14px; font-size: 26px; -unity-font-style: bold;
+    background-color: rgba(255, 255, 255, 0.06); border-width: 2px; border-color: var(--c-line); border-radius: 10px; color: var(--c-text);
+}
+.dlg-btn:focus { background-color: var(--c-gold); border-color: var(--c-gold); color: rgb(36, 26, 0); }

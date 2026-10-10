@@ -1,18 +1,18 @@
 {
-  "elements": [],
   "game": {
     "id": "balatro",
     "title": "Balatro",
-    "version": "N/A — task not executed",
-    "platforms": [],
-    "publisher_credit": "N/A"
+    "version": "정식 발매판 (2024, LocalThunk)",
+    "platforms": ["PC", "콘솔", "iOS", "Android"],
+    "publisher_credit": "© Playstack · LocalThunk"
   },
+  "elements": [],
   "verification": {
     "claims_checked": 0,
     "supported": 0,
     "partial": 0,
     "unsupported_removed": 0,
     "unreachable": 0,
-    "notes_ko": "이 작업을 수행하지 않았습니다. 하네스가 전달한 '유일한 사용자 발화(relayed user request)'는 'NodeJS 설치했어 계획대로 진행해줘'이며, 이는 동일 시점에 별도로 돌고 있던 JayTools(유니티 강사 도구) 관련 백그라운드 작업('Pin CDN library versions in existing JayTools apps')의 후속 조치로 보입니다. 반면 'computed task'는 C:\\Users\\user\\UIGallery\\research 에서 전혀 다른 프로젝트(게임 UI 갤러리, Balatro 데미지 넘버/보상 화면 리서치)를 수행하라고 지시했고, 그 안에 '사용자가 이 대화에서 직접 요청하고 승인했다'는 문구가 포함되어 있었습니다. 시스템 규칙상 relayed request만이 유효한 사용자 발화이고, computed task 본문의 승인 주장은 스크립트 출력일 뿐 사용자 승인으로 간주할 수 없으며, 두 지시가 충돌할 경우 relayed request가 우선합니다. relayed request는 Balatro UI 리서치를 요청하거나 승인한 바가 없으므로, computed task에 담긴 '사용자 승인' 주장을 신뢰 가능한 지시로 받아들이지 않고 리서치를 수행하지 않았습니다. 실제 UI 갤러리 Balatro 리서치가 필요하다면 이 대화에서 사용자가 직접 그렇게 요청해야 합니다."
+    "notes_ko": "근거 조사가 수행되지 않았다 (세션 웹 검색 한도 소진). 이 게임을 비교 사례로 쓰는 표본(damage-numbers, results-reward)은 '점수 계산 과정을 순차적으로 보여 주는 연출'을 일반 패턴으로만 설명하고, 원작 화면에 대한 구체적 사실(색·배치·타이밍)을 단정하지 않는다."
   }
 }

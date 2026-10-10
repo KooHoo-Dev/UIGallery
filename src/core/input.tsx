@@ -150,28 +150,52 @@ export function TouchGlyph({ kind, size = 40, tone }: GlyphProps & { kind: 'tap'
   )
 }
 
+/** 십자 방향키 — 강조할 방향(들)만 채운다 */
+export function DPad({ dirs = ['up', 'down', 'left', 'right'], size = 40, tone }: GlyphProps & { dirs?: ('up' | 'down' | 'left' | 'right')[] }) {
+  const s = size
+  const a = s * 0.34
+  const b = s * 0.66
+  const arm = (d: 'up' | 'down' | 'left' | 'right') =>
+    ({
+      up: `M${a} 2 H${b} V${a} H${a} Z`,
+      down: `M${a} ${b} H${b} V${s - 2} H${a} Z`,
+      left: `M2 ${a} H${a} V${b} H2 Z`,
+      right: `M${b} ${a} H${s - 2} V${b} H${b} Z`,
+    })[d]
+  const all = ['up', 'down', 'left', 'right'] as const
+  return (
+    <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} role="img" aria-label={`방향키 ${dirs.join('·')}`} style={{ verticalAlign: 'middle' }}>
+      <path d={`M${a} 2 H${b} V${a} H${s - 2} V${b} H${b} V${s - 2} H${a} V${b} H2 V${a} H${a} Z`} fill={paper(tone)} stroke={ink(tone)} strokeWidth="2" strokeLinejoin="round" />
+      {all.map(d => (dirs.includes(d) ? <path key={d} d={arm(d)} fill={ink(tone)} /> : null))}
+    </svg>
+  )
+}
+
 /**
- * 마지막으로 쓴 입력 장치. forced 를 주면 그 값을 그대로 돌려준다 (조절 패널의 '입력 장치' 선택용).
+ * 마지막 입력 장치 + 입력 순번(seq). seq 는 어떤 입력이든 들어올 때마다 1씩 늘어난다
+ * (같은 장치로 다시 입력해도 알 수 있어서, 자동 데모의 '강제 장치'를 풀 때 쓴다).
+ * forced 를 주면 그 장치를 그대로 돌려준다 (조절 패널의 '입력 장치' 선택용).
  * 게임패드는 Gamepad API 를 0.25초마다 확인한다 (보안 컨텍스트에서만 동작 — file:// 와 https 는 OK).
  */
-export function useLastInputDevice(forced?: Device | 'auto'): Device {
-  const [device, setDevice] = useState<Device>('keyboard')
+export function useLastInput(forced?: Device | 'auto'): { device: Device; seq: number } {
+  const [state, setState] = useState<{ device: Device; seq: number }>({ device: 'keyboard', seq: 0 })
   useEffect(() => {
     if (forced && forced !== 'auto') return
-    const onKey = () => setDevice('keyboard')
-    const onPointer = (e: PointerEvent) => setDevice(e.pointerType === 'touch' ? 'touch' : 'mouse')
+    const set = (device: Device) => setState(s => ({ device, seq: s.seq + 1 }))
+    const onKey = () => set('keyboard')
+    const onPointer = (e: PointerEvent) => set(e.pointerType === 'touch' ? 'touch' : 'mouse')
     addEventListener('keydown', onKey)
     addEventListener('pointerdown', onPointer)
     let timer = 0
     if (typeof navigator.getGamepads === 'function') {
+      let wasActive = false
       timer = window.setInterval(() => {
+        let active = false
         for (const gp of navigator.getGamepads()) {
-          if (!gp) continue
-          if (gp.buttons.some(b => b.pressed) || gp.axes.some(a => Math.abs(a) > 0.5)) {
-            setDevice('gamepad')
-            return
-          }
+          if (gp && (gp.buttons.some(b => b.pressed) || gp.axes.some(v => Math.abs(v) > 0.5))) active = true
         }
+        if (active && !wasActive) set('gamepad')
+        wasActive = active
       }, 250)
     }
     return () => {
@@ -180,5 +204,10 @@ export function useLastInputDevice(forced?: Device | 'auto'): Device {
       clearInterval(timer)
     }
   }, [forced])
-  return forced && forced !== 'auto' ? forced : device
+  return forced && forced !== 'auto' ? { device: forced, seq: state.seq } : state
+}
+
+/** 마지막으로 쓴 입력 장치만 필요할 때 */
+export function useLastInputDevice(forced?: Device | 'auto'): Device {
+  return useLastInput(forced).device
 }

@@ -1,0 +1,87 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <!-- 설정·접근성 메뉴 (UI Toolkit). Panel Settings: Scale With Screen Size, 1920×1080 -->
+    <!-- StepSelectorElement 는 StepSelectorElement.cs 의 [UxmlElement] 커스텀 컨트롤 (◀ 값 ▶) -->
+    <Style src="SettingsMenu.uss" />
+    <ui:VisualElement name="root" class="settings">
+        <ui:VisualElement name="head" class="head">
+            <ui:Label text="일시정지 · 옵션" class="eyebrow" />
+            <ui:Label text="접근성 설정" class="title" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="left" class="panel-left">
+            <!-- 프리셋 바 + 상태 라벨 -->
+            <ui:VisualElement name="preset-bar" class="preset-bar">
+                <ui:VisualElement class="preset-head">
+                    <ui:Label text="빠른 프리셋" class="sec-label" />
+                    <ui:Label name="preset-state" text="기본" class="preset-state" />
+                </ui:VisualElement>
+                <ui:VisualElement class="preset-row">
+                    <ui:Button name="preset-vision" text="시각" class="preset-btn" />
+                    <ui:Button name="preset-hearing" text="청각" class="preset-btn" />
+                    <ui:Button name="preset-motor" text="운동" class="preset-btn" />
+                    <ui:Button name="preset-comfort" text="멀미 완화" class="preset-btn" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- 카테고리 탭 (탭 하나 = 버튼 + 배지). TabView 대신 버튼 줄로 만들어 배지를 붙이기 쉽게 했다 -->
+            <ui:VisualElement name="tabs" class="tabs">
+                <ui:Button name="tab-0" text="화면" class="tab"><ui:Label class="badge" text="0" /></ui:Button>
+                <ui:Button name="tab-1" text="자막" class="tab"><ui:Label class="badge" text="0" /></ui:Button>
+                <ui:Button name="tab-2" text="색·대비" class="tab"><ui:Label class="badge" text="0" /></ui:Button>
+                <ui:Button name="tab-3" text="모션" class="tab"><ui:Label class="badge" text="0" /></ui:Button>
+                <ui:Button name="tab-4" text="조작" class="tab"><ui:Label class="badge" text="0" /></ui:Button>
+            </ui:VisualElement>
+
+            <!-- 옵션 행: data-tab 대신 tab-N 클래스로 어느 탭인지 표시. key 는 AccessibilitySettings.Key 이름 -->
+            <ui:ScrollView name="option-list" class="option-list">
+                <ui:VisualElement class="option-row tab-0"><ui:VisualElement class="change-dot" /><ui:Label text="글자 크기" class="row-label scaled" /><StepSelectorElement key="TextScale" /></ui:VisualElement>
+                <ui:VisualElement class="option-row tab-0"><ui:VisualElement class="change-dot" /><ui:Label text="HUD 크기" class="row-label scaled" /><StepSelectorElement key="HudSize" /></ui:VisualElement>
+                <ui:VisualElement class="option-row tab-0"><ui:VisualElement class="change-dot" /><ui:Label text="화면 중앙 점" class="row-label scaled" /><StepSelectorElement key="CenterDot" /></ui:VisualElement>
+                <ui:VisualElement class="option-row tab-1"><ui:VisualElement class="change-dot" /><ui:Label text="자막 배경" class="row-label scaled" /><StepSelectorElement key="SubtitleBg" /></ui:VisualElement>
+                <ui:VisualElement class="option-row tab-1"><ui:VisualElement class="change-dot" /><ui:Label text="화자명·방향 표시" class="row-label scaled" /><StepSelectorElement key="SpeakerCues" /></ui:VisualElement>
+                <ui:VisualElement class="option-row tab-1"><ui:VisualElement class="change-dot" /><ui:Label text="자막 글자 색" class="row-label scaled" /><StepSelectorElement key="SubtitleColor" /></ui:VisualElement>
+                <ui:VisualElement class="option-row tab-2"><ui:VisualElement class="change-dot" /><ui:Label text="색각 모드" class="row-label scaled" /><StepSelectorElement key="ColorMode" /></ui:VisualElement>
+                <ui:VisualElement class="option-row tab-2"><ui:VisualElement class="change-dot" /><ui:Label text="고대비 디스플레이" class="row-label scaled" /><StepSelectorElement key="HighContrast" /></ui:VisualElement>
+                <ui:VisualElement class="option-row tab-3"><ui:VisualElement class="change-dot" /><ui:Label text="카메라 흔들림" class="row-label scaled" /><StepSelectorElement key="CameraShake" /></ui:VisualElement>
+                <ui:VisualElement class="option-row tab-3"><ui:VisualElement class="change-dot" /><ui:Label text="모션 줄이기" class="row-label scaled" /><StepSelectorElement key="ReduceMotion" /></ui:VisualElement>
+                <ui:VisualElement class="option-row tab-4"><ui:VisualElement class="change-dot" /><ui:Label text="연타 대신 길게 누르기" class="row-label scaled" /><StepSelectorElement key="HoldToPress" /></ui:VisualElement>
+                <ui:VisualElement class="option-row tab-4"><ui:VisualElement class="change-dot" /><ui:Label text="조준 보조" class="row-label scaled" /><StepSelectorElement key="AimAssist" /></ui:VisualElement>
+            </ui:ScrollView>
+
+            <ui:Button name="reset" text="기본값 복원" class="reset-btn" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="right" class="panel-right">
+            <!-- 미리보기 Camera 의 RenderTexture 를 C# 에서 background-image 로 넣는다 -->
+            <ui:VisualElement name="preview" class="preview">
+                <ui:VisualElement name="subtitle" class="subtitle bg-default">
+                    <ui:Label name="arrow-left" text="◀" class="arrow hidden" />
+                    <ui:Label name="speaker" text="하린:" class="speaker scaled-sub" />
+                    <ui:Label name="line" text="저 언덕 너머에 보급 상자가 있어. 내가 엄호할게." class="line scaled-sub" />
+                    <ui:Label name="arrow-right" text="▶" class="arrow hidden" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="description-panel">
+                <ui:Label name="description-title" text="자막 배경" class="description-title scaled" />
+                <ui:Label name="description" text="자막 뒤 반투명 판의 진하기." class="description scaled" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="footer" class="footer">
+            <ui:Label name="hints" text="↑↓ 이동   ←→ 값 변경   Q/E 탭   R 기본값 복원   C 고대비 빠른 전환" class="hints" />
+        </ui:VisualElement>
+
+        <!-- 기본값 복원 확인 창 (기본 숨김, 기본 포커스 = 취소) -->
+        <ui:VisualElement name="reset-dialog" class="scrim hidden">
+            <ui:VisualElement class="dialog">
+                <ui:Label text="기본값으로 되돌릴까요?" class="dialog-title" />
+                <ui:Label name="dialog-body" text="되돌릴 범위를 고르세요." class="dialog-body" />
+                <ui:VisualElement class="dialog-buttons">
+                    <ui:Button name="dlg-tab" text="현재 탭만" class="dlg-btn" />
+                    <ui:Button name="dlg-all" text="전체" class="dlg-btn" />
+                    <ui:Button name="dlg-cancel" text="취소" class="dlg-btn" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
