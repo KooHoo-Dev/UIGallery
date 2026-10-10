@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+# 연구용 캡처·메모는 절대 커밋하지 않는다 (docs/plan.md 3절)
+_research/
+_shots/

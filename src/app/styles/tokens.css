@@ -1,0 +1,60 @@
+/* 갤러리 크롬(내비·패널) 전용 토큰. 표본 고유의 색은 각 표본 CSS Module 안에서 정의한다. */
+:root {
+  --bg: #090d15;
+  --bg-2: #0e1420;
+  --panel: #131a28;
+  --panel-2: #1a2334;
+  --panel-3: #222d42;
+  --line: #27334b;
+  --line-2: #34425f;
+  --text: #e8eef8;
+  --text-2: #a3b0c6;
+  --text-3: #6f7d96;
+  --accent: #37d6ff;
+  --accent-ink: #04212b;
+  --accent-soft: rgba(55, 214, 255, 0.14);
+  --warm: #ffb547;
+  --good: #4ade80;
+  --bad: #ff5d6c;
+  --focus: #ffe066;
+
+  --font: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Chakra Petch', var(--font);
+  --font-mono: 'JetBrains Mono', Consolas, 'D2Coding', monospace;
+
+  --r-sm: 6px;
+  --r: 10px;
+  --r-lg: 16px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --cut: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+
+  --fs-base: 16px;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #eef2f8;
+  --bg-2: #e4eaf3;
+  --panel: #ffffff;
+  --panel-2: #f3f6fb;
+  --panel-3: #e7ecf4;
+  --line: #d3dbe8;
+  --line-2: #bcc7d8;
+  --text: #121a2a;
+  --text-2: #475570;
+  --text-3: #6d7a92;
+  --accent: #0077b6;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(0, 119, 182, 0.1);
+  --warm: #b86e00;
+  --good: #15803d;
+  --bad: #c81e3a;
+  --focus: #b45309;
+  --shadow: 0 8px 24px rgba(20, 30, 60, 0.12);
+  color-scheme: light;
+}
+
+/* 발표 모드 — 프로젝터에서 읽히도록 전체 글자를 키운다 */
+:root[data-presenter='true'] {
+  --fs-base: 20px;
+}

@@ -1,0 +1,72 @@
+.hud,
+.waypoint-layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* 마커 원점(0,0)이 목표 위치. 내용물은 가운데 정렬되도록 translate 로 당긴다 */
+.waypoint {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    overflow: visible;
+}
+
+.waypoint__icon {
+    position: absolute;
+    width: 46px;
+    height: 46px;
+    translate: -50% -50%;
+    rotate: 45deg;
+    background-color: rgb(255, 196, 67);
+    border-width: 4px;
+    border-color: rgb(16, 19, 26);
+}
+
+/* 화살표: 회전 중심이 마커 원점이 되도록 폭 0 컨테이너를 돌린다.
+   삼각형 모양은 background-image(화살표 스프라이트)로 넣는다 */
+.waypoint__arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: visible;
+}
+
+.waypoint__arrow-shape {
+    position: absolute;
+    left: 34px;
+    top: -16px;
+    width: 26px;
+    height: 32px;
+    background-image: resource("WaypointArrow");
+    -unity-background-image-tint-color: rgb(255, 196, 67);
+}
+
+.waypoint__dist {
+    position: absolute;
+    top: 34px;
+    translate: -50% 0;
+    font-size: 26px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+}
+
+.compass {
+    position: absolute;
+    top: 44px;
+    left: 50%;
+    width: 960px;
+    height: 64px;
+    translate: -50% 0;
+    overflow: hidden;
+    background-color: rgba(8, 12, 20, 0.45);
+    border-top-width: 2px;
+    border-color: rgba(255, 255, 255, 0.5);
+}

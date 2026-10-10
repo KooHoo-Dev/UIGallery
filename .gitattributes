@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.cs text eol=lf
+*.uxml text eol=lf
+*.uss text eol=lf

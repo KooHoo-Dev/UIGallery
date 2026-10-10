@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Waypoints.uss" />
+    <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
+        <!-- 목표 마커는 WaypointsUITK.cs 가 목표 수만큼 여기에 만든다 -->
+        <ui:VisualElement name="waypoint-layer" class="waypoint-layer" picking-mode="Ignore" />
+        <ui:VisualElement name="compass" class="compass" picking-mode="Ignore">
+            <ui:VisualElement name="compass-ticks" class="compass__ticks" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

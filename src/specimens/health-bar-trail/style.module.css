@@ -1,0 +1,149 @@
+.root {
+  position: absolute;
+  inset: 0;
+  font-family: 'Chakra Petch', 'Malgun Gothic', sans-serif;
+  --bar-w: 660px;
+  --bar-h: 34px;
+}
+
+/* 저체력 테두리 — 화면 가장자리만 붉게 (Meta UI) */
+.vignette {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 75% 70% at 50% 50%, transparent 52%, rgba(150, 0, 18, 0.55) 78%, rgba(90, 0, 10, 0.9) 100%);
+}
+.flash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: rgba(255, 40, 60, 1);
+  mix-blend-mode: screen;
+}
+
+.cluster {
+  position: absolute;
+  left: 96px;
+  bottom: 92px;
+  width: var(--bar-w);
+  will-change: transform;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #f4f7fb;
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: 0.16em;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+.icon {
+  width: 30px;
+  height: 30px;
+  fill: #f4f7fb;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+.number {
+  margin-left: auto;
+  font-size: 30px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  position: relative;
+  height: var(--bar-h);
+  --clip: polygon(18px 0, 100% 0, calc(100% - 18px) 100%, 0 100%);
+  clip-path: var(--clip);
+  background: rgba(6, 9, 15, 0.72);
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.85);
+}
+.cluster[data-shape='rounded'] .bar {
+  --clip: inset(0 round 999px);
+  height: 30px;
+}
+.cluster[data-shape='thin'] .bar {
+  --clip: inset(0);
+  height: 14px;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
+}
+
+.track,
+.trail,
+.fill,
+.healPreview {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+}
+.cluster[data-shape='thin'] :is(.trail, .fill, .healPreview) {
+  top: 2px;
+  bottom: 2px;
+}
+.zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+.track {
+  right: 0;
+  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0 8px, transparent 8px 16px);
+}
+
+/* 잔상: 방금 잃은 양 — 어떤 체력 색과도 구분되는 밝은 흰색 */
+.trail {
+  background: linear-gradient(180deg, #ffffff, #e9e1d0);
+}
+/* 회복 미리보기: 곧 차오를 양 */
+.healPreview {
+  background: repeating-linear-gradient(90deg, rgba(160, 255, 190, 0.85) 0 6px, rgba(160, 255, 190, 0.45) 6px 12px);
+}
+.fill {
+  --hue: 120;
+  background: linear-gradient(180deg, hsl(var(--hue) 85% 62%), hsl(var(--hue) 80% 42%));
+  box-shadow: 0 0 18px hsl(var(--hue) 90% 50% / 0.5);
+}
+.root:not([data-juice]) .fill {
+  box-shadow: none;
+}
+.tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  margin-left: -1.5px;
+  background: rgba(6, 9, 15, 0.75);
+}
+.lowMark {
+  position: absolute;
+  top: -8px;
+  bottom: -8px;
+  width: 0;
+  border-left: 2px dashed rgba(255, 255, 255, 0.35);
+}
+.root:not([data-juice]) .lowMark {
+  display: none;
+}
+
+/* 저체력: 바 자체도 맥동 (배속·일시정지 반영) */
+.cluster[data-low] .bar {
+  animation: pulse calc(0.9s / var(--ts, 1)) ease-in-out infinite;
+}
+.root[data-paused] .cluster[data-low] .bar {
+  animation-play-state: paused;
+}
+.cluster[data-low] .label {
+  color: #ffb1b9;
+}
+@keyframes pulse {
+  50% {
+    box-shadow: inset 0 0 0 3px #ff6b7a, 0 0 22px rgba(255, 60, 80, 0.6);
+  }
+}

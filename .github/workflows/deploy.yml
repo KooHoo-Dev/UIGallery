@@ -1,0 +1,56 @@
+# main 에 push → 빌드·검사 → GitHub Pages 배포
+# v* 태그 push → 오프라인용 단일 HTML 을 Release 에 첨부
+name: Build & Deploy
+
+on:
+  push:
+    branches: ['main']
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: 검사 (오프라인 실행·용량·파일명)
+        run: python3 tools/check.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Release 첨부 (태그일 때만)
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp dist/index.html "UIGallery-${GITHUB_REF_NAME}.html"
+          gh release create "$GITHUB_REF_NAME" "UIGallery-${GITHUB_REF_NAME}.html" \
+            --title "UI Gallery $GITHUB_REF_NAME" \
+            --notes "오프라인용 HTML 파일 하나입니다. 내려받아 더블클릭하면 인터넷 없이 실행됩니다."
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="HealthBarTrail.uss" />
+    <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
+        <ui:VisualElement name="vignette" class="vignette" picking-mode="Ignore" />
+        <ui:Label name="label" class="hb-label" text="100 / 100" />
+        <ui:VisualElement name="health-bar" class="hb">
+            <!-- 아래 → 위 순서로 겹친다 -->
+            <ui:VisualElement name="trail" class="hb__layer hb__trail" />
+            <ui:VisualElement name="heal-preview" class="hb__layer hb__heal" />
+            <ui:VisualElement name="fill" class="hb__layer hb__fill" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
