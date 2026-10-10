@@ -760,9 +760,11 @@ a.card:hover {
   border-radius: var(--r);
   border: 1px solid var(--line);
 }
+/* .stage 는 container(inline-size) 라 내용으로 너비를 정할 수 없다 → 세로 무대는 너비를 직접 계산 */
 .spec-stage-col .stage[data-aspect='9:16'] {
-  height: min(78vh, 980px);
-  margin: 0 auto;
+  width: min(100%, calc(min(78vh, 980px) * 9 / 16));
+  height: auto;
+  justify-self: center;
 }
 .juice-note {
   font-size: 0.9rem;
@@ -1294,11 +1296,15 @@ th {
 .specimen[data-presenter] .back {
   display: none;
 }
+.specimen[data-presenter] .spec-head .lead {
+  display: none;
+}
 .specimen[data-presenter] .spec-stage-col .stage[data-aspect='16:9'] {
-  max-height: calc(100vh - 220px);
-  width: auto;
-  max-width: 100%;
-  margin: 0 auto;
+  width: min(100%, calc((100vh - 200px) * 16 / 9));
+  justify-self: center;
+}
+.specimen[data-presenter] .spec-stage-col .stage[data-aspect='9:16'] {
+  width: min(100%, calc((100vh - 200px) * 9 / 16));
 }
 
 /* ───────── 반응형 ───────── */

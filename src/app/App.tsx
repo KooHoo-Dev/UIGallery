@@ -13,7 +13,8 @@ export function App() {
   const [theme, setTheme] = useState<Theme>(() =>
     load<Theme>('theme', matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'),
   )
-  const [presenter, setPresenter] = useState(false)
+  // ?present=1 이면 발표 모드로 시작 (수업 자료 링크용)
+  const [presenter, setPresenter] = useState(() => /[?&]present=1\b/.test(location.hash))
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme

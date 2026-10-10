@@ -1,0 +1,567 @@
+{
+  "specimen_id": "quest-tracker-toasts",
+  "name_ko": "퀘스트 목록 + 알림 큐",
+  "name_en": "Quest Tracker & Toast Queue",
+  "group": "C",
+  "paradigm": "non-diegetic",
+  "one_liner_ko": "추적 중인 목표는 한자리에 고정해 두고 진행이 바뀔 때만 살짝 강조한다. 몰려드는 획득·업적 알림은 큐에 넣고 우선순위·병합·표시 시간 규칙에 따라 차례로 보여 준다.",
+  "learning_goals_ko": [
+    "(입문) 고정 정보(퀘스트 트래커)와 일시 정보(토스트 알림)를 화면 영역과 수명으로 나누는 이유를 설명할 수 있다.",
+    "(입문~중급) 알림 요청을 큐에 쌓은 뒤 '동시 표시 슬롯 수 · 표시 시간 · 우선순위 · 같은 키 병합'의 네 규칙으로 꺼내는 로직을 직접 설계할 수 있다.",
+    "(입문) 목표 진행 갱신(3/5→4/5)을 숫자만 바꾸지 않고 짧은 하이라이트와 바 채움으로 알리는 피드백을 만들 수 있다.",
+    "(입문) 정보가 많은 다중 목록형과 화면이 좁을 때 쓰는 단일 목표형의 장단점을 프리셋을 바꿔 가며 비교할 수 있다.",
+    "(중급) 일시정지(Time.timeScale = 0) 중에 알림 타이머를 멈출지 계속 돌릴지 의도적으로 정하고, 표시 시간을 사용자가 늘릴 수 있게 하는 이유(접근성)를 설명할 수 있다.",
+    "(중급 심화) Unity UGUI(LayoutGroup+CanvasGroup)와 UI Toolkit(UXML+USS transition)에서 큐 로직은 그대로 두고 뷰만 바꿔 재사용할 수 있다."
+  ],
+  "anatomy": [
+    {
+      "part_id": "tracker-panel",
+      "name_ko": "퀘스트 트래커 패널",
+      "role_ko": "플레이어가 '추적'으로 고른 퀘스트만 보여 주는 영역. 화면 가장자리 고정 위치에 있다. 위치와 크기가 바뀌지 않으므로 시선이 습관처럼 돌아올 수 있다."
+    },
+    {
+      "part_id": "tracker-quest-title",
+      "name_ko": "퀘스트 제목 줄",
+      "role_ko": "퀘스트 이름과 종류 아이콘(메인/반복 과제 등). 종류별로 그룹을 나눠 메인 목표가 반복 과제 사이에 묻히지 않게 한다."
+    },
+    {
+      "part_id": "tracker-objective-row",
+      "name_ko": "목표 행",
+      "role_ko": "체크 표시 + 목표 문구 + 현재/최대 수치. 목표를 달성하면 체크가 채워지고, 행이 흐려진 뒤 접힌다."
+    },
+    {
+      "part_id": "tracker-progress",
+      "name_ko": "목표 진행 바",
+      "role_ko": "수치가 바뀔 때만 잠깐 밝아지며 채워지는 얇은 바. 숫자를 읽지 않아도 '방금 올랐다'는 것을 알 수 있다."
+    },
+    {
+      "part_id": "toast-stack",
+      "name_ko": "토스트 스택",
+      "role_ko": "알림 카드가 정해진 방향으로 쌓이는 영역. 트래커와 겹치지 않도록 반대쪽 가장자리에 둔다. 동시 표시 슬롯 수만큼만 보인다."
+    },
+    {
+      "part_id": "toast-card",
+      "name_ko": "토스트 카드",
+      "role_ko": "획득·진행 알림 한 건. 아이콘·문구·수량으로 이루어지며 들어오기(슬라이드+페이드) → 유지 → 나가기 순서의 수명을 가진다. 높이는 고정 토큰(예: 56px)이라 접기와 펼치기를 계산하기 쉽다."
+    },
+    {
+      "part_id": "toast-rarity-stripe",
+      "name_ko": "등급 띠",
+      "role_ko": "카드 왼쪽의 색 띠. 등급(일반/고급/희귀/전설)을 색뿐 아니라 띠 두께와 Ⅰ~Ⅳ 문자 표기로도 구분해 우선순위가 한눈에 보이게 한다."
+    },
+    {
+      "part_id": "toast-count-badge",
+      "name_ko": "병합 수량 배지",
+      "role_ko": "같은 키(같은 아이템)의 알림이 병합 창 안에 다시 들어오면 새 카드를 만들지 않는다. 대신 'x3'처럼 수량만 올리고 표시 시간을 연장한다."
+    },
+    {
+      "part_id": "queue-overflow-indicator",
+      "name_ko": "대기열 표시",
+      "role_ko": "슬롯이 꽉 차서 기다리는 알림 수를 '+N 대기'로 보여 준다. 알림이 사라진 게 아니라 순서를 기다리고 있다는 신호다."
+    },
+    {
+      "part_id": "priority-banner",
+      "name_ko": "우선 배너",
+      "role_ko": "퀘스트 완료·업적처럼 최상위 알림에만 쓰는 상단 중앙 배너. 일반 토스트 큐와 별도 채널로 돌아가며, 배너가 떠 있는 동안 일반 토스트 타이머를 잠시 멈출 수 있다."
+    }
+  ],
+  "states": [
+    {
+      "name": "tracker-idle",
+      "trigger_ko": "진행 변화가 없을 때",
+      "visual_ko": "트래커가 낮은 대비(반투명 배경, 보조 텍스트색)로 조용히 떠 있다."
+    },
+    {
+      "name": "quest-tracked",
+      "trigger_ko": "새 퀘스트 추적 시작 이벤트(quest-accept)",
+      "visual_ko": "트래커 목록 맨 위(단일 목표형이면 유일한 줄)에 새 퀘스트 블록의 높이가 펼쳐지며 들어오고, 제목 줄이 한 번 밝아졌다가 원래 대비로 돌아온다."
+    },
+    {
+      "name": "objective-progress",
+      "trigger_ko": "목표 수치 증가 이벤트(kill-enemy 등)",
+      "visual_ko": "해당 행만 밝아지고 수치가 바뀐다. 진행 바는 새 값까지 채워지고, 0.6초 안에 원래 대비로 돌아간다."
+    },
+    {
+      "name": "objective-complete",
+      "trigger_ko": "목표 수치가 최대에 도달",
+      "visual_ko": "체크가 채워지고 문구가 흐려진다. 마지막 목표였다면 퀘스트 완료로 이어진다."
+    },
+    {
+      "name": "quest-complete",
+      "trigger_ko": "퀘스트의 모든 목표 완료(quest-complete 이벤트 또는 마지막 목표 달성)",
+      "visual_ko": "우선 배너가 뜨고(banner-show), 트래커의 해당 퀘스트 블록은 잠시 머문 뒤 높이가 접히며 사라진다."
+    },
+    {
+      "name": "banner-show",
+      "trigger_ko": "퀘스트 완료 또는 업적 달성(achievement) 이벤트",
+      "visual_ko": "상단 중앙 배너가 위에서 내려오며 페이드인하고, 정해진 시간 동안 머문 뒤 사라진다. '배너 중 토스트 타이머 정지' 옵션이 켜져 있으면 그동안 일반 토스트의 남은 시간이 줄지 않는다."
+    },
+    {
+      "name": "toast-enter",
+      "trigger_ko": "큐에서 빈 슬롯으로 알림이 꺼내짐",
+      "visual_ko": "카드가 스택 바깥쪽에서 짧게 슬라이드하며 페이드인한다. 기존 카드들은 슬롯 높이가 펼쳐지는 만큼 부드럽게 한 칸씩 밀린다."
+    },
+    {
+      "name": "toast-merge",
+      "trigger_ko": "표시 중이거나 대기 중인 알림과 같은 키의 알림이 병합 창 안에 도착",
+      "visual_ko": "표시 중인 카드라면 새 카드 없이 수량 배지가 'x2→x3'으로 바뀌며 살짝 튀고, 남은 표시 시간이 다시 채워진다. 대기 중인 알림에 합쳐지면 '+N 대기' 수는 그대로이고 디버그 표시의 병합 횟수만 오른다."
+    },
+    {
+      "name": "toast-queued",
+      "trigger_ko": "슬롯이 모두 찬 상태에서 새 알림 도착(loot-burst 등)",
+      "visual_ko": "스택 끝의 '+N 대기' 숫자가 늘어난다. 카드는 아직 보이지 않는다."
+    },
+    {
+      "name": "toast-preempt",
+      "trigger_ko": "priority-preempt 모드에서 표시 중인 최저 등급보다 높은 등급 알림 도착(loot-legendary 등)",
+      "visual_ko": "가장 낮은 등급 중 가장 오래된 카드가 바로 나가기 애니메이션을 시작하고, 그 자리에 높은 등급 카드가 들어온다. 밀려난 알림은 표시 시간을 다시 채워 큐 맨 앞으로 돌아간다."
+    },
+    {
+      "name": "toast-exit",
+      "trigger_ko": "표시 시간 만료",
+      "visual_ko": "카드가 페이드아웃하며 높이가 접히고, 남은 카드들이 빈자리를 메운다. 대기열이 있으면 다음 알림이 들어온다."
+    },
+    {
+      "name": "paused",
+      "trigger_ko": "일시정지 토글(pause-toggle) 이벤트",
+      "visual_ko": "무대가 어두운 반투명 막으로 덮이고 '일시정지' 표시가 뜬다. freezeOnPause가 켜져 있으면 토스트가 그대로 멈춰 있고, 꺼져 있으면 막 뒤에서 토스트가 계속 사라져 돌아왔을 때 알림을 놓친다."
+    },
+    {
+      "name": "queue-reset",
+      "trigger_ko": "큐 비우기(clear-queue) 이벤트",
+      "visual_ko": "표시 중인 카드가 모두 나가기 애니메이션으로 사라진다. 대기 수와 디버그 카운터는 0으로, 트래커는 초기 예시 퀘스트로 돌아간다."
+    }
+  ],
+  "params": [
+    {
+      "key": "maxVisible",
+      "label_ko": "동시 표시 슬롯 수",
+      "type": "range",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": "3",
+      "unit": "개",
+      "affects_ko": "한 번에 보이는 토스트 개수. 늘리면 정보가 빨리 지나가지만 화면이 붐비고, 줄이면 대기열(+N)이 길어진다."
+    },
+    {
+      "key": "displayMs",
+      "label_ko": "기본 표시 시간",
+      "type": "range",
+      "min": 1500,
+      "max": 15000,
+      "step": 500,
+      "default": "3500",
+      "unit": "ms",
+      "affects_ko": "토스트 한 장이 유지되는 시간. 짧으면 읽기 전에 사라지고, 길면 대기열이 밀린다. 등급이 높을수록 이 값에 시간이 더해진다(희귀 +30%, 전설 +60%). 최대값을 넉넉히 둔 이유는 읽는 속도가 느린 사람을 위한 접근성 비교용이다."
+    },
+    {
+      "key": "mergeWindowMs",
+      "label_ko": "병합 창",
+      "type": "range",
+      "min": 0,
+      "max": 3000,
+      "step": 250,
+      "default": "1500",
+      "unit": "ms",
+      "affects_ko": "같은 아이템 알림을 하나로 합치는 시간 창. 0이면 병합이 꺼지고, 같은 문구가 줄줄이 쌓이는 모습을 볼 수 있다."
+    },
+    {
+      "key": "priorityMode",
+      "label_ko": "큐 정렬 방식",
+      "type": "select",
+      "options": [
+        "fifo",
+        "priority",
+        "priority-preempt"
+      ],
+      "default": "priority",
+      "affects_ko": "fifo는 도착한 순서대로 꺼낸다. priority는 대기열 안에서 등급이 높은 것부터 꺼낸다. priority-preempt는 표시 중인 낮은 등급 카드를 밀어내고 바로 끼어든다."
+    },
+    {
+      "key": "trackerMode",
+      "label_ko": "트래커 형태",
+      "type": "select",
+      "options": [
+        "multi-list",
+        "single-focus"
+      ],
+      "default": "multi-list",
+      "affects_ko": "multi-list는 추적 중인 퀘스트 여러 개와 모든 목표를 펼쳐 보인다. single-focus는 현재 목표 한 줄만 좌상단에 짧게 보여 화면 가림을 최소화한다."
+    },
+    {
+      "key": "stackAnchor",
+      "label_ko": "토스트 위치·방향",
+      "type": "select",
+      "options": [
+        "left-up",
+        "right-down",
+        "bottom-center-up"
+      ],
+      "default": "left-up",
+      "affects_ko": "토스트가 쌓이는 가장자리와 방향. multi-list 트래커는 우상단에 있으므로 right-down을 고르면 서로 겹치는 나쁜 예를 볼 수 있다."
+    },
+    {
+      "key": "progressFlash",
+      "label_ko": "진행 갱신 하이라이트",
+      "type": "toggle",
+      "default": "true",
+      "affects_ko": "끄면 목표 수치가 연출 없이 숫자만 바뀌어, 진행이 올랐는지 놓치기 쉬워진다."
+    },
+    {
+      "key": "freezeOnPause",
+      "label_ko": "일시정지 중 알림 멈춤",
+      "type": "toggle",
+      "default": "true",
+      "affects_ko": "켜면 일시정지 동안 토스트 타이머가 멈춘다(Unity의 deltaTime 기반에 해당). 끄면 계속 흐른다(unscaledDeltaTime 기반에 해당). 끈 상태로 일시정지를 걸었다 풀면 그 사이 알림이 다 사라져 있다."
+    }
+  ],
+  "presets": [
+    {
+      "id": "dense-looter",
+      "name_ko": "고밀도 루트 슈터형",
+      "genre_ko": "루트 슈터 / 온라인 액션 RPG",
+      "values_json": "{\"maxVisible\":\"4\",\"displayMs\":\"3000\",\"mergeWindowMs\":\"1500\",\"priorityMode\":\"priority\",\"trackerMode\":\"multi-list\",\"stackAnchor\":\"left-up\",\"progressFlash\":\"true\",\"freezeOnPause\":\"true\"}",
+      "look_ko": "여러 퀘스트와 반복 과제를 함께 추적하는 목록이 우상단에 고정되고, 반대쪽 좌측에서는 획득 알림이 빠르게 흘러간다. 정보량은 많지만 병합과 등급 정렬 덕분에 중요한 알림이 먼저 보인다."
+    },
+    {
+      "id": "mobile-single-focus",
+      "name_ko": "좁은 화면 단일 목표형",
+      "genre_ko": "모바일·크로스플랫폼 오픈월드 ARPG",
+      "values_json": "{\"maxVisible\":\"2\",\"displayMs\":\"2500\",\"mergeWindowMs\":\"2000\",\"priorityMode\":\"priority\",\"trackerMode\":\"single-focus\",\"stackAnchor\":\"right-down\",\"progressFlash\":\"true\",\"freezeOnPause\":\"true\"}",
+      "look_ko": "현재 목표 한 줄만 좌상단에 짧게 보여 주고, 획득 알림은 우측에 적은 수를 짧게 쌓는다. 병합 창을 넓혀 채집처럼 연달아 얻는 알림을 한 장으로 묶는다. 차이는 9:16 무대에서 가장 잘 보인다."
+    },
+    {
+      "id": "relaxed-readable",
+      "name_ko": "읽기 여유형(접근성)",
+      "genre_ko": "장르 공통 · 접근성 옵션",
+      "values_json": "{\"maxVisible\":\"2\",\"displayMs\":\"9000\",\"mergeWindowMs\":\"3000\",\"priorityMode\":\"priority-preempt\",\"trackerMode\":\"multi-list\",\"stackAnchor\":\"bottom-center-up\",\"progressFlash\":\"true\",\"freezeOnPause\":\"true\"}",
+      "look_ko": "표시 시간을 크게 늘리고 슬롯을 줄여 한 장씩 천천히 읽게 한다. 그만큼 대기열이 길어지므로 병합 창을 넓히고, 중요한 알림은 선점으로 바로 띄운다. 일시정지 중에는 알림이 멈춘다."
+    }
+  ],
+  "events": [
+    {
+      "id": "kill-enemy",
+      "label_ko": "적 처치 (목표 +1)"
+    },
+    {
+      "id": "loot-burst",
+      "label_ko": "전리품 대량 획득 (10건 몰림)"
+    },
+    {
+      "id": "loot-same-item",
+      "label_ko": "같은 재료 연속 획득"
+    },
+    {
+      "id": "loot-legendary",
+      "label_ko": "전설 등급 획득"
+    },
+    {
+      "id": "achievement",
+      "label_ko": "업적 달성"
+    },
+    {
+      "id": "quest-complete",
+      "label_ko": "퀘스트 완료"
+    },
+    {
+      "id": "quest-accept",
+      "label_ko": "새 퀘스트 추적 시작"
+    },
+    {
+      "id": "pause-toggle",
+      "label_ko": "일시정지 켜기/끄기"
+    },
+    {
+      "id": "clear-queue",
+      "label_ko": "큐 비우기 (리셋)"
+    }
+  ],
+  "timings": [
+    {
+      "event_ko": "토스트 들어오기 (슬라이드 24px + 페이드인)",
+      "duration_ms": 220,
+      "easing": "cubic-bezier(0.22, 1, 0.36, 1) /* ease-out-cubic, USS: ease-out-cubic */",
+      "note_ko": "권장값. 200~250ms면 빠르면서도 눈이 따라갈 수 있다."
+    },
+    {
+      "event_ko": "토스트 나가기 (페이드아웃 + 높이 접기)",
+      "duration_ms": 180,
+      "easing": "cubic-bezier(0.55, 0, 1, 0.45) /* ease-in-cubic, USS: ease-in-cubic */",
+      "note_ko": "권장값. 나가기를 들어오기보다 짧게 해서 다음 카드로 주의를 넘긴다. 선점으로 밀려날 때도 같은 값을 쓴다."
+    },
+    {
+      "event_ko": "남은 카드 재배치(한 칸 밀림/메움)",
+      "duration_ms": 200,
+      "easing": "ease-out",
+      "note_ko": "권장값. 위치가 툭 튀는 것을 막는 핵심 연출. 슬롯 높이를 0↔카드 높이로 보간해서 만든다."
+    },
+    {
+      "event_ko": "병합 수량 배지 튀기 (scale 1→1.15→1)",
+      "duration_ms": 160,
+      "easing": "cubic-bezier(0.34, 1.56, 0.64, 1) /* ease-out-back, USS: ease-out-back */",
+      "note_ko": "권장값. 커지는 데 80ms, 돌아오는 데 80ms. 수량만 바뀌었다는 것을 알리는 최소한의 피드백."
+    },
+    {
+      "event_ko": "목표 진행 바 채움",
+      "duration_ms": 400,
+      "easing": "ease-out",
+      "note_ko": "권장값. 값이 크게 뛸수록 같은 시간 안에 더 많이 채워진다."
+    },
+    {
+      "event_ko": "목표 행 하이라이트 복귀",
+      "duration_ms": 600,
+      "easing": "ease-in-out",
+      "note_ko": "권장값. 밝아졌다가 원래 대비로 돌아오는 데 걸리는 시간."
+    },
+    {
+      "event_ko": "퀘스트 완료 블록 유지 후 접기",
+      "duration_ms": 1500,
+      "easing": "ease-in-out (접기 구간 250ms)",
+      "note_ko": "권장값. 완료 상태를 1.25초 동안 보여 준 뒤 250ms에 걸쳐 높이를 접는다."
+    },
+    {
+      "event_ko": "우선 배너 표시",
+      "duration_ms": 2500,
+      "easing": "in 250ms ease-out / out 300ms ease-in",
+      "note_ko": "권장값. 배너가 떠 있는 동안 일반 토스트 타이머를 멈출지 정할 수 있다."
+    }
+  ],
+  "hotspots": [
+    {
+      "n": 1,
+      "part_id": "toast-count-badge",
+      "title_ko": "같은 알림은 한 장으로 합친다",
+      "body_ko": "재료 10개를 연달아 주웠을 때 카드 10장 대신 'x10' 한 장만 띄우면 화면을 덜 가리고, 그 사이에 들어온 다른 알림도 묻히지 않는다. 병합 창을 0으로 바꿔 차이를 직접 확인해 보자.",
+      "principle": "인지 부하"
+    },
+    {
+      "n": 2,
+      "part_id": "toast-rarity-stripe",
+      "title_ko": "등급이 높을수록 먼저, 오래",
+      "body_ko": "큐는 등급 순으로 꺼내고, 높은 등급은 표시 시간을 늘린다. 등급 띠는 색과 굵기와 Ⅰ~Ⅳ 표기를 함께 써서, 색을 구분하기 어려운 사람도 우선순위를 읽을 수 있게 한다. 큐 정렬 방식을 fifo로 바꾸고 '전리품 대량 획득' 다음에 '전설 등급 획득'을 눌러 보자.",
+      "principle": "시각 위계"
+    },
+    {
+      "n": 3,
+      "part_id": "tracker-progress",
+      "title_ko": "숫자만 바꾸지 말고 '방금 올랐다'를 보여 준다",
+      "body_ko": "전투 중에는 트래커 숫자를 읽을 여유가 없다. 바뀐 행만 잠깐 밝아지고 바가 채워지면 곁눈으로도 진행을 알아챌 수 있다. 하이라이트 토글을 끄고 비교해 보자.",
+      "principle": "즉각 피드백"
+    },
+    {
+      "n": 4,
+      "part_id": "toast-stack",
+      "title_ko": "항상 같은 곳, 같은 방향으로 쌓인다",
+      "body_ko": "트래커와 토스트를 서로 반대쪽 가장자리에 고정하고 쌓이는 방향을 바꾸지 않으면, 플레이어는 어디를 봐야 무엇이 있는지 익히게 된다. '+N 대기' 표시는 알림이 사라진 게 아니라 순서를 기다리고 있다는 약속이다.",
+      "principle": "일관성"
+    },
+    {
+      "n": 5,
+      "part_id": "tracker-panel",
+      "title_ko": "화면이 좁으면 목표 하나만",
+      "body_ko": "단일 목표형은 지금 할 일 한 줄만 남겨 풍경과 전투 화면을 덜 가린다. 목록형은 정보가 많은 대신 많이 가린다. 트래커 형태를 바꿔 가며 무엇을 얻고 무엇을 잃는지 비교하자.",
+      "principle": "몰입"
+    },
+    {
+      "n": 6,
+      "part_id": "toast-card",
+      "title_ko": "읽을 시간은 사용자가 정한다",
+      "body_ko": "읽는 속도는 사람마다 다르다. 표시 시간을 늘릴 수 있게 하고, 일시정지 중에는 타이머를 멈춰야 메뉴를 보는 동안 알림을 놓치지 않는다. '일시정지 중 알림 멈춤'을 끈 채 일시정지를 걸었다 풀어 보자.",
+      "principle": "접근성"
+    }
+  ],
+  "principles": [
+    "고정 정보와 일시 정보는 영역과 수명을 나눈다. 트래커는 늘 같은 자리에 있고, 토스트는 나타났다가 사라진다.",
+    "알림은 바로 그리지 않고 큐에 넣은 뒤 규칙(슬롯 수·표시 시간·우선순위·병합)에 따라 꺼낸다.",
+    "같은 키의 알림은 병합하고 표시 시간을 연장한다. 화면에 보이는 카드 수보다 실제로 전달되는 정보량이 중요하다.",
+    "우선순위는 정렬(대기열 순서)과 선점(표시 중인 카드 교체)의 두 단계로 나눠 설계한다.",
+    "진행 갱신은 바뀐 부분만, 짧게, 원래대로 돌아오는 하이라이트로 알린다.",
+    "표시 시간은 사용자가 늘릴 수 있어야 한다(접근성). 웹 표준 WCAG 2.2.1은 시간 제한을 끄거나 기본값의 10배 이상으로 늘릴 수 있게 하라고 요구하니 게임 옵션을 설계할 때 참고 기준으로 삼는다. 일시정지 중 타이머가 어떻게 동작할지도 의도적으로 정한다.",
+    "큐 로직과 뷰(UGUI/UI Toolkit)를 분리하면 같은 규칙을 어느 UI 시스템에서든 재사용할 수 있다."
+  ],
+  "mistakes": [
+    {
+      "title_ko": "오는 대로 전부 바로 띄우기",
+      "body_ko": "큐 없이 Instantiate만 하면 전리품이 몰릴 때 카드가 화면 절반을 덮고 트래커까지 가린다. 슬롯 수를 반드시 정하고, 넘치는 알림은 대기시킨다."
+    },
+    {
+      "title_ko": "같은 알림을 병합하지 않기",
+      "body_ko": "'탄약 +1'이 스무 줄 쌓이면 정작 중요한 희귀 획득 카드가 그 사이에 묻혀 지나간다. 키(아이템 ID) 기준 병합과 표시 시간 연장을 넣는다."
+    },
+    {
+      "title_ko": "모두 도착 순(FIFO)으로 처리하기",
+      "body_ko": "전설 획득이 일반 재료 알림 10개 뒤에 줄을 서면 몇 초 늦게 뜨고 감흥이 사라진다. 대기열은 등급 순으로 정렬하고, 최상위 알림은 별도 배너 채널로 뺀다."
+    },
+    {
+      "title_ko": "카드가 사라질 때 나머지가 순간이동",
+      "body_ko": "위치 보간 없이 레이아웃만 다시 계산하면 남은 카드가 툭 튀어 읽던 문구를 놓친다. 높이 접기와 재배치 애니메이션을 넣는다."
+    },
+    {
+      "title_ko": "표시 시간을 짧게 고정하고 timeScale에 그냥 묶기",
+      "body_ko": "2초로 고정하면 읽는 속도가 느린 사람은 내용을 놓친다. 표시 시간 배율 옵션을 두고, 일시정지(Time.timeScale = 0) 중에 타이머를 멈출지(deltaTime) unscaled 시간으로 계속 돌릴지(unscaledDeltaTime) 의도적으로 고른다."
+    },
+    {
+      "title_ko": "UI Toolkit에서 height: auto를 0으로 트랜지션하기",
+      "body_ko": "USS 트랜지션은 auto 같은 키워드 값을 보간하지 못해 높이가 툭 사라진다. 카드 높이를 고정 px 토큰으로 두거나, 시작값을 px로 명시한 뒤 0으로 바꾼다."
+    }
+  ],
+  "juice_off_ko": "효과를 끄면 큐·병합·우선순위·연출이 모두 꺼진다. 전리품 대량 획득을 누르면 카드 10장이 한 프레임에 동시에 나타나 트래커 위까지 덮고, 같은 재료 문구가 줄줄이 반복되며, 전설 획득 카드는 그 맨 아래에 묻힌다. 카드는 페이드 없이 툭 나타났다가 툭 사라지고, 하나가 사라질 때마다 남은 카드가 위치를 건너뛴다. 목표 수치는 하이라이트 없이 숫자만 바뀌어 진행이 올랐는지 알아채기 어렵다. 일시정지 중에도 알림이 계속 흘러가 버린다.",
+  "stage": {
+    "aspect": "both",
+    "needs_3d": false,
+    "scene_ko": "가상의 '외곽 탐사대' 테마에 맞춰 어두운 탐사 지형을 단순한 SVG 실루엣으로 깔고, 그 위에 HUD를 올린다. 16:9에서는 우상단에 다중 목록 트래커, 좌측 중앙에 위로 쌓이는 토스트 스택, 상단 중앙에 우선 배너 자리를 둔다. single-focus 트래커는 화면 비율과 상관없이 좌상단 한 줄로 줄어든다. 9:16에서는 토스트를 우측에 두고 2슬롯만 쓴다. 무대 아래에는 이벤트 버튼 줄과 현재 큐 상태(표시 중 / 대기 N / 병합 횟수 / 일시정지 여부) 디버그 표시를 둔다. 일시정지 중에는 무대 위에 반투명 막을 덮는다."
+  },
+  "unity_ugui": {
+    "hierarchy": "HUDCanvas (Canvas: Screen Space - Overlay, CanvasScaler: Scale With Screen Size 1920x1080, Match 0.5, GraphicRaycaster 제거)\n├─ QuestTrackerCanvas (Canvas: 하위 캔버스)\n│  └─ QuestTracker (RectTransform: 우상단 앵커, VerticalLayoutGroup, ContentSizeFitter: Vertical Preferred)\n│     └─ QuestEntry [Prefab] (CanvasGroup, VerticalLayoutGroup, LayoutElement)\n│        ├─ Title (TextMeshProUGUI)\n│        └─ Objectives (VerticalLayoutGroup)\n│           └─ ObjectiveRow [Prefab] (HorizontalLayoutGroup, Image 배경: 하이라이트용)\n│              ├─ Check (Image)\n│              ├─ Label (TextMeshProUGUI)\n│              ├─ Count (TextMeshProUGUI)\n│              └─ ProgressFill (Image: Source Image 지정, Image Type Filled, Fill Method Horizontal)\n└─ ToastCanvas (Canvas: 하위 캔버스, 자주 바뀌는 요소 격리)\n   ├─ ToastStack (RectTransform: 좌측 중앙 앵커, VerticalLayoutGroup: Child Alignment Lower Left, Control Child Size Height 켬, Child Force Expand 끔)\n   │  └─ ToastSlot [Prefab, 풀링] (LayoutElement: preferredHeight 애니메이션용)\n   │     └─ ToastCard (CanvasGroup, Image 배경, 슬롯 크기에 맞춘 Stretch 앵커)  ← 슬라이드는 이 자식의 anchoredPosition만 움직인다\n   │        ├─ RarityStripe (Image)\n   │        ├─ Icon (Image)\n   │        ├─ Message (TextMeshProUGUI)\n   │        └─ CountBadge (TextMeshProUGUI)\n   ├─ OverflowLabel (TextMeshProUGUI: \"+N 대기\")\n   └─ PriorityBanner (CanvasGroup, 상단 중앙 앵커)\n\nHudSystems (씬 루트의 별도 GameObject, Canvas 밖)\n├─ NotificationQueue (MonoBehaviour: 순수 큐 로직)\n├─ ToastStackView (MonoBehaviour: UGUI 뷰)\n└─ QuestTrackerView (MonoBehaviour)",
+    "components_ko": [
+      "Canvas 분리: 트래커와 토스트를 각각 하위 Canvas로 나눈다. 그러면 토스트가 매 프레임 바뀌어도 HUD 전체 메시를 다시 빌드하지 않는다.",
+      "GraphicRaycaster: 클릭을 받지 않는 HUD라면 루트 Canvas에서 제거하고, 하위 Canvas에도 추가하지 않는다. 각 Image·TextMeshProUGUI의 Raycast Target도 끈다.",
+      "VerticalLayoutGroup(ToastStack): Child Force Expand는 끄고 Control Child Size의 Height는 켠다. 슬롯의 LayoutElement.preferredHeight를 0↔카드 높이로 보간해 '접기/펼치기'를 만든다.",
+      "LayoutGroup의 자식은 위치를 직접 바꿀 수 없다. 그래서 슬라이드는 한 단계 더 아래인 ToastCard의 anchoredPosition만 움직인다.",
+      "CanvasGroup: alpha로 페이드한다. blocksRaycasts와 interactable은 끈다(HUD가 클릭을 막지 않게).",
+      "Image(Image Type = Filled, Fill Method = Horizontal): ProgressFill.fillAmount를 코루틴으로 보간해 진행 바를 채운다.",
+      "TextMeshProUGUI: 수치는 고정폭 숫자를 지원하는 폰트를 쓰거나 <mspace> 태그로 감싸 자릿수가 바뀔 때 흔들리지 않게 한다.",
+      "NotificationQueue: 대기 목록 List<NotificationRequest>와 활성 목록을 가지고, Enqueue(key, priority, message, amount)만 공개한다. 뷰는 OnShow/OnUpdateCount/OnHide 이벤트만 구독한다.",
+      "Input System: 테스트 입력은 InputAction(예: <Keyboard>/f1~f9 바인딩)을 [SerializeField] InputActionReference로 받아 이벤트 버튼을 흉내 낸다. 레거시 Input.GetKey는 쓰지 않는다."
+    ],
+    "steps_ko": [
+      "NotificationRequest 클래스를 정의한다: key(string), priority(int: 0 일반~3 전설), message, amount, enqueuedAt(float), remaining(float).",
+      "NotificationQueue.Enqueue의 처리 순서. (1) 활성 목록에 같은 key가 있고 병합 창 안이면 amount를 더하고 remaining을 표시 시간으로 되돌린 뒤 OnUpdateCount를 호출한다. (2) 대기 목록에 같은 key가 있으면 거기에 합산한다. (3) 둘 다 아니면 대기 목록에 추가하고, '정렬 필요' 플래그만 세운다.",
+      "LateUpdate에서 플래그가 서 있으면 대기 목록을 priority 내림차순 → enqueuedAt 오름차순으로 한 번만 정렬한다. 같은 프레임에 수십 건이 들어와도 정렬은 한 번만 한다. fifo 모드라면 enqueuedAt만 기준으로 삼는다.",
+      "선점 모드: 슬롯이 꽉 찼고 새 요청의 priority가 활성 카드 중 최저보다 높으면, 최저 등급 중 가장 오래된 카드를 OnHide로 내보낸다. 그 요청은 remaining을 다시 채워 대기 목록 맨 앞으로 되돌린다.",
+      "Update에서 활성 카드의 remaining을 줄인다. 일시정지 중 멈추게 하려면 Time.deltaTime을, 계속 흐르게 하려면 Time.unscaledDeltaTime을 쓴다(freezeOnPause 플래그로 선택). remaining이 0 이하가 되면 OnHide를 호출하고, 빈 슬롯이 생기면 대기 목록 앞에서 꺼내 OnShow를 호출한다. 표시 시간 = 기본값 × 등급 배율 × 접근성 배율.",
+      "ToastStackView.OnShow: 풀에서 ToastSlot을 꺼내 SetAsLastSibling한다. 코루틴으로 preferredHeight를 0→카드 높이(200ms)로 바꾸고, 동시에 카드의 anchoredPosition.x를 -24→0, alpha를 0→1로 바꾼다(220ms, ease-out). stackAnchor가 right-down이면 ToastStack의 Child Alignment를 Upper Right로 바꾸고 SetAsFirstSibling을 쓴다.",
+      "OnHide: alpha 1→0과 preferredHeight 카드 높이→0을 함께 진행한다(180ms, ease-in). 끝나면 슬롯을 풀에 반환한다. OnUpdateCount는 CountBadge 텍스트를 갱신하고 localScale을 1→1.15→1로 바꾼다(160ms).",
+      "OverflowLabel은 대기 목록이 0개면 숨기고, 아니면 '+N 대기'로 갱신한다.",
+      "QuestTrackerView: 게임 쪽 이벤트 OnObjectiveProgress(questId, objectiveId, current, max)를 구독해 해당 ObjectiveRow만 갱신한다. 순서는 수치 텍스트 교체 → fillAmount 보간(400ms) → 배경 Image 하이라이트 색 페이드(600ms). current==max면 체크를 표시하고 행 CanvasGroup.alpha를 0.5로 내린다.",
+      "퀘스트 완료와 업적은 NotificationQueue가 아니라 PriorityBanner 채널로 보낸다. 배너가 떠 있는 동안 토스트 타이머를 멈출지는 bool 플래그로 정한다.",
+      "참조는 인스펙터의 [SerializeField]로 연결한다. 꼭 코드로 찾아야 한다면 Start에서 한 번만 FindFirstObjectByType<NotificationQueue>()(순서가 상관없으면 FindAnyObjectByType)를 호출해 캐싱한다. obsolete인 FindObjectOfType은 쓰지 않는다.",
+      "(선택) DOTween 같은 트윈 패키지를 쓰면 코루틴 보간 코드를 줄일 수 있지만, 기본 예제는 코루틴만으로 작성한다."
+    ],
+    "pitfalls_ko": [
+      "LayoutGroup 자식의 위치를 직접 애니메이션하면 다음 레이아웃 계산 때 덮어써진다. 래퍼(슬롯)는 레이아웃이 맡고, 안쪽 카드는 애니메이션이 맡도록 두 단계로 나눈다.",
+      "토스트마다 Instantiate/Destroy를 하면 알림이 몰릴 때 GC 스파이크가 생긴다. 슬롯 수에 여유분을 더한 만큼 미리 만들어 풀링한다.",
+      "Source Image가 비어 있는 Image는 인스펙터에 Image Type 항목이 보이지 않아 Filled를 고를 수 없을 수 있다. 흰색 단색 스프라이트를 넣고 color로 색을 정한다.",
+      "Time.timeScale = 0인 일시정지 메뉴에서 deltaTime 기반 타이머와 코루틴의 WaitForSeconds는 멈추고, unscaledDeltaTime 기반과 WaitForSecondsRealtime은 계속 흐른다. 메뉴를 보는 사이 알림이 다 지나가 버리지 않도록 의도를 정한다.",
+      "TextMeshProUGUI 텍스트를 매 프레임 바꾸면 메시가 계속 다시 만들어진다. 수치가 실제로 바뀔 때만 갱신한다.",
+      "HUD Canvas에 GraphicRaycaster를 남겨 두거나 Image·Text의 Raycast Target을 켜 두면 아래쪽 UI 클릭을 가로챈다. 꺼 둔다.",
+      "ContentSizeFitter를 LayoutGroup의 자식에 또 붙이면 'Parent has a layout group' 경고가 뜨고 크기가 흔들린다. 최상위 컨테이너에만 붙인다."
+    ]
+  },
+  "unity_uitk": {
+    "structure": "<!-- HudRoot.uxml -->\n<ui:UXML xmlns:ui=\"UnityEngine.UIElements\">\n  <Style src=\"Hud.uss\" />\n  <ui:VisualElement name=\"hud-root\" class=\"hud\" picking-mode=\"Ignore\">\n    <ui:VisualElement name=\"quest-tracker\" class=\"tracker\" picking-mode=\"Ignore\" />\n    <ui:VisualElement name=\"toast-stack\" class=\"toast-stack toast-stack--left-up\" picking-mode=\"Ignore\" />\n    <ui:Label name=\"toast-overflow\" class=\"toast-overflow\" text=\"+0 대기\" picking-mode=\"Ignore\" />\n    <ui:VisualElement name=\"priority-banner\" class=\"banner banner--hidden\" picking-mode=\"Ignore\">\n      <ui:Label name=\"banner-text\" class=\"banner__text\" picking-mode=\"Ignore\" />\n    </ui:VisualElement>\n  </ui:VisualElement>\n</ui:UXML>\n\n<!-- Toast.uxml (VisualTreeAsset 템플릿. Instantiate()는 TemplateContainer로 한 번 감싸서 돌려준다) -->\n<ui:UXML xmlns:ui=\"UnityEngine.UIElements\">\n  <ui:VisualElement name=\"toast\" class=\"toast toast--enter\" picking-mode=\"Ignore\">\n    <ui:VisualElement name=\"stripe\" class=\"toast__stripe\" />\n    <ui:VisualElement name=\"icon\" class=\"toast__icon\" />\n    <ui:Label name=\"message\" class=\"toast__message\" />\n    <ui:Label name=\"count\" class=\"toast__count\" />\n  </ui:VisualElement>\n</ui:UXML>\n\n<!-- ObjectiveRow.uxml -->\n<ui:UXML xmlns:ui=\"UnityEngine.UIElements\">\n  <ui:VisualElement class=\"objective\">\n    <ui:VisualElement name=\"check\" class=\"objective__check\" />\n    <ui:Label name=\"label\" class=\"objective__label\" />\n    <ui:Label name=\"value\" class=\"objective__value\" />\n    <ui:VisualElement class=\"objective__bar\"><ui:VisualElement name=\"fill\" class=\"objective__fill\" /></ui:VisualElement>\n  </ui:VisualElement>\n</ui:UXML>",
+    "uss_notes_ko": [
+      "쌓이는 방향은 클래스 교체만으로 바꾼다. .toast-stack--left-up { position: absolute; left: 32px; bottom: 40%; flex-direction: column; }은 바닥 고정 컨테이너에 새 카드를 Add하면 아래에 붙고 기존 카드가 위로 밀린다. .toast-stack--right-down { position: absolute; right: 32px; top: 120px; flex-direction: column-reverse; }은 새 카드가 위에 붙고 기존 카드가 아래로 밀린다. UGUI 쪽 Child Alignment와 형제 순서를 바꾸는 방식과 같은 결과를 낸다.",
+      "카드 높이는 변수로 고정한다: :root { --toast-h: 56px; }. .toast { height: var(--toast-h); opacity: 1; translate: 0 0; transition-property: opacity, translate, height; transition-duration: 0.22s, 0.22s, 0.2s; transition-timing-function: ease-out-cubic; } .toast--enter { opacity: 0; translate: -24px 0; height: 0; } .toast--exit { opacity: 0; height: 0; transition-duration: 0.18s; transition-timing-function: ease-in-cubic; } 높이를 auto로 두면 트랜지션이 보간하지 못하므로 px 값을 쓴다. height가 0일 때 내용이 삐져나오지 않게 overflow: hidden도 준다.",
+      "되돌아올 때도 애니메이션이 되려면 transition은 상태 클래스가 아니라 기본 클래스에 둔다. .toast__count { scale: 1 1; transition-property: scale; transition-duration: 0.08s; transition-timing-function: ease-out-back; } .toast__count--bump { scale: 1.15 1.15; } 클래스를 붙였다가 80ms 뒤 떼면 튀었다가 돌아온다.",
+      ".objective__fill { transition-property: width; transition-duration: 0.4s; transition-timing-function: ease-out; } 너비는 C#에서 style.width = Length.Percent(값)으로 바꾼다. .objective { transition-property: background-color; transition-duration: 0.6s; transition-timing-function: ease-in-out; } .objective--flash { background-color: var(--hud-accent-dim); } 플래시 클래스를 떼면 기본 클래스의 transition으로 천천히 원래 색으로 돌아온다.",
+      ".toast__stripe--common/--uncommon/--rare/--legendary 같은 등급 클래스는 색과 함께 width(3px/4px/6px/8px)도 다르게 줘서 색에만 기대지 않게 한다. Ⅰ~Ⅳ 표기는 stripe 옆의 Label로 넣는다.",
+      "HUD 요소는 picking-mode=\"Ignore\"로 두어 아래쪽 입력을 막지 않는다. 색은 USS 변수(--hud-accent, --rarity-rare 등)로 정의하고 var()로 참조해 테마를 한곳에서 바꾼다.",
+      "USS 이징은 ease-out-cubic, ease-in-cubic, ease-out-back 같은 키워드를 쓴다. 웹 쪽 cubic-bezier() 값은 가장 가까운 키워드로 바꿔 옮긴다."
+    ],
+    "steps_ko": [
+      "씬에 UIDocument를 놓고 PanelSettings(Scale Mode: Scale With Screen Size, Reference Resolution 1920x1080)와 HudRoot.uxml을 연결한다.",
+      "HudToastView 스크립트에서 uiDocument.rootVisualElement.Q<VisualElement>(\"toast-stack\") 같은 식으로 요소를 찾고, [SerializeField] VisualTreeAsset toastTemplate을 받는다.",
+      "UGUI와 같은 NotificationQueue(순수 C# 로직)를 재사용하고, OnShow/OnUpdateCount/OnHide만 UI Toolkit 뷰로 구현한다.",
+      "OnShow: toastTemplate.Instantiate()가 돌려준 TemplateContainer에서 Q(\"toast\")로 실제 카드를 꺼내고(또는 풀에서 꺼낸 카드를 쓰고) 텍스트와 등급 클래스를 넣는다. toast--enter 클래스가 붙은 상태로 스택에 Add한 다음, card.schedule.Execute(() => card.RemoveFromClassList(\"toast--enter\")).StartingIn(16)으로 한 프레임 뒤에 클래스를 떼어 트랜지션을 시작시킨다.",
+      "OnHide: toast--exit 클래스를 붙이고 TransitionEndEvent와 TransitionCancelEvent를 등록한다. 둘 중 하나가 오면 RemoveFromHierarchy를 한 뒤 풀에 반환한다. 이벤트가 오지 않는 경우에 대비해 schedule.Execute(...).StartingIn(300)으로 강제 제거하는 안전장치도 둔다.",
+      "OnUpdateCount: count Label의 text를 바꾸고, toast__count--bump 클래스를 붙였다가 80ms 뒤 뗀다.",
+      "트래커: ObjectiveRow 템플릿을 목표마다 Instantiate한다. 진행 이벤트가 오면 value 텍스트와 fill의 style.width를 바꾸고, objective--flash 클래스를 붙였다가 600ms 뒤 뗀다.",
+      "표시 시간 타이머는 NotificationQueue의 Update에 맡기고 뷰에서는 시간 계산을 하지 않는다. 다만 schedule.Execute로 건 UI 지연은 timeScale을 따르지 않는다는 점을 기억한다. 테스트 입력은 Input System의 InputActionReference로 받는다."
+    ],
+    "pitfalls_ko": [
+      "요소를 계층에 추가한 프레임에 바로 클래스를 바꾸면, 시작 스타일이 계산되기 전이라 트랜지션 없이 최종 상태로 튀어 버린다. 한 프레임 미뤄서 클래스를 바꾼다.",
+      "TransitionEndEvent는 전환되는 속성마다 따로 올 수 있다(이 예시에서는 opacity와 height). 제거 처리가 두 번 실행되지 않도록 플래그를 두거나 evt.stylePropertyNames를 검사한다. 트랜지션이 중간에 끊기면 End 대신 TransitionCancelEvent가 오므로 둘 다 처리한다.",
+      "height가 auto인 상태에서 0으로 바꾸면 보간되지 않고 즉시 접힌다. 고정 px 높이 토큰을 쓰거나, C#에서 style.height를 resolvedStyle.height 값으로 고정한 다음 0으로 바꾼다.",
+      "height/width 같은 레이아웃 속성 트랜지션은 매 프레임 레이아웃을 다시 계산한다. 슬롯 수가 적은 토스트 정도면 괜찮지만, 요소가 많을 때는 opacity/translate/scale 위주로 바꾼다.",
+      "toastTemplate.Instantiate()는 TemplateContainer라는 래퍼를 하나 더 만든다. 이 래퍼에 클래스를 붙이면 .toast 규칙이 적용되지 않고, 래퍼의 기본 picking-mode가 입력을 막을 수 있다. 실제 카드 요소를 꺼내 다루거나 래퍼도 picking-mode를 Ignore로 둔다.",
+      "picking-mode를 지정하지 않은 빈 VisualElement가 화면 전체를 덮으면 그 아래 다른 UI 클릭이 막힌다. 루트와 컨테이너를 Ignore로 둔다."
+    ]
+  },
+  "inspired_by": [
+    {
+      "game_id": "destiny-2",
+      "title": "Destiny 2",
+      "credit": "© Bungie, Inc.",
+      "borrowed_axes": [
+        "레이아웃 구조"
+      ],
+      "what_learned_ko": "빌린 것은 구조적 아이디어 하나다. 추적하는 주요 목표와 반복 과제를 한 목록에 섞지 않고 구분하며, 획득·진행 알림을 우선순위가 있는 흐름으로 다룬다. 이 근거는 과제 정의에 실린 대표 게임 설명에 기댄 것이고, 이번 작업에서 원문을 다시 확인하지 못했으므로 'plausible'로 다룬다. 화면 배치·색·형태 같은 시각 세부는 직접 확인하지 않았다('unverified'). 분석 대상: Destiny 2 라이브 서비스(2017~)."
+    },
+    {
+      "game_id": "genshin-impact",
+      "title": "Genshin Impact",
+      "credit": "©miHoYo ©HoYoverse",
+      "borrowed_axes": [
+        "레이아웃 구조"
+      ],
+      "what_learned_ko": "좁은 모바일 화면을 고려해 추적 목표를 하나만 짧게 보여 주고, 획득 알림을 측면에 간결하게 쌓는 해법을 '단일 목표형' 프리셋으로 일반화했다. 한 번에 한 퀘스트만 추적한다는 점과 측면 배치는 화면을 직접 보지 못해 'plausible'이다. 알림 큐의 표시 시간 세부는 'unverified'다. 분석 대상: 정식 발매판 글로벌 서비스의 공용 UI(버전에 따라 바뀌었을 수 있음)."
+    }
+  ],
+  "original_ko": "원작의 에셋·로고·아이콘·문구·폰트는 쓰지 않고 다음을 새로 만든다. (1) 모티프: 가상의 '외곽 탐사대' 테마. 퀘스트 예시도 '신호 중계기 복구 2/3', '광석 표본 채집 5/8' 같은 자체 카피를 쓴다. (2) 아이콘: 육각 결정·톱니·별·물방울 같은 단순한 기하 SVG를 새로 그린다. (3) 등급색: 업계 관례인 흰/초록/파랑/보라/금 대신 자체 토큰(회청 · 청록 · 자홍 · 호박)을 쓴다. 여기에 등급 띠 굵기(3/4/6/8px)와 'Ⅰ~Ⅳ' 문자 표기를 더해 색 없이도 구분되게 한다. (4) 타이포: 시스템 산세리프에 tabular-nums 숫자를 쓰고, 원작 전용 서체를 흉내 내지 않는다. (5) 학습용으로 새로 넣은 장치: 대기 수를 보여 주는 '+N 대기' 배지, 튀는 연출이 붙은 병합 수량 배지, 무대 아래의 큐 상태 디버그 표시(표시 중/대기/병합 횟수/일시정지), 일시정지 중 타이머 동작을 비교하는 토글. (6) 형태: 카드는 모서리 4px의 둥근 사각형에 좌측 띠만 둔 중립적인 모양이고, 특정 게임의 기울기나 장식선을 따르지 않는다.",
+  "references": [
+    {
+      "label": "Destiny 2 공식 사이트 (Bungie)",
+      "url": "https://www.bungie.net/7/en/Destiny",
+      "type": "T1-공식"
+    },
+    {
+      "label": "Genshin Impact 공식 사이트 (HoYoverse)",
+      "url": "https://genshin.hoyoverse.com/en/home",
+      "type": "T1-공식"
+    },
+    {
+      "label": "Unity Manual (6000.3): USS transition (지원 이징 키워드, 단위 일치·auto 제한, transition 단축 속성)",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/Manual/UIE-Transitions.html",
+      "type": "T1-엔진 문서"
+    },
+    {
+      "label": "Unity UI (uGUI 2.0): Vertical Layout Group",
+      "url": "https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/script-VerticalLayoutGroup.html",
+      "type": "T1-엔진 문서"
+    },
+    {
+      "label": "Unity UI (uGUI 2.0): Image",
+      "url": "https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/script-Image.html",
+      "type": "T1-엔진 문서"
+    },
+    {
+      "label": "Unity Scripting API (6000.3): CanvasGroup",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/CanvasGroup.html",
+      "type": "T1-엔진 문서"
+    },
+    {
+      "label": "Unity Scripting API (6000.3): Object.FindFirstObjectByType",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Object.FindFirstObjectByType.html",
+      "type": "T1-엔진 문서"
+    },
+    {
+      "label": "W3C WCAG 2.2 Understanding 2.2.1 Timing Adjustable (표시 시간 조절 근거, 웹 표준을 유추 적용)",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable.html",
+      "type": "T1-접근성 표준"
+    },
+    {
+      "label": "Game UI Database (사람이 직접 여는 참고 링크, AI 접근 금지)",
+      "url": "https://www.gameuidatabase.com/",
+      "type": "참고 링크(미접속)"
+    }
+  ],
+  "confidence_notes_ko": "게임 근거는 아직 약하다. 전달받은 근거 레코드 두 건(Destiny 2, Genshin Impact) 모두 elements가 비어 있어서, hotspots의 '왜 효과적인가'는 레코드에서 가져온 것이 아니라 일반 UI 설계 원리(인지 부하·시각 위계·즉각 피드백·일관성·몰입·접근성)로 썼다. inspired_by에 적은 게임별 서술은 'plausible'이고, 그 시각 세부(위치·색·모양)는 'unverified'다. 수업 전에 게임별 기사나 개발자 강연 URL로 보강해야 한다. timings는 모두 근거 없는 업계 통상 권장값이다. 이번 검수에서 WebFetch로 직접 확인한 Unity 6.3 사실은 세 가지다. (1) USS 트랜지션은 ease-out-cubic·ease-in-cubic·ease-out-back 키워드를 지원하고, 문서에 cubic-bezier 언급은 없다. auto 같은 키워드 값은 보간되지 않아 시작값을 px로 명시해야 한다. (2) uGUI 2.0 Vertical Layout Group의 속성은 Padding·Spacing·Child Alignment·Control Child Size·Use Child Scale·Child Force Expand다. (3) FindFirstObjectByType은 6000.3에서 obsolete가 아니며, 순서가 상관없으면 FindAnyObjectByType을 권장한다. 다만 'Source Image가 없으면 인스펙터에 Image Type 항목이 보이지 않는다'는 함정은 Image 문서에서 직접 확인하지 못한 경험 기반 서술이다('unverified'). WCAG 2.2.1은 웹 표준을 게임 알림에 유추해서 적용한 것이고, 데모 슬라이더 최대값(15000ms)은 기본값의 10배 요건을 다 채우지 않는 비교용 범위다. gameuidatabase.com과 interfaceingame.com에는 접속하지 않았다.",
+  "critic_changes_ko": [
+    "[원리 반영·교육성] 일시정지 동작을 다룬 원칙과 실수 항목은 있었지만 무대에서 체험할 수단이 없었다. 그래서 freezeOnPause 토글 파라미터, pause-toggle 이벤트, paused 상태, hotspot 6(접근성)을 추가하고 세 프리셋 모두에 freezeOnPause 값을 넣었다.",
+    "[events↔states 대응] quest-accept, achievement, clear-queue 이벤트에 대응하는 상태가 없었다. quest-tracked, banner-show, queue-reset 상태를 추가하고, 각 상태의 trigger에 어떤 이벤트에서 오는지 적었다. toast-merge는 대기 중인 알림에 병합될 때 화면에 어떻게 보이는지도 정의했다.",
+    "[파라미터 범위] displayMs 최대값을 8000에서 15000으로 늘렸다. 접근성 비교 폭을 넓히려는 것이다. 이에 맞춰 relaxed-readable 프리셋의 displayMs를 7000에서 9000으로 올렸다. 모든 프리셋 값이 범위 안에 있는지 다시 확인했다.",
+    "[레이아웃 충돌] single-focus 트래커의 위치가 정해져 있지 않아, mobile-single-focus(right-down)를 16:9에서 쓰면 우상단 트래커와 겹칠 수 있었다. stage와 trackerMode 설명에 'single-focus는 비율과 상관없이 좌상단'이라고 명시했다.",
+    "[UITK 정확성] 기존 USS(column-reverse + bottom 고정)로는 새 카드가 위에 붙어 UGUI 설명(새 카드가 아래, 기존 카드가 위로 밀림)과 반대로 움직였다. left-up은 column+bottom, right-down은 column-reverse+top으로 고쳤다.",
+    "[UITK 정확성] Unity 문서상 USS 트랜지션은 auto 같은 키워드 값을 보간하지 못한다. 그래서 .toast--exit의 height:0은 auto 높이에서 즉시 접혔을 것이다. 카드 높이를 --toast-h(56px) 고정 토큰으로 바꾸고, enter에도 height 0을 넣어 UGUI의 preferredHeight 보간과 맞췄다. 같은 내용을 함정 항목과 실수 항목에 추가했다.",
+    "[UITK 정확성] transition을 bump·flash 상태 클래스에만 두면 클래스를 뗄 때 기본 상태로 즉시 돌아간다. transition을 .toast__count와 .objective 기본 클래스로 옮겼다. 단축 속성 대신 longhand 속성을 쓰고, 색은 var() 참조로 바꿨다.",
+    "[UITK 정확성] VisualTreeAsset.Instantiate()가 TemplateContainer 래퍼를 돌려준다는 점과 Q(\"toast\")로 실제 카드를 꺼내는 방법을 추가했다. TransitionCancelEvent 처리와 evt.stylePropertyNames 검사도 추가했다. Label·배너에도 picking-mode=\"Ignore\"를 붙였다.",
+    "[UGUI 정확성] 계층도에서 HudSystems(로직 MonoBehaviour)가 HUDCanvas 아래에 있는 것처럼 그려져 있었다. 씬 루트의 별도 GameObject로 분리했다. 루트 Canvas의 GraphicRaycaster 제거, ObjectiveRow 하이라이트용 배경 Image, ProgressFill의 Source Image 지정을 명시했다.",
+    "[UGUI 정확성] 정렬을 Enqueue마다 하던 단계(Steps)와 'LateUpdate에서 한 번만 정렬'이라는 함정이 서로 모순됐다. Enqueue는 플래그만 세우고 LateUpdate에서 정렬하도록 단계를 고쳤다. fifo 모드의 정렬 기준과 right-down 방향일 때 Child Alignment·형제 순서를 어떻게 바꾸는지도 추가했다.",
+    "[UGUI 정확성] FindFirstObjectByType이 6000.3에서 obsolete가 아님을 공식 문서로 확인하고 FindAnyObjectByType을 대안으로 적었다. Source Image가 없을 때 Filled를 고를 수 없는 함정, WaitForSeconds/WaitForSecondsRealtime과 timeScale의 관계, ContentSizeFitter 중첩 경고 함정을 추가했다.",
+    "[과잉 모방] 게임별 borrowed_axes는 각각 1개(레이아웃 구조)로 기준을 지킨다. Destiny 2 서술에 있던 '바운티' 대신 일반 용어인 '반복 과제'를 썼다. Genshin Impact의 credit 표기를 근거 레코드 원문(©miHoYo ©HoYoverse)과 맞췄다. 프리셋 id·part_id·무대 문구에는 게임명이나 고유 용어가 없는 것을 확인했고, 무대 배경을 '외곽 탐사대' 자체 테마로 명시했다.",
+    "[교육성] 학습 목표마다 난이도 표기(입문/중급/중급 심화)를 붙이고, 일시정지·접근성 학습 목표를 하나 추가했다. hotspot 2에는 fifo와 전설 획득을 비교해 보는 체험 지시를 넣었다.",
+    "[근거 정직성] confidence_notes에 근거 레코드의 elements가 비어 있어 hotspots가 일반 원리에 기댄다는 점, 이번에 공식 문서로 확인한 Unity 사실 3건, 확인하지 못한 1건, WCAG를 유추 적용했다는 한계를 명시했다. Image와 FindFirstObjectByType 문서를 참고 자료에 추가했다."
+  ]
+}

@@ -1,0 +1,525 @@
+{
+  "specimen_id": "results-reward",
+  "name_ko": "결과·보상 정산 화면",
+  "name_en": "Sequential Reward Tally & Level-up Spotlight",
+  "group": "D",
+  "paradigm": "none",
+  "one_liner_ko": "보상을 한꺼번에 쏟지 않고 한 줄씩 등장시키고 숫자를 올려 세며, 성장(레벨업)만 따로 무대에 세워 '얼마나 얻었는지'를 몸으로 느끼게 하되, 반복 전투의 피로를 줄이도록 스킵을 설계하는 정산 패턴.",
+  "learning_goals_ko": [
+    "보상 항목을 순차 등장(stagger)시켜 한 번에 하나씩 읽히게 만드는 이유를 설명할 수 있다.",
+    "숫자 카운트업을 '고정 시간 + easeOut'으로 구현해 값의 크기와 상관없이 같은 리듬을 유지할 수 있다.",
+    "스킵 입력을 '현재 단계 즉시 완료 → 다음 단계' 2단계로 설계하고, 스킵해도 최종 값이 정확히 남게 할 수 있다.",
+    "화려한 결과 연출이 주는 '마무리감'과 반복 시의 '피로'를 비교하고, 연출 길이·스킵 방식으로 둘의 균형을 잡을 수 있다.",
+    "레벨업처럼 동기부여가 큰 정보를 별도 스포트라이트 상태로 분리해 시각 위계를 만들 수 있다.",
+    "Unity UGUI(코루틴+CanvasGroup)와 UI Toolkit(USS transition+클래스 토글)로 같은 연출을 각각 만들 수 있다."
+  ],
+  "anatomy": [
+    {
+      "part_id": "victory_banner",
+      "name_ko": "승리 배너",
+      "role_ko": "전투(라운드)가 끝났음을 한 단어로 선언하고 긴장에서 보상으로 분위기를 전환한다."
+    },
+    {
+      "part_id": "tally_panel",
+      "name_ko": "정산 패널",
+      "role_ko": "보상 행들을 담는 판. 기울기·위치로 화면의 스타일을 결정한다."
+    },
+    {
+      "part_id": "reward_row",
+      "name_ko": "보상 행(라벨+값)",
+      "role_ko": "경험치·골드·보너스 등 한 항목. 순서대로 등장하고 값이 0부터 올라간다."
+    },
+    {
+      "part_id": "total_line",
+      "name_ko": "합계 줄",
+      "role_ko": "원장(ledger) 모드에서 각 행이 합산되어 쌓이는 최종 값. 행이 더해질 때마다 작은 펄스로 확정을 알린다."
+    },
+    {
+      "part_id": "exp_bar",
+      "name_ko": "경험치 바",
+      "role_ko": "카운트업과 동기화되어 차오르며, 가득 차면 레벨업 스포트라이트로 넘어가는 트리거가 된다."
+    },
+    {
+      "part_id": "levelup_spotlight",
+      "name_ko": "레벨업 스포트라이트",
+      "role_ko": "레벨이 오른 캐릭터를 다른 보상과 분리된 별도 카드로 크게 보여 준다."
+    },
+    {
+      "part_id": "rank_stamp",
+      "name_ko": "등급 도장",
+      "role_ko": "S/A/B 같은 성과 등급을 마지막에 도장처럼 찍어 요약한다(선택 요소, 참고 게임 근거 없음·교육용으로 새로 추가)."
+    },
+    {
+      "part_id": "item_list",
+      "name_ko": "획득 아이템 목록",
+      "role_ko": "수치 정산 뒤에 이어지는 아이템 아이콘+이름 리스트."
+    },
+    {
+      "part_id": "prompt_hint",
+      "name_ko": "진행/스킵 안내",
+      "role_ko": "화면 하단 입력 안내. 문구는 skip_behavior에 따라 바뀐다(finish-step: '확인: 이 단계 완료/다음', skip-all: '확인: 모두 건너뛰기', disabled: '확인: 계속'은 연출 종료 후에만 표시)."
+    }
+  ],
+  "states": [
+    {
+      "name": "idle",
+      "trigger_ko": "무대 초기 상태 또는 reset 이벤트",
+      "visual_ko": "어두운 배경만 보이고 패널은 화면 밖에 대기"
+    },
+    {
+      "name": "victory_banner",
+      "trigger_ko": "victory_normal / victory_levelup / victory_big_reward 이벤트",
+      "visual_ko": "배너가 크게 튀어나왔다가(overshoot) 상단으로 줄어들며 자리 잡음. 진입 직후 입력 잠금 시작"
+    },
+    {
+      "name": "tallying",
+      "trigger_ko": "배너 연출 종료 후 자동 진행",
+      "visual_ko": "보상 행이 stagger 간격으로 하나씩 밀려 들어오고, 각 값이 0에서 목표치까지 카운트업. 원장 모드면 합계 줄이 함께 누적"
+    },
+    {
+      "name": "levelup_spotlight",
+      "trigger_ko": "경험치 바가 가득 찼을 때(victory_levelup에서만, levelup_spotlight 켬일 때)",
+      "visual_ko": "배경이 어두워지고 캐릭터 카드가 확대 등장, 'LEVEL UP'과 이전→이후 수치가 표시. press_confirm 입력 전까지 유지"
+    },
+    {
+      "name": "rank_reveal",
+      "trigger_ko": "모든 수치 정산 완료 후(rank_stamp 켬일 때)",
+      "visual_ko": "등급 도장이 2배 크기에서 1배로 빠르게 줄어들며 찍히고, 도장 자체만 펄스 1회(화면 흔들림 없음)"
+    },
+    {
+      "name": "item_reveal",
+      "trigger_ko": "수치·등급 공개 이후",
+      "visual_ko": "아이템 아이콘이 짧은 간격으로 순차 페이드인"
+    },
+    {
+      "name": "complete_wait_input",
+      "trigger_ko": "모든 연출 완료",
+      "visual_ko": "진행 안내가 부드럽게 깜빡이며(초당 1회 이하) 입력을 기다림"
+    },
+    {
+      "name": "closing",
+      "trigger_ko": "complete_wait_input 상태에서 press_confirm",
+      "visual_ko": "패널이 아래로 빠지며 페이드아웃, 필드로 복귀 후 idle"
+    }
+  ],
+  "params": [
+    {
+      "key": "tally_mode",
+      "label_ko": "정산 방식",
+      "type": "select",
+      "default": "category-pages",
+      "options": [
+        "category-pages",
+        "ledger-lines"
+      ],
+      "affects_ko": "category-pages: 경험치→레벨업→골드→아이템을 단계(페이지)별로 보여줌. ledger-lines: 한 패널에서 항목이 한 줄씩 추가되며 하단 합계로 누적 합산."
+    },
+    {
+      "key": "countup_ms",
+      "label_ko": "카운트업 시간",
+      "type": "range",
+      "min": 0,
+      "max": 2000,
+      "step": 100,
+      "default": "900",
+      "unit": "ms",
+      "affects_ko": "한 값이 0에서 목표치까지 올라가는 시간. 0이면 즉시 표시. 값의 크기와 무관하게 고정."
+    },
+    {
+      "key": "stagger_ms",
+      "label_ko": "행 등장 간격",
+      "type": "range",
+      "min": 0,
+      "max": 800,
+      "step": 50,
+      "default": "250",
+      "unit": "ms",
+      "affects_ko": "보상 행이 차례로 들어오는 간격. 0이면 전부 동시에 등장해 순차 공개의 효과가 사라짐."
+    },
+    {
+      "key": "count_easing",
+      "label_ko": "카운트 곡선",
+      "type": "select",
+      "default": "easeOutExpo",
+      "options": [
+        "linear",
+        "easeOutCubic",
+        "easeOutExpo"
+      ],
+      "affects_ko": "linear는 기계적으로 일정하게, easeOut 계열은 빠르게 올라가다 목표 근처에서 감속해 '도착'이 느껴짐. countup_ms가 0이면 영향 없음."
+    },
+    {
+      "key": "skip_behavior",
+      "label_ko": "스킵 방식",
+      "type": "select",
+      "default": "finish-step",
+      "options": [
+        "finish-step",
+        "skip-all",
+        "disabled"
+      ],
+      "affects_ko": "finish-step: 1회 입력 시 현재 단계 즉시 완료, 다시 누르면 다음 단계. skip-all: 한 번에 끝까지(레벨업 카드·등급 도장은 결과로 남김). disabled: 연출이 끝날 때까지 스킵 불가(나쁜 예 비교용)."
+    },
+    {
+      "key": "levelup_spotlight",
+      "label_ko": "레벨업 스포트라이트",
+      "type": "toggle",
+      "default": "true",
+      "affects_ko": "끄면 레벨업이 경험치 행 옆에 작은 텍스트로만 표시되어 다른 수치와 위계가 같아짐."
+    },
+    {
+      "key": "rank_stamp",
+      "label_ko": "등급 도장",
+      "type": "toggle",
+      "default": "false",
+      "affects_ko": "켜면 정산 마지막에 S/A/B 등급 도장이 찍히는 단계(rank_reveal)가 추가됨."
+    },
+    {
+      "key": "panel_tilt_deg",
+      "label_ko": "패널 기울기",
+      "type": "range",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "default": "6",
+      "unit": "deg",
+      "affects_ko": "0이면 정돈된 미니멀 원장, 값이 클수록 사선 패널의 역동적 스타일. 숫자 가독성 때문에 값 텍스트는 기울기를 상쇄해 수평 유지."
+    }
+  ],
+  "presets": [
+    {
+      "id": "stylish-jrpg-stages",
+      "name_ko": "스타일리시 단계형 정산",
+      "genre_ko": "JRPG·턴제 RPG",
+      "values_json": "{\"tally_mode\":\"category-pages\",\"countup_ms\":\"900\",\"stagger_ms\":\"300\",\"count_easing\":\"easeOutExpo\",\"skip_behavior\":\"finish-step\",\"levelup_spotlight\":\"true\",\"rank_stamp\":\"false\",\"panel_tilt_deg\":\"8\"}",
+      "look_ko": "사선 패널이 단계마다 바뀌며 들어오고, 레벨업은 별도 카드로 크게 등장. 연출 밀도가 높고 '보여주기' 순간이 길지만 단계별 스킵으로 반복 피로를 줄인다."
+    },
+    {
+      "id": "minimal-ledger-tally",
+      "name_ko": "미니멀 원장 합산",
+      "genre_ko": "로그라이트·덱빌딩",
+      "values_json": "{\"tally_mode\":\"ledger-lines\",\"countup_ms\":\"400\",\"stagger_ms\":\"350\",\"count_easing\":\"linear\",\"skip_behavior\":\"finish-step\",\"levelup_spotlight\":\"false\",\"rank_stamp\":\"false\",\"panel_tilt_deg\":\"0\"}",
+      "look_ko": "기울기 없는 한 패널에서 '기본 보상, 남은 기회 보너스, 저축 이자'가 한 줄씩 붙고 아래 합계가 일정한 박자로 늘어난다. 계산 과정을 설명하는 정산."
+    },
+    {
+      "id": "mobile-quick-tally",
+      "name_ko": "짧은 세션용 빠른 정산",
+      "genre_ko": "모바일·반복 전투",
+      "values_json": "{\"tally_mode\":\"ledger-lines\",\"countup_ms\":\"300\",\"stagger_ms\":\"100\",\"count_easing\":\"easeOutCubic\",\"skip_behavior\":\"skip-all\",\"levelup_spotlight\":\"true\",\"rank_stamp\":\"true\",\"panel_tilt_deg\":\"3\"}",
+      "look_ko": "전체가 1~2초 안에 끝나고 한 번 탭으로 모두 넘어가지만, 레벨업과 등급만은 남겨서 핵심 성취를 놓치지 않게 한다."
+    }
+  ],
+  "events": [
+    {
+      "id": "victory_normal",
+      "label_ko": "일반 승리"
+    },
+    {
+      "id": "victory_levelup",
+      "label_ko": "레벨업 포함 승리"
+    },
+    {
+      "id": "victory_big_reward",
+      "label_ko": "큰 보상(9,999 이상) 승리 — 고정 시간 카운트업 확인용"
+    },
+    {
+      "id": "press_confirm",
+      "label_ko": "확인/스킵 입력"
+    },
+    {
+      "id": "reset",
+      "label_ko": "처음으로"
+    }
+  ],
+  "timings": [
+    {
+      "event_ko": "승리 배너 등장",
+      "duration_ms": 450,
+      "easing": "easeOutBack",
+      "note_ko": "권장값. 살짝 넘쳤다 돌아오는 overshoot로 '쾅' 느낌."
+    },
+    {
+      "event_ko": "정산 패널 슬라이드 인",
+      "duration_ms": 300,
+      "easing": "easeOutCubic",
+      "note_ko": "권장값. panel_tilt_deg만큼 기울어진 상태로 진입."
+    },
+    {
+      "event_ko": "보상 행 순차 등장 간격",
+      "duration_ms": 250,
+      "easing": "easeOutCubic",
+      "note_ko": "권장값(stagger_ms 기본). 각 행은 200ms 동안 x 40px 이동+페이드인."
+    },
+    {
+      "event_ko": "숫자 카운트업",
+      "duration_ms": 900,
+      "easing": "easeOutExpo",
+      "note_ko": "권장값. 참고 게임의 실제 속도는 1차 자료로 확인 못함. 값 크기와 무관한 고정 시간으로 구현."
+    },
+    {
+      "event_ko": "합계 확정 펄스",
+      "duration_ms": 150,
+      "easing": "easeOutQuad",
+      "note_ko": "권장값. scale 1→1.12→1, 행이 합계에 더해질 때마다 1회."
+    },
+    {
+      "event_ko": "레벨업 스포트라이트 등장",
+      "duration_ms": 600,
+      "easing": "easeOutBack",
+      "note_ko": "권장값. 배경 딤 200ms 후 카드 확대 등장."
+    },
+    {
+      "event_ko": "등급 도장",
+      "duration_ms": 350,
+      "easing": "easeInQuad",
+      "note_ko": "권장값. scale 2.0→1.0으로 '찍히는' 가속 곡선."
+    },
+    {
+      "event_ko": "진입 직후 입력 잠금",
+      "duration_ms": 300,
+      "easing": "linear",
+      "note_ko": "권장값. 결과 화면 진입 직후 입력을 막아 전투 중 연타가 결과를 날리지 않게 함."
+    },
+    {
+      "event_ko": "결과 화면 닫기",
+      "duration_ms": 250,
+      "easing": "easeInCubic",
+      "note_ko": "권장값."
+    }
+  ],
+  "hotspots": [
+    {
+      "n": 1,
+      "part_id": "reward_row",
+      "title_ko": "한 번에 하나씩 읽힌다",
+      "body_ko": "경험치·골드·아이템을 동시에 띄우면 눈이 어디부터 볼지 헤맨다. 순서대로 등장시키면 시선이 자연스럽게 따라가고, 각 보상이 짧은 '자기 순간'을 갖는다.",
+      "principle": "인지 부하"
+    },
+    {
+      "n": 2,
+      "part_id": "levelup_spotlight",
+      "title_ko": "성장은 따로 무대에 세운다",
+      "body_ko": "레벨업은 골드 몇 개보다 동기부여가 훨씬 크다. 별도 카드로 분리하고 화면을 어둡게 해 다른 수치와 다른 층위로 올려 둔다.",
+      "principle": "시각 위계"
+    },
+    {
+      "n": 3,
+      "part_id": "total_line",
+      "title_ko": "숫자가 올라가는 동안 '이유'가 보인다",
+      "body_ko": "원장 방식은 기본 보상+보너스+이자가 한 줄씩 더해지며 합계가 커진다. 플레이어는 결과뿐 아니라 '무엇을 잘해서 더 받았는지'를 배우고 다음 판 전략에 반영한다.",
+      "principle": "즉각 피드백"
+    },
+    {
+      "n": 4,
+      "part_id": "prompt_hint",
+      "title_ko": "기다리게 하되 가두지 않는다",
+      "body_ko": "화려한 결과 화면도 수십 번 반복되면 지루하다는 플레이어 의견이 실제로 많다. 1회 입력은 현재 단계 즉시 완료, 2회는 다음 단계로 설계하고, 스킵해도 최종 값과 레벨업 정보는 반드시 남긴다.",
+      "principle": "접근성"
+    },
+    {
+      "n": 5,
+      "part_id": "victory_banner",
+      "title_ko": "마무리를 각인시키되 길이는 아낀다",
+      "body_ko": "강한 승리 연출과 게임의 말투를 입힌 패널은 결과 화면을 '행정 절차'가 아니라 전투의 클라이맥스로 느끼게 한다. 하지만 전투가 잦은 게임일수록 같은 연출이 피로가 되므로, 인상이 큰 순간(배너·레벨업)에만 시간을 쓰고 나머지는 짧게 끝낸다.",
+      "principle": "몰입"
+    }
+  ],
+  "principles": [
+    "순차 공개: 보상은 종류별로 한 줄씩, 일정한 간격으로 등장시킨다.",
+    "카운트업은 값 크기와 무관한 고정 시간 + easeOut 곡선으로 '도착감'을 준다.",
+    "스킵은 2단계(현재 단계 완료 → 다음 단계)로 설계하고, 스킵해도 최종 값은 정확해야 한다.",
+    "동기부여가 가장 큰 정보(레벨업·등급)를 별도 상태로 분리해 시각 위계를 세운다.",
+    "계산 과정을 보여주는 원장형 정산은 플레이어에게 다음 판의 전략을 가르친다.",
+    "연출의 화려함과 반복 피로는 맞바꿈 관계다. 전투 빈도가 높을수록 총 연출 시간을 줄인다.",
+    "결과 화면 진입 직후 짧은 입력 잠금으로 전투 중 연타가 결과를 날려버리지 않게 한다."
+  ],
+  "mistakes": [
+    {
+      "title_ko": "단위당 속도로 카운트업",
+      "body_ko": "'1프레임에 1씩 증가'로 만들면 50은 순식간, 50,000은 몇 분이 걸린다. 항상 고정 시간 동안 Lerp하고 정수 반올림해 표시한다."
+    },
+    {
+      "title_ko": "스킵하면 값이 틀어짐",
+      "body_ko": "코루틴만 멈추고 최종 값을 대입하지 않아 '1,237'에서 멈춘다. 스킵 시 모든 행을 목표값으로 확정하고 바·합계도 함께 맞춘다."
+    },
+    {
+      "title_ko": "숫자 폭이 출렁임",
+      "body_ko": "비례폭 숫자는 1과 8의 폭이 달라 카운트 중 라벨이 좌우로 떨린다. 고정폭(tabular) 숫자나 TMP <mspace> 태그, 오른쪽 정렬을 쓴다."
+    },
+    {
+      "title_ko": "전투 연타가 결과를 날림",
+      "body_ko": "공격 버튼을 연타하던 입력이 그대로 들어가 결과·레벨업 정보를 못 보고 지나간다. 진입 후 200~300ms 입력 잠금과 '눌렀다 뗄 때' 판정을 쓴다."
+    },
+    {
+      "title_ko": "스킵 없는 긴 연출",
+      "body_ko": "처음엔 멋있지만 100번째 전투에선 고문이다. 반복되는 화면일수록 총 연출 시간을 줄이고 스킵을 제공한다."
+    }
+  ],
+  "juice_off_ko": "승리하자마자 경험치·골드·아이템·레벨업 문구가 최종 값으로 한꺼번에 뜨고, 모든 행이 같은 크기·같은 색이라 레벨업이 골드 줄 사이에 묻힌다. 배너도 등장 모션 없이 'VICTORY' 텍스트만 있고, 하단의 평범한 '확인' 버튼 하나로 끝난다. 무엇을 얼마나 얻었는지, 왜 그만큼 받았는지 기억에 남지 않는다.",
+  "stage": {
+    "aspect": "both",
+    "needs_3d": false,
+    "scene_ko": "어두운 단색 배경 위에 승리 배너가 튀어나온 뒤, 기울어진 정산 패널(16:9에서는 화면 오른쪽 60%, 9:16에서는 하단 70%)에 보상 행이 차례로 들어온다. 레벨업 시 화면 전체가 딤되고 중앙에 캐릭터 실루엣(SVG 도형) 카드가 등장한다. 캐릭터·아이콘은 모두 기하 도형으로 새로 그리고, 숫자는 font-variant-numeric: tabular-nums로 떨림을 막는다."
+  },
+  "unity_ugui": {
+    "hierarchy": "ResultsCanvas (Canvas, CanvasScaler, GraphicRaycaster)\n├─ Dim (Image, CanvasGroup)\n├─ VictoryBanner (RectTransform, CanvasGroup)\n│  └─ Label (TextMeshProUGUI)\n├─ TallyPanel (RectTransform, rotation Z = tilt, CanvasGroup)\n│  ├─ Rows (VerticalLayoutGroup)\n│  │  ├─ RowSlot_Exp (LayoutElement)\n│  │  │  └─ RowContent (RectTransform, CanvasGroup) ← 애니메이션은 여기만\n│  │  │     ├─ Label (TextMeshProUGUI)\n│  │  │     └─ Value (TextMeshProUGUI, 오른쪽 정렬)\n│  │  ├─ RowSlot_Gold ...\n│  │  └─ RowSlot_Bonus ...\n│  ├─ ExpBar (Image, Image Type = Filled, Fill Method = Horizontal)\n│  └─ TotalLine\n│     └─ Value (TextMeshProUGUI)\n├─ LevelUpSpotlight (CanvasGroup, 기본 비활성)\n│  ├─ PortraitCard (Image)\n│  └─ StatsText (TextMeshProUGUI)\n├─ RankStamp (TextMeshProUGUI, CanvasGroup)\n├─ ItemList (HorizontalLayoutGroup)\n└─ PromptHint (TextMeshProUGUI)\nEventSystem (InputSystemUIInputModule)\nResultsController (MonoBehaviour: ResultsSequence.cs)",
+    "components_ko": [
+      "CanvasScaler: UI Scale Mode = Scale With Screen Size, Reference Resolution 1920x1080, Match 0.5(가로·세로 모두 대응).",
+      "CanvasGroup: 각 행·배너·스포트라이트의 alpha와 interactable/blocksRaycasts를 한 번에 제어.",
+      "TextMeshProUGUI: Value는 오른쪽 정렬, 숫자 떨림 방지를 위해 <mspace=0.6em> 태그 또는 고정폭 숫자 폰트 사용. 갱신은 SetText(\"{0}\", value)로 GC 할당 최소화(소수 자리는 {0:2}처럼 지정, 천 단위 구분 기호는 지원되지 않으므로 필요하면 값이 바뀔 때만 ToString(\"N0\")).",
+      "Image(Filled): 경험치 바는 fillAmount를 카운트업과 같은 t로 동기화.",
+      "VerticalLayoutGroup + LayoutElement: 슬롯 위치만 잡고, 실제 이동 애니메이션은 자식 RowContent의 anchoredPosition으로.",
+      "InputActionReference(UI/Submit): 확인·스킵 입력. action.performed를 OnEnable에서 구독하고 OnDisable에서 해제.",
+      "EventSystem에는 InputSystemUIInputModule(Input System 패키지용 모듈)을 쓰고, 구 Input Manager 기반 StandaloneInputModule은 쓰지 않는다."
+    ],
+    "steps_ko": [
+      "ResultsSequence.cs에 보상 데이터 배열(label, target)과 countupDuration, stagger, AnimationCurve(easeOut) 필드를 만든다.",
+      "Play() 코루틴: 배너 등장 → 패널 슬라이드 → 행마다 등장 코루틴 시작 후 stagger만큼 대기하는 순서로 작성한다.",
+      "카운트업 코루틴: t = elapsed / duration, shown = Mathf.RoundToInt(Mathf.Lerp(0, target, curve.Evaluate(t))). 시간은 Time.unscaledDeltaTime으로 누적(결과 화면에서 timeScale을 0으로 두는 경우 대비). 루프 끝에서 반드시 target을 정확히 대입.",
+      "스킵: bool skipRequested 플래그를 두고, 각 코루틴의 while 조건에서 확인해 즉시 t=1로 점프. 1회=현재 단계 완료, 2회=다음 단계.",
+      "레벨업: 경험치 바 fillAmount가 1에 도달하면 바를 0으로 돌리고 LevelUpSpotlight를 활성화, 확인 입력까지 yield return new WaitUntil(() => confirmed)로 대기.",
+      "진입 직후 inputLockSeconds(0.3초) 동안 입력을 무시한다(Time.unscaledTime 비교).",
+      "Closing: CanvasGroup alpha 1→0, 끝나면 SetActive(false)와 이벤트(OnResultsClosed) 호출.",
+      "선택: DOTween을 쓰면 DOCounter·Sequence로 줄일 수 있지만 기본 수업 코드는 코루틴으로 작성한다."
+    ],
+    "pitfalls_ko": [
+      "LayoutGroup 자식의 위치를 직접 움직이면 다음 레이아웃 갱신에서 되돌아간다. 슬롯(LayoutElement) 안의 자식만 움직인다.",
+      "Time.timeScale=0인데 deltaTime을 쓰면 카운트업이 영원히 멈춘다. unscaledDeltaTime을 쓴다.",
+      "코루틴을 StopCoroutine으로만 끊으면 최종 값이 틀린다. 스킵은 '목표값 확정' 함수로 처리한다.",
+      "TMP의 text 속성에 매 프레임 문자열 보간을 넣으면 GC가 쌓인다. SetText 포맷 오버로드를 쓴다.",
+      "Mathf.Lerp는 float라 약 1,600만이 넘는 값은 정밀도가 떨어진다. 아주 큰 값은 double/long으로 계산한다.",
+      "구 Input Manager(Input.GetButtonDown 등)와 obsolete인 FindObjectOfType는 쓰지 않는다. 참조는 인스펙터 연결이 기본이고, 꼭 찾아야 하면 FindFirstObjectByType 또는 더 빠른 FindAnyObjectByType(매 프레임 호출 금지).",
+      "패널을 rotation Z로 기울이면 자식 텍스트도 기울어진다. 숫자 가독성을 위해 6도 이하를 권장하거나 Value만 역회전한다."
+    ]
+  },
+  "unity_uitk": {
+    "structure": "Results.uxml\n<ui:UXML xmlns:ui=\"UnityEngine.UIElements\">\n  <ui:VisualElement name=\"root\" class=\"results\">\n    <ui:VisualElement name=\"dim\" class=\"dim\" picking-mode=\"Ignore\"/>\n    <ui:Label name=\"banner\" class=\"banner\" text=\"VICTORY\"/>\n    <ui:VisualElement name=\"panel\" class=\"panel\">\n      <ui:VisualElement name=\"rows\" class=\"rows\"/>  <!-- 행은 코드로 생성 -->\n      <ui:ProgressBar name=\"exp-bar\" class=\"exp-bar\"/>\n      <ui:VisualElement class=\"total\">\n        <ui:Label text=\"합계\"/>\n        <ui:Label name=\"total-value\" class=\"value\"/>\n      </ui:VisualElement>\n    </ui:VisualElement>\n    <ui:VisualElement name=\"levelup\" class=\"levelup\"/>\n    <ui:Label name=\"rank\" class=\"rank\"/>\n    <ui:Label name=\"hint\" class=\"hint\" text=\"확인: 계속\"/>\n  </ui:VisualElement>\n</ui:UXML>\n\n행 템플릿 Row.uxml: VisualElement.row > Label.row-label + Label.value\n씬: GameObject(UIDocument: PanelSettings + Results.uxml) + ResultsSequenceUITK.cs",
+    "uss_notes_ko": [
+      ".row { opacity: 0; translate: 40px 0; transition-property: opacity, translate; transition-duration: 200ms; transition-timing-function: ease-out-cubic; } .row.is-shown { opacity: 1; translate: 0 0; } — 클래스 토글만으로 등장 모션 완성(ease-out-cubic은 Unity 지원 키워드).",
+      ".panel { rotate: 6deg; } — 기울기는 USS rotate로. 값은 C#에서 style.rotate = new Rotate(new Angle(deg))로 덮어써 params와 연결.",
+      ".banner { scale: 1.6 1.6; opacity: 0; transition: scale 450ms ease-out-back, opacity 200ms; } .banner.is-shown { scale: 1 1; opacity: 1; }",
+      ".value { -unity-text-align: middle-right; } 고정폭 숫자 폰트를 -unity-font-definition으로 지정해 떨림 방지.",
+      ".levelup { display: none; } .levelup.is-open { display: flex; } — display 전환에는 transition이 걸리지 않으므로 opacity/scale 클래스를 한 프레임 뒤 추가.",
+      "USS에는 OS의 '동작 줄이기'를 읽는 미디어 쿼리가 없다. 게임 옵션의 '모션 줄이기'가 켜지면 C#에서 루트에 .reduced 클래스를 붙이고 .reduced .row { transition-duration: 0ms; }로 일괄 차단한다."
+    ],
+    "steps_ko": [
+      "UIDocument의 rootVisualElement에서 Q<VisualElement>(\"rows\") 등으로 요소를 찾는다.",
+      "보상 데이터마다 Row.uxml(VisualTreeAsset)을 Instantiate해 rows에 추가한다(처음엔 .is-shown 없음).",
+      "root.schedule.Execute(() => row.AddToClassList(\"is-shown\")).StartingIn(stagger * i)로 각 행을 순서대로 켠다(첫 행도 최소 1프레임 뒤).",
+      "카운트업: MonoBehaviour 코루틴(unscaledDeltaTime 기준)에서 표시값이 바뀔 때만 label.text를 갱신하고, 끝에 목표값을 정확히 대입한다. schedule.Execute(tick).Every(16).Until(() => done)도 가능하지만 시간 기준이 코루틴과 달라질 수 있으니 한 가지로 통일한다.",
+      "ProgressBar.value를 같은 t로 갱신하고 최대치 도달 시 levelup에 is-open 추가.",
+      "입력: InputActionReference(UI/Submit)의 performed를 구독해 스킵 단계를 처리한다(진입 300ms 동안 무시).",
+      "닫기: root에 .is-closing 클래스(opacity 0, translate 0 40px) 추가 후 TransitionEndEvent에서 UIDocument 비활성화."
+    ],
+    "pitfalls_ko": [
+      "요소를 만든 같은 프레임에 is-shown 클래스를 붙이면 '이전 상태'가 없어 transition이 실행되지 않고 바로 최종 상태가 된다(공식 문서 명시). schedule.Execute로 한 프레임 이상 늦추거나 GeometryChangedEvent 후에 붙인다.",
+      "display: none ↔ flex는 애니메이션되지 않는다. 등장 연출은 opacity/scale/translate로 한다.",
+      "dim 같은 덮개 요소가 picking-mode Position이면 뒤쪽 버튼 클릭을 가로챈다. 장식 요소는 picking-mode=\"Ignore\".",
+      "Label.text에 매 프레임 새 문자열을 만들면 GC가 생긴다. 값이 바뀌었을 때만 갱신한다.",
+      "USS transition이 Time.timeScale의 영향을 받는지는 공식 문서에 명시가 없다. timeScale=0인 결과 화면에서는 바·숫자가 어긋나지 않는지 직접 확인하고, 코루틴 쪽은 unscaledDeltaTime으로 통일한다.",
+      "구 Input Manager, obsolete인 FindObjectOfType 금지. UIDocument 참조는 인스펙터 연결."
+    ]
+  },
+  "inspired_by": [
+    {
+      "game_id": "persona-5-royal",
+      "title": "Persona 5 Royal (Royal판, 일본 2019 / 글로벌 2020. UI 체계는 2016 원작 계승)",
+      "credit": "© ATLUS © SEGA",
+      "borrowed_axes": [
+        "레이아웃 구조",
+        "형태·기울기"
+      ],
+      "what_learned_ko": "근거 레코드의 상태 흐름(승리 연출 → 경험치·돈·아이템 표시 → 레벨업 안내 → 버튼으로 복귀)을 '정산을 단계로 나누고 레벨업을 분리한다'는 구조로 일반화했다(정확한 순서·형태는 미검증). 사선 패널은 시리즈 UI 전반의 그래픽 성향에서 가져온 축이며 결과 화면 고유 배치로 확인된 것은 아니다. 또 '화려하지만 반복되면 번거롭다'는 플레이어 의견을 스킵 설계의 근거로 삼았다. 빨강 중심 고대비 배색, 예고장풍 타이포그래피, 마무리 공격 연출은 가져오지 않는다."
+    },
+    {
+      "game_id": "balatro",
+      "title": "Balatro (정식 발매판 2024)",
+      "credit": "© Playstack (개발 LocalThunk)",
+      "borrowed_axes": [
+        "모션 리듬",
+        "레이아웃 구조"
+      ],
+      "what_learned_ko": "라운드 종료 정산이 기본 보상, 남은 핸드 보너스, 이자라는 여러 항목으로 나뉜다는 점(위키 기준)을 '항목별 줄 + 하단 합계'의 원장형 구성으로, 숫자가 차례로 더해지는 리듬을 행 단위 순차 합산으로 일반화했다(정산 화면의 실제 배치·박자는 미검증). 픽셀아트·CRT 왜곡·카드 그래픽은 가져오지 않는다."
+    }
+  ],
+  "original_ko": "색은 참고 게임의 빨강·검정 고대비나 사이키델릭 픽셀 배색 대신 남색 배경 + 청록 패널 + 호박색(amber) 강조의 새 토큰으로 만든다. 승리 배너 문구는 일반어('승리'/'CLEAR')만 쓰고 서체는 시스템 폰트만 사용한다. 캐릭터 초상화 대신 기하 도형 실루엣 SVG를 쓰고, 참고 게임 고유의 마무리 공격 연출·효과음은 재현하지 않는다. '등급 도장'(rank_stamp), '스킵 방식 3종 비교', '카운트 곡선 비교', '진입 입력 잠금', '큰 보상 이벤트로 고정 시간 카운트업 확인'은 두 참고 게임 근거가 아닌 교육용으로 새로 추가한 요소다. 원장 모드의 항목명도 '기본 보상/남은 기회 보너스/저축 이자'처럼 게임 중립적으로 바꾼다.",
+  "references": [
+    {
+      "label": "Persona Central: CEDEC Awards 2019 Visual Arts 수상(Masayoshi Sutoh)",
+      "url": "https://personacentral.com/cedec-awards-2019-persona-5-masayoshi-sutoh-visual-arts/",
+      "type": "T1"
+    },
+    {
+      "label": "Persona Central: CEDEC+KYUSHU 2017 Persona UI 패널 보도",
+      "url": "https://personacentral.com/persona-5-panel-concept-development-ui/",
+      "type": "T1"
+    },
+    {
+      "label": "Persona Central: UI·사운드 개발자 인터뷰",
+      "url": "https://personacentral.com/persona-5-interview-ui-design-sound-music/",
+      "type": "T1"
+    },
+    {
+      "label": "ATLUS 공식 Persona 5 Royal FAQ",
+      "url": "https://atlus.com/persona-5-royal-launch-faq/",
+      "type": "T1"
+    },
+    {
+      "label": "ResetEra: 결과 화면 스킵 요청 스레드(플레이어 의견)",
+      "url": "https://www.resetera.com/threads/victory-results-screens-in-rpgs-are-annoying-please-let-players-completely-disable-them-to-speed-things-up-devs.556687/",
+      "type": "T3"
+    },
+    {
+      "label": "Playstack 공식: Balatro GDC Awards 2025 수상",
+      "url": "https://www.playstack.com/news/balatro-gdc-awards-2025/",
+      "type": "T1"
+    },
+    {
+      "label": "Apple Newsroom: Apple Design Awards 2025 수상작",
+      "url": "https://www.apple.com/newsroom/2025/06/apple-unveils-winners-and-finalists-of-the-2025-apple-design-awards/",
+      "type": "T1"
+    },
+    {
+      "label": "Balatro Wiki: Money(라운드 종료 정산 항목)",
+      "url": "https://balatrowiki.org/w/Money",
+      "type": "T3"
+    },
+    {
+      "label": "GMTK(Mark Brown): Balatro's cursed design problem",
+      "url": "https://gmtk.substack.com/p/balatros-cursed-design-problem",
+      "type": "T2"
+    },
+    {
+      "label": "Unity 6.3 Manual: USS transitions(지원 easing 키워드, 첫 프레임 규칙)",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/Manual/UIE-Transitions.html",
+      "type": "T1"
+    },
+    {
+      "label": "Unity 6.3 Scripting API: Object.FindFirstObjectByType",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Object.FindFirstObjectByType.html",
+      "type": "T1"
+    },
+    {
+      "label": "Game UI Database(사람이 직접 여는 참고용, AI 접근 금지)",
+      "url": "https://www.gameuidatabase.com/",
+      "type": "human-only"
+    }
+  ],
+  "confidence_notes_ko": "[Persona 5 Royal] 검증된 근거 레코드(persona-5-royal.json, results-reward)의 confidence는 'unverified'다(이전 카드의 '전체 plausible' 표기는 틀려서 바로잡음). 출처로 확인된 것: UI 디자이너의 CEDEC Awards 2019 수상(결과 화면 자체는 다루지 않음), 시리즈 UI가 빨강 지배 고대비 배색이라는 개발자 패널 보도, 승리 화면이 화려하지만 반복되면 번거롭다는 포럼 의견(T3). 미검증: 경험치·돈·아이템의 표시 순서와 타이밍, 레벨업 안내의 형태, 결과 화면 고유의 배치·강조색, 마무리 공격 연출과 효과음(원 출처 403), 버튼 홀드 스킵(포럼의 기억 기반 언급). 이전 카드의 '노란 포인트'는 레코드 검증 단계에서 삭제된 주장이라 뺐다. GameFAQs 경험치 링크는 검증 단계에서 해당 도메인이 403이었고 레코드 근거에 없어 references에서 뺐다. 카드의 단계형 구조와 사선 패널은 이 미검증 흐름과 시리즈 전반의 성향을 일반화한 설계 제안이다.\n[Balatro] 전달받은 근거 레코드는 'task not executed'로 비어 있고 balatro.json에도 elements가 없다. 따라서 Balatro 관련 서술은 이전 작성자가 직접 확인한 출처에 기댄다: 정산 항목 구성(블라인드 보상, 남은 핸드당 보너스, 이자, Balatro Wiki T3), 득점 시 숫자가 차례로 더해지며 고조되는 연출(GMTK T2, 손패 득점 연출이며 정산 화면에 대한 진술은 아님), GDC Awards 2025 수상(Playstack 공식). 정산 화면에서 줄이 하나씩 붙고 합계가 일정한 박자로 늘어나는 구체적 배치·리듬은 기억 기반이라 unverified다. Apple Design Award 2025 수상은 이번에 재확인하지 않았다.\n[패턴 일반화] hotspot 1~3(순차 공개, 레벨업 분리, 원장형 피드백)은 근거 레코드의 why_it_works가 아니라 업계 통상 설계 원리로 제시한 것이다. hotspot 4~5만 레코드의 '화려한 연출 vs 반복 피로' 근거를 직접 반영한다. 등급 도장, 스킵 2단계, 입력 잠금은 교육용 추가 요소다. timings의 모든 ms는 권장값이다.\n[Unity] Unity 6.3 공식 문서로 확인: USS transition-timing-function의 ease-out-cubic/ease-out-back 키워드 지원, 첫 프레임에는 transition이 걸리지 않는 규칙, FindFirstObjectByType이 obsolete가 아님(FindAnyObjectByType이 더 빠름). 문서로 확인하지 못한 것: USS transition과 Time.timeScale의 관계, TMP SetText 포맷의 세부 규칙(기억 기반). 실제 컴파일·동작은 강사 검증이 필요하다.",
+  "critic_changes_ko": [
+    "[근거 정확성] confidence_notes에서 P5R 레코드를 '전체 plausible'로 쓴 것을 실제 값 'unverified'로 고쳤다. 레코드에서 미검증인 '순차 표시 순서'를 '확인됨'으로 쓴 부분과 레코드에서 삭제된 '노란 포인트' 주장을 바로잡았다.",
+    "[근거 정확성] references에서 GameFAQs 경험치 링크를 뺐다(레코드 근거에 없고 검증 단계에서 해당 도메인이 403). 대신 Unity 6.3 공식 문서 2건을 추가했다.",
+    "[과잉 모방] P5R what_learned_ko를 레코드의 상태 흐름에 근거한 일반화로 다시 썼다. 사선 패널은 시리즈 전반의 성향이며 결과 화면 고유 배치로 확인된 것은 아니라고 밝혔다. 미검증 고유 연출(유리 파편·승리 랩) 언급은 '마무리 공격 연출'이라는 일반 표현으로 바꿨다.",
+    "[과잉 모방] 미니멀 원장 프리셋 문구의 '이자'를 original_ko와 같은 중립어 '저축 이자'로 통일하고, '똑딱이며' 같은 참고 게임 리듬 묘사를 '일정한 박자'로 일반화했다. borrowed_axes는 게임당 2개를 유지했다.",
+    "[원리 반영] hotspot 4에 레코드의 '화려하지만 반복되면 번거롭다' 플레이어 의견을 근거로 넣었다. hotspot 5를 tally_panel에서 victory_banner로 옮기고, 레코드의 why_it_works(마무리 각인 vs 반복 피로 맞바꿈)를 반영하도록 다시 썼다. principles에 '화려함과 반복 피로는 맞바꿈' 원리를 추가했다.",
+    "[교육성] learning_goals에 '연출의 마무리감과 반복 피로의 균형'을 다루는 목표를 추가했다.",
+    "[구현 가능성] mobile-quick-tally 프리셋의 stagger_ms 80을 step 50에 맞는 100으로 고쳤다.",
+    "[구현 가능성] prompt_hint에 적혀 있던 '길게: 모두 건너뛰기'(길게 누르기 입력)가 params·events에 없어서, skip_behavior별 안내 문구로 다시 정의했다. skip-all 설명에 '등급 도장도 남김'을 더해 mobile 프리셋 서술과 맞췄다.",
+    "[구현 가능성] states의 trigger_ko를 event id(victory_*, press_confirm, reset)와 직접 대응하도록 고쳤다. 어색했던 rank_reveal visual('흔들림 없이 펄스')을 명확히 바꾸고, victory_big_reward 이벤트의 교육 목적(고정 시간 카운트업 확인)을 적었다.",
+    "[Unity 정확성] FindFirstObjectByType이 6.3에서 obsolete가 아님을 공식 문서로 확인했고, 더 빠른 FindAnyObjectByType과 매 프레임 호출 금지를 함께 적었다.",
+    "[Unity 정확성] UITK transition 키워드와 첫 프레임 규칙은 공식 문서로 확인했다. 'USS transition은 timeScale 영향 없음'은 문서에 근거가 없어 '직접 확인 필요'로 내렸다.",
+    "[Unity 정확성] USS에 OS 동작 줄이기 미디어 쿼리가 없다는 점을 밝혀 reduced-motion 메모를 고쳤다. TMP SetText 포맷의 소수 자리·천 단위 구분 한계를 적었다. CanvasScaler 속성명(UI Scale Mode, Reference Resolution)과 Image Fill Method 표기를 정확히 했다.",
+    "[Unity 정확성] UGUI pitfalls에 큰 값에서 Mathf.Lerp(float) 정밀도가 떨어지는 문제를 추가했다. UITK 카운트업은 시간 기준이 섞이지 않도록 코루틴 하나로 통일하라고 권장했다.",
+    "[근거 정확성] confidence_notes에 hotspot 1~3은 레코드가 아닌 일반 설계 원리이고 hotspot 4~5만 레코드를 직접 반영한다고 밝혔다. Balatro 레코드가 비어 있다는 사실(balatro.json의 elements도 비어 있음)도 적었다."
+  ]
+}

@@ -8,6 +8,8 @@ import s from './style.module.css'
 export { meta } from './meta'
 
 const MAX = 100
+/** 연타 중 잔상이 기다릴 수 있는 최대 시간(초) */
+const MAX_HOLD = 1.2
 
 /**
  * 체력 바 + 잔상(데미지 트레일) + 회복 미리보기 + 저체력 테두리.
@@ -22,10 +24,27 @@ export default function HealthBarTrail(p: SpecimenProps) {
   const shape = str(p.params, 'shape', 'slanted')
   const numberMode = str(p.params, 'numberMode', 'value')
   const colorShift = bool(p.params, 'colorShift', true)
+  const healStyle = str(p.params, 'healStyle', 'preview')
   const juice = p.juice
 
   // 시뮬레이션 상태
-  const st = useRef({ hp: 72, fill: 72, trail: 72, heal: 72, hold: 0, shown: 72, shake: 0, flash: 0, t: 0, autoStep: 0 })
+  const st = useRef({
+    hp: 72,
+    fill: 72,
+    trail: 72,
+    heal: 72,
+    hold: 0,
+    /** 이번 잔상이 지금까지 기다린 시간 — 연타로 대기가 무한히 늘지 않게 상한(MAX_HOLD)을 둔다 */
+    held: 0,
+    shown: 72,
+    shake: 0,
+    flash: 0,
+    t: 0,
+    autoStep: 0,
+    /** 연속 타격 예약: 남은 타수와 다음 타격까지 시간 */
+    combo: 0,
+    comboTimer: 0,
+  })
 
   const rootRef = useRef<HTMLDivElement>(null)
   const fillRef = useRef<HTMLDivElement>(null)
@@ -42,9 +61,10 @@ export default function HealthBarTrail(p: SpecimenProps) {
     x.hp = clamp(x.hp - amount, 0, MAX)
     x.heal = x.hp
     if (juice) {
-      // 잔상은 맞기 전 위치에 남겨 두고 잠시 기다린다. 연타 중에는 대기 시간을 다시 채운다.
+      // 잔상은 맞기 전 위치에 남겨 두고 잠시 기다린다. 연타 중에는 대기 시간을 다시 채우되 총 대기는 MAX_HOLD 까지만.
+      if (x.trail <= x.fill + 0.01) x.held = 0
       x.trail = Math.max(x.trail, before)
-      x.hold = trailDelay
+      x.hold = Math.min(trailDelay, Math.max(0, MAX_HOLD - x.held))
       x.shake = Math.min(1, amount / 25)
       if (amount >= 20 && requestFlash()) x.flash = 1
     } else {
@@ -57,32 +77,49 @@ export default function HealthBarTrail(p: SpecimenProps) {
     x.hp = clamp(x.hp + amount, 0, MAX)
     x.heal = x.hp
     x.trail = Math.min(x.trail, x.fill)
-    if (!juice) x.fill = x.hp
+    if (!juice || healStyle === 'instant') x.fill = x.hp
   }
 
   const handle = (id: string) => {
+    const x = st.current
     if (id === 'hit') damage(9)
     else if (id === 'heavy') damage(28)
-    else if (id === 'heal') heal(35)
+    else if (id === 'combo') {
+      // 5 × 4 연타, 120ms 간격 — 메인 바는 계단식, 잔상은 합계를 한 덩어리로
+      damage(5)
+      x.combo = 3
+      x.comboTimer = 0.12
+    } else if (id === 'heal') heal(30)
   }
   useTrigger(p.trigger, handle)
 
   // 자동 데모: 맞고, 크게 맞고, 위험해지면 회복
-  useAutoplay(p.autoplay, p.playing, p.timeScale, 1.3, () => {
+  useAutoplay(p.autoplay, p.playing, p.timeScale, 1.4, () => {
     const x = st.current
     x.autoStep++
-    if (x.hp <= 22) handle('heal')
-    else handle(x.autoStep % 3 === 0 ? 'heavy' : 'hit')
+    if (x.hp <= 24) handle('heal')
+    else handle(['hit', 'combo', 'hit', 'heavy'][x.autoStep % 4])
   }, p.trigger?.seq)
 
   useGameLoop(p.playing, p.timeScale, dt => {
     const x = st.current
     x.t += dt
+    if (x.combo > 0) {
+      x.comboTimer -= dt
+      if (x.comboTimer <= 0) {
+        damage(5)
+        x.combo--
+        x.comboTimer = 0.12
+      }
+    }
     if (juice) {
-      // 체력이 줄 때 메인 바는 거의 즉시(약 60ms), 회복은 미리보기 구간을 채우며 천천히(약 600ms)
-      x.fill = x.hp < x.fill ? damp(x.fill, x.hp, 40, dt) : Math.min(x.hp, x.fill + 60 * dt)
-      if (x.hold > 0) x.hold -= dt
-      else if (x.trail > x.fill) x.trail = Math.max(x.fill, x.trail - trailSpeed * dt)
+      // 체력이 줄 때 메인 바는 거의 즉시(약 60ms), 회복은 방식에 따라 미리보기 구간을 채우며 천천히
+      const healRate = healStyle === 'slow' ? 25 : 60
+      x.fill = x.hp < x.fill ? damp(x.fill, x.hp, 40, dt) : Math.min(x.hp, x.fill + healRate * dt)
+      if (x.hold > 0) {
+        x.hold -= dt
+        x.held += dt
+      } else if (x.trail > x.fill) x.trail = Math.max(x.fill, x.trail - trailSpeed * dt)
       x.shown = damp(x.shown, x.hp, 14, dt)
       x.shake = Math.max(0, x.shake - dt * 4)
       x.flash = Math.max(0, x.flash - dt * 5)
@@ -115,7 +152,7 @@ export default function HealthBarTrail(p: SpecimenProps) {
     }
     if (healRef.current) {
       healRef.current.style.left = pct(x.fill)
-      healRef.current.style.width = pct(Math.max(0, x.heal - x.fill))
+      healRef.current.style.width = healStyle === 'preview' ? pct(Math.max(0, x.heal - x.fill)) : '0%'
     }
     if (numRef.current) {
       const v = Math.round(x.shown)

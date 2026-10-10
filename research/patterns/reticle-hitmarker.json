@@ -1,0 +1,537 @@
+{
+  "specimen_id": "reticle-hitmarker",
+  "name_ko": "조준점 + 적중 표시",
+  "name_en": "Reticle & Hitmarker",
+  "group": "B",
+  "paradigm": "non-diegetic",
+  "one_liner_ko": "조준점은 '지금 쏘면 어디로 얼마나 퍼지는지'를 정직하게 보여 주고, 히트마커는 '맞았다·약점이다·쓰러뜨렸다'를 0.1초 안에 서로 다른 모양으로 알려 준다.",
+  "learning_goals_ko": [
+    "이동·사격 상태에 따라 조준점 팔(arm) 간격이 벌어지고 회복되는 퍼짐(spread) 모델을 값 하나(현재 퍼짐)로 설계하고, 그 값을 탄 발사 방향과 UI 표시가 함께 쓰도록 연결할 수 있다.",
+    "화면 중앙 레이캐스트로 적 조준 여부를 판정해 조준점 색을 바꾸는 흐름을 구현할 수 있다.",
+    "일반 적중·치명타·처치 히트마커를 색에만 기대지 않고 형태·크기·지속 시간으로 위계 있게 구분할 수 있다.",
+    "히트마커의 등장·유지·소멸 타이밍(ms)과 easing을 조절해 타격감 차이를 체감하고 말로 설명할 수 있다.",
+    "화면 고정(non-diegetic) 조준점과 월드 공간 레이저 조준(diegetic)을 같은 장면에서 전환해 보고, 정보량과 몰입의 교환 관계를 비교할 수 있다."
+  ],
+  "anatomy": [
+    {
+      "part_id": "reticle_root",
+      "name_ko": "조준점 루트",
+      "role_ko": "화면 정중앙에 고정된 기준점. 모든 조준 요소의 부모이며 상태(대기·이동·사격·적 조준)를 클래스/필드로 보유한다."
+    },
+    {
+      "part_id": "center_dot",
+      "name_ko": "중심 점",
+      "role_ko": "탄이 향하는 정확한 지점. 퍼짐과 무관하게 크기가 변하지 않아야 기준점 역할을 한다."
+    },
+    {
+      "part_id": "spread_arms",
+      "name_ko": "퍼짐 팔(4선) / 퍼짐 원",
+      "role_ko": "상하좌우 짧은 선(원 모드에서는 원). 중심에서의 거리가 현재 탄 퍼짐(명중 원 반지름)을 그대로 나타낸다."
+    },
+    {
+      "part_id": "outline",
+      "name_ko": "외곽선",
+      "role_ko": "밝은 하늘·어두운 복도 어디서나 조준점이 묻히지 않게 하는 1px 반대색 테두리."
+    },
+    {
+      "part_id": "hitmarker",
+      "name_ko": "적중 표시(X)",
+      "role_ko": "중심을 비워 둔 대각선 4개. 일반 적중 시 짧게 튀어나왔다 사라진다."
+    },
+    {
+      "part_id": "crit_layer",
+      "name_ko": "치명타 강조",
+      "role_ko": "히트마커 선을 굵고 길게 바꾸고 강조색을 입힌다. 색 외에 형태 차이도 함께 준다."
+    },
+    {
+      "part_id": "kill_ring",
+      "name_ko": "처치 링",
+      "role_ko": "처치 시 히트마커 바깥에서 퍼지며 사라지는 원. 적중과 처치를 확실히 구분하는 별도 형태."
+    },
+    {
+      "part_id": "laser_beam",
+      "name_ko": "레이저 조준선(비교 모드)",
+      "role_ko": "월드 공간에서 무기 총구부터 조준 지점까지 이어지는 선. 화면 고정 조준점을 대체하는 다이어제틱 해법."
+    },
+    {
+      "part_id": "laser_dot",
+      "name_ko": "레이저 접촉점(비교 모드)",
+      "role_ko": "레이저가 표면·표적에 닿은 지점의 작은 점. 표적의 '어느 부위'에 닿았는지를 표면 위에서 직접 보여 주며, 원근에 따라 화면 중앙에서 벗어날 수 있다. 적에 닿으면 적 조준 색으로 바뀐다."
+    }
+  ],
+  "states": [
+    {
+      "name": "idle",
+      "trigger_ko": "정지 상태로 사격하지 않음",
+      "visual_ko": "팔 간격이 기본 퍼짐(가장 좁음). 기본색(흰색 계열) + 외곽선."
+    },
+    {
+      "name": "moving",
+      "trigger_ko": "이동 입력 유지(이벤트 toggle_move)",
+      "visual_ko": "팔이 '이동 퍼짐 배율'만큼 바깥으로 벌어진 채 유지. 멈추면 회복 시간 동안 원위치."
+    },
+    {
+      "name": "firing",
+      "trigger_ko": "사격 1발마다(이벤트 fire, burst)",
+      "visual_ko": "팔이 사격당 퍼짐만큼 순간적으로 튀어 나갔다가(블룸) 회복 곡선으로 돌아옴. 연사 시 누적되며 상한(기본 퍼짐의 4배, 고정값)에서 멈춤."
+    },
+    {
+      "name": "aim_hostile",
+      "trigger_ko": "화면 중앙 레이캐스트가 적에 닿음(이벤트 toggle_hostile, 또는 무대에서 표적 위 마우스 오버)",
+      "visual_ko": "조준점 전체가 적 조준 색으로 짧게 전환. 적에서 벗어나면 기본색 복귀. 레이저 모드에서는 접촉점만 색이 바뀐다."
+    },
+    {
+      "name": "hit",
+      "trigger_ko": "일반 부위 적중(이벤트 hit)",
+      "visual_ko": "가는 X 히트마커가 1.3배로 나타났다 제 크기로 줄고, 짧게 유지 후 페이드."
+    },
+    {
+      "name": "crit",
+      "trigger_ko": "약점 적중(이벤트 crit)",
+      "visual_ko": "X가 더 굵고 길며 강조색. 등장 크기 튐이 더 큼. '치명타 형태 구분'이 켜져 있으면 색을 빼도 일반 적중과 구분됨."
+    },
+    {
+      "name": "kill",
+      "trigger_ko": "적 처치(이벤트 kill, crit_kill)",
+      "visual_ko": "히트마커(crit_kill이면 치명타 형태) + 바깥으로 퍼지며 사라지는 처치 링. 지속 시간이 가장 김."
+    },
+    {
+      "name": "laser_mode",
+      "trigger_ko": "파라미터 '조준 방식'을 '월드 레이저(다이어제틱)'로 전환",
+      "visual_ko": "화면 중앙 조준점과 퍼짐 표시가 사라지고 총구에서 뻗는 선과 접촉점만 보임. 퍼짐 관련 파라미터는 표시에 반영되지 않는다(정보가 줄어드는 것 자체가 비교 포인트). 히트마커는 접촉점 근처에 작게 표시."
+    }
+  ],
+  "params": [
+    {
+      "key": "reticle_mode",
+      "label_ko": "조준 방식",
+      "type": "select",
+      "options": [
+        "화면 고정 4선+점",
+        "화면 고정 원+점",
+        "월드 레이저(다이어제틱)"
+      ],
+      "default": "화면 고정 4선+점",
+      "affects_ko": "조준점 형태 자체를 바꾼다. 레이저 모드에서는 화면 중앙 조준점 대신 총구→접촉점 SVG 선이 나타나고 퍼짐 표시는 생략된다."
+    },
+    {
+      "key": "base_spread",
+      "label_ko": "기본 퍼짐",
+      "type": "range",
+      "min": 2,
+      "max": 40,
+      "step": 1,
+      "default": "10",
+      "unit": "px",
+      "affects_ko": "정지 상태 팔 간격(원 모드에서는 원 반지름). 정밀 무기는 작게, 산탄류는 크게. 연사 상한은 이 값의 4배로 자동 계산."
+    },
+    {
+      "key": "move_spread_mult",
+      "label_ko": "이동 퍼짐 배율",
+      "type": "range",
+      "min": 1,
+      "max": 3,
+      "step": 0.1,
+      "default": "1.6",
+      "unit": "배",
+      "affects_ko": "이동 중 기본 퍼짐에 곱해지는 값. 1이면 이동해도 조준점이 변하지 않는다."
+    },
+    {
+      "key": "shot_bloom",
+      "label_ko": "사격당 퍼짐",
+      "type": "range",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "default": "6",
+      "unit": "px",
+      "affects_ko": "1발 쏠 때마다 팔이 튀어 나가는 양. 연사 시 누적되어 반동 제어의 필요성을 보여 준다."
+    },
+    {
+      "key": "recovery_ms",
+      "label_ko": "퍼짐 회복 시간",
+      "type": "range",
+      "min": 80,
+      "max": 800,
+      "step": 20,
+      "default": "260",
+      "unit": "ms",
+      "affects_ko": "사격·이동이 끝난 뒤 기본 퍼짐으로 돌아오는 시간. 짧으면 경쾌, 길면 묵직."
+    },
+    {
+      "key": "hostile_color",
+      "label_ko": "적 조준 색",
+      "type": "color",
+      "default": "#ff5a4f",
+      "affects_ko": "적을 겨눴을 때 조준점(레이저 모드에서는 접촉점) 색. 기본색과 같은 색으로 두면 적 조준 피드백이 사라지는 것을 확인할 수 있다."
+    },
+    {
+      "key": "hitmarker_hold_ms",
+      "label_ko": "히트마커 유지 시간",
+      "type": "range",
+      "min": 40,
+      "max": 500,
+      "step": 10,
+      "default": "120",
+      "unit": "ms",
+      "affects_ko": "일반 적중 표시가 완전 불투명으로 머무는 시간(치명타·처치는 이 값에 비례해 조금 더 길게). 너무 길면 연사 시 겹쳐 개별 적중이 구분되지 않는다."
+    },
+    {
+      "key": "crit_shape_distinct",
+      "label_ko": "치명타 형태 구분",
+      "type": "toggle",
+      "default": "true",
+      "affects_ko": "켜면 치명타 X가 굵고 길어진다. 끄면 색만 달라져, 흑백 미리보기나 붉은 배경에서 구분이 사라지는 것을 체험한다."
+    }
+  ],
+  "presets": [
+    {
+      "id": "precision-looter",
+      "name_ko": "정밀 사격 · 화면 고정 조준",
+      "genre_ko": "SF 협동 FPS",
+      "values_json": "{\"reticle_mode\":\"화면 고정 4선+점\",\"base_spread\":\"8\",\"move_spread_mult\":\"1.4\",\"shot_bloom\":\"5\",\"recovery_ms\":\"220\",\"hostile_color\":\"#ff5a4f\",\"hitmarker_hold_ms\":\"110\",\"crit_shape_distinct\":\"true\"}",
+      "look_ko": "좁고 절제된 4선 조준점. 적을 겨누면 붉게 바뀌고, 일반·치명타·처치가 형태와 색으로 또렷이 나뉜다. 회복이 빨라 경쾌한 리듬."
+    },
+    {
+      "id": "immersive-laser",
+      "name_ko": "몰입 우선 · 월드 레이저 조준",
+      "genre_ko": "3인칭 서바이벌 호러",
+      "values_json": "{\"reticle_mode\":\"월드 레이저(다이어제틱)\",\"base_spread\":\"4\",\"move_spread_mult\":\"1.0\",\"shot_bloom\":\"0\",\"recovery_ms\":\"400\",\"hostile_color\":\"#ff8a3d\",\"hitmarker_hold_ms\":\"60\",\"crit_shape_distinct\":\"false\"}",
+      "look_ko": "화면 중앙에 아무것도 없고 총구에서 뻗는 가는 라임색 선과 접촉점만 보인다. 적에 닿으면 접촉점만 주황으로 바뀌고, 히트마커는 거의 존재감이 없어 표적의 반응을 직접 봐야 한다. 정보는 줄고 긴장감은 커진다."
+    },
+    {
+      "id": "arcade-juicy",
+      "name_ko": "과장된 피드백 · 아케이드 사격",
+      "genre_ko": "아케이드 슈터 / 파티 FPS",
+      "values_json": "{\"reticle_mode\":\"화면 고정 원+점\",\"base_spread\":\"18\",\"move_spread_mult\":\"2.2\",\"shot_bloom\":\"14\",\"recovery_ms\":\"500\",\"hostile_color\":\"#ffd23f\",\"hitmarker_hold_ms\":\"200\",\"crit_shape_distinct\":\"true\"}",
+      "look_ko": "큰 원이 이동·사격에 크게 출렁이고 히트마커가 오래 머문다. 초보자도 상태를 읽기 쉽지만, 연사 중에는 화면 중앙이 다소 시끄러워진다. 적 조준 색이 치명타 강조색과 같아 '색만으로는 구분이 약해지는' 사례도 함께 보여 준다."
+    }
+  ],
+  "events": [
+    {
+      "id": "toggle_move",
+      "label_ko": "이동 시작/정지"
+    },
+    {
+      "id": "fire",
+      "label_ko": "사격 1발"
+    },
+    {
+      "id": "burst",
+      "label_ko": "연사 6발"
+    },
+    {
+      "id": "toggle_hostile",
+      "label_ko": "적 조준 켜기/끄기"
+    },
+    {
+      "id": "hit",
+      "label_ko": "일반 적중"
+    },
+    {
+      "id": "crit",
+      "label_ko": "치명타 적중"
+    },
+    {
+      "id": "kill",
+      "label_ko": "처치"
+    },
+    {
+      "id": "crit_kill",
+      "label_ko": "치명타 처치"
+    }
+  ],
+  "timings": [
+    {
+      "event_ko": "사격 블룸(팔이 튀어 나감)",
+      "duration_ms": 50,
+      "easing": "easeOutQuad",
+      "note_ko": "권장값. 반동 입력과 같은 프레임에 시작해야 사격감이 맞는다."
+    },
+    {
+      "event_ko": "퍼짐 회복(기본 간격으로 복귀)",
+      "duration_ms": 260,
+      "easing": "easeOutCubic",
+      "note_ko": "권장값. recovery_ms 파라미터로 조절. 매 프레임 지수 감쇠(lerp)로 구현해도 비슷한 느낌."
+    },
+    {
+      "event_ko": "이동 퍼짐 전환",
+      "duration_ms": 150,
+      "easing": "easeOutQuad",
+      "note_ko": "권장값. 즉시 튀면 이동 입력마다 조준점이 덜컥거린다."
+    },
+    {
+      "event_ko": "적 조준 색 전환",
+      "duration_ms": 60,
+      "easing": "linear",
+      "note_ko": "권장값. 0~80ms 범위. 느리면 적을 스쳐 지나갈 때 색이 따라오지 못한다."
+    },
+    {
+      "event_ko": "히트마커 등장(1.3배→1배)",
+      "duration_ms": 40,
+      "easing": "easeOutBack",
+      "note_ko": "권장값. 적중 판정 프레임에 바로 시작. 사운드와 동시에."
+    },
+    {
+      "event_ko": "히트마커 유지",
+      "duration_ms": 120,
+      "easing": "none",
+      "note_ko": "권장값. 값 변화 없음. hitmarker_hold_ms 파라미터. 연사 무기는 80~120ms가 무난."
+    },
+    {
+      "event_ko": "히트마커 소멸(페이드)",
+      "duration_ms": 120,
+      "easing": "easeInQuad",
+      "note_ko": "권장값. 새 적중이 오면 소멸을 취소하고 등장부터 다시 시작."
+    },
+    {
+      "event_ko": "치명타 히트마커 등장(1.5배→1배)",
+      "duration_ms": 60,
+      "easing": "easeOutBack",
+      "note_ko": "권장값. 일반보다 튐과 지속을 약간 키워 위계를 만든다."
+    },
+    {
+      "event_ko": "처치 링 확산·소멸",
+      "duration_ms": 320,
+      "easing": "easeOutCubic",
+      "note_ko": "권장값. 반지름 1배→2배, 불투명도 1→0. 가장 큰 사건이므로 가장 길게."
+    }
+  ],
+  "hotspots": [
+    {
+      "n": 1,
+      "part_id": "spread_arms",
+      "title_ko": "퍼짐을 거리로 정직하게",
+      "body_ko": "팔 간격이 곧 실제 탄 퍼짐 반지름이다. 이동하거나 연사하면 벌어지고 멈추면 좁아지므로, 플레이어는 '지금 쏘면 맞을까'를 숫자 없이 판단한다. 표시와 실제 탄착이 같은 변수에서 나와야 신뢰가 생긴다.",
+      "principle": "즉각 피드백"
+    },
+    {
+      "n": 2,
+      "part_id": "reticle_root",
+      "title_ko": "적을 겨누면 색이 바뀐다",
+      "body_ko": "쏘기 전에 '이 대상은 쏴도 되는 적'이라는 확인을 준다. 먼 거리·어두운 곳에서 적과 배경을 헷갈리는 일을 줄여, 사격 버튼을 누를 근거를 제공한다. 평소에는 무채색으로 두어 필요할 때만 정보가 드러나게 한다.",
+      "principle": "어포던스"
+    },
+    {
+      "n": 3,
+      "part_id": "crit_layer",
+      "title_ko": "적중 < 치명타 < 처치 위계",
+      "body_ko": "세 사건을 크기·굵기·지속 시간·추가 형태(처치 링)로 단계적으로 키운다. 색을 빼도 순서가 읽히므로 급박한 교전 중에도 결과를 한눈에 안다.",
+      "principle": "시각 위계"
+    },
+    {
+      "n": 4,
+      "part_id": "outline",
+      "title_ko": "어떤 배경에서도 보이는 1px 테두리",
+      "body_ko": "흰 하늘, 폭발 섬광, 어두운 실내를 오가도 조준점이 사라지지 않는다. 화면에서 가장 자주 보는 요소일수록 대비 확보가 최우선이다.",
+      "principle": "가독성"
+    },
+    {
+      "n": 5,
+      "part_id": "laser_beam",
+      "title_ko": "비교: 조준을 세계 안으로",
+      "body_ko": "화면 고정 조준점 대신 무기에서 뻗는 선으로 조준하면 화면 오버레이 없이도 조준 정보가 전달되어 몰입이 커진다(근거 게임의 레이저 조준선은 커뮤니티 출처 기반). 대신 퍼짐·히트마커 같은 정보가 줄어 표적의 반응이 피드백을 대신해야 한다.",
+      "principle": "몰입"
+    },
+    {
+      "n": 6,
+      "part_id": "laser_dot",
+      "title_ko": "부위 단위 조준이라면 접촉점이 답",
+      "body_ko": "헤드샷 하나가 아니라 표적의 특정 부위를 골라 맞히는 전투 설계에서는, 화면 중앙의 십자보다 표면 위에 찍힌 점이 '지금 어느 부위를 겨누는가'를 더 정확히 보여 준다. 조준 UI는 전투 설계가 요구하는 정밀도에 맞춰 고른다.",
+      "principle": "과업 적합성"
+    }
+  ],
+  "principles": [
+    "조준점은 '탄이 어디로 얼마나 퍼질지'를 표시하는 계기판이다. 장식이 아니므로 표시값과 실제 탄 퍼짐을 같은 변수에서 계산한다.",
+    "중심 점은 고정, 팔만 움직인다. 기준이 흔들리면 조준 자체가 불안해진다.",
+    "히트마커는 판정 프레임에 즉시 시작하고 짧게 끝낸다. 지연된 피드백은 '맞았는지' 확신을 깎는다.",
+    "사건의 중요도(적중<치명타<처치)를 형태·크기·시간의 순서로 일관되게 키운다.",
+    "색은 보조 채널이다. 모든 구분은 색을 뺀 흑백 상태에서도 읽혀야 한다.",
+    "화면 고정(non-diegetic)은 정보량, 월드 레이저(diegetic)는 몰입을 우선한다. 장르 목표와 전투 설계(헤드샷 중심인가, 부위 선택인가)에 맞게 고른다."
+  ],
+  "mistakes": [
+    {
+      "title_ko": "표시 퍼짐 ≠ 실제 탄 퍼짐",
+      "body_ko": "UI 팔 간격을 애니메이션 값으로 따로 만들고 탄 퍼짐은 무기 코드에서 따로 계산하면, 조준점 안에 있는데 빗나가는 일이 생긴다. 같은 spread 값을 화면 px로 변환해 표시하라."
+    },
+    {
+      "title_ko": "히트마커가 너무 오래 머문다",
+      "body_ko": "300ms 이상 유지하면 연사 중 마커가 계속 켜져 있어 몇 발이 맞았는지, 언제 빗나갔는지 알 수 없다. 새 적중마다 재시작하고 유지 시간을 짧게 둔다."
+    },
+    {
+      "title_ko": "치명타를 색으로만 구분",
+      "body_ko": "흰색 대 빨간색 차이만 두면 적록 색각 이상 사용자나 붉은 배경에서는 구분이 사라진다. 굵기·길이·추가 형태를 함께 바꾼다."
+    },
+    {
+      "title_ko": "처치와 적중이 똑같이 보인다",
+      "body_ko": "처치 전용 표시가 없으면 이미 쓰러진 적에게 탄을 낭비하거나 다음 대상으로 늦게 넘어간다. 처치 링처럼 별도 형태를 둔다."
+    },
+    {
+      "title_ko": "외곽선 없는 단색 조준점",
+      "body_ko": "흰 조준점은 하늘·눈·섬광 앞에서, 검은 조준점은 그림자 속에서 사라진다. 반대색 1px 외곽선이나 그림자를 기본으로 넣는다."
+    }
+  ],
+  "juice_off_ko": "조준점이 이동·사격과 무관하게 고정 크기로 멈춰 있고, 적을 겨눠도 색이 바뀌지 않는다. 적중·치명타·처치 모두 같은 흰 X가 애니메이션 없이 즉시 켜졌다 즉시 꺼지며(또는 아예 없음), 외곽선도 없어 밝은 배경에서 조준점이 묻힌다. 플레이어는 맞았는지, 약점이었는지, 쓰러뜨렸는지 화면만으로 알 수 없다.",
+  "stage": {
+    "aspect": "16:9",
+    "needs_3d": false,
+    "scene_ko": "SVG/CSS로 그린 1점 투시 복도(새로 디자인한 기하학 배경)와 그 안에 서 있는 무표정 기하학 실루엣 표적 2개. 각 표적 상단에는 밝게 테두리 친 원형 '약점 영역'이 있다. 화면 중앙에 조준점, 오른쪽 아래에 단순한 총구 실루엣. 배경 일부를 밝은 패널로 만들어 외곽선 효과를 확인할 수 있게 한다. 레이저 모드에서는 총구에서 표적 표면까지 2D SVG 선과 접촉점을 그려 원근감을 흉내 내며, 3D 캔버스는 쓰지 않는다. 표적 위에 마우스를 올리면 적 조준 상태, 클릭하면 사격·적중(약점 영역 클릭 시 치명타). 퍼짐은 React state 하나(currentSpread)를 requestAnimationFrame에서 감쇠시키고 팔 위치는 CSS transform: translate로만 갱신한다."
+  },
+  "unity_ugui": {
+    "hierarchy": "HUDCanvas (Canvas: Screen Space - Overlay, CanvasScaler)\n└─ ReticleCanvas (Canvas: 하위 캔버스, 매 프레임 갱신 분리용)\n   └─ ReticleRoot (RectTransform: anchor/pivot 중앙, ReticleView)\n      ├─ CenterDot (Image 4x4, Outline 컴포넌트)\n      ├─ ArmTop (Image 2x10, pivot (0.5,0), Outline)\n      ├─ ArmBottom (Image 2x10, pivot (0.5,1), Outline)\n      ├─ ArmLeft (Image 10x2, pivot (1,0.5), Outline)\n      ├─ ArmRight (Image 10x2, pivot (0,0.5), Outline)\n      └─ Hitmarker (CanvasGroup, HitmarkerView)\n         ├─ HM_TL / HM_TR / HM_BL / HM_BR (Image 2x12, Z회전 ±45°, 중심에서 오프셋)\n         └─ KillRing (Image: 원형 스프라이트, CanvasGroup)\nPlayer (PlayerInput 또는 InputActionReference 보유, TargetProbe)\nWeapon (Weapon: currentSpread 소유, 비교 모드용 LineRenderer + LaserDot)",
+    "components_ko": [
+      "CanvasScaler: UI Scale Mode = Scale With Screen Size, Reference Resolution 1920x1080, Match 0.5. 얇은 선이 흐려지면 Canvas의 Pixel Perfect를 켜거나 선 굵기를 2px로.",
+      "ReticleCanvas를 별도 하위 Canvas로 분리: 팔이 매 프레임 움직여도 나머지 HUD 메시가 재빌드되지 않는다.",
+      "외곽선은 각 Image에 UnityEngine.UI.Outline 컴포넌트(Effect Color 검정 80%, Effect Distance 1,-1)를 붙여 만든다. 별도 복제 오브젝트는 필요 없다.",
+      "모든 조준점 Image의 Raycast Target 끄기.",
+      "Weapon.cs: currentSpread(각도 또는 px)를 소유. 이동 여부·사격 시 값을 올리고 Update에서 Mathf.MoveTowards 또는 지수 감쇠로 목표 퍼짐을 향해 회복. 탄 발사 방향도 이 값으로 계산.",
+      "ReticleView.cs: [SerializeField] Weapon 참조를 인스펙터로 연결해 currentSpread를 읽고, 네 팔의 anchoredPosition을 (0, ±spread), (±spread, 0)으로 설정. 각도 단위라면 px = tan(spreadAngle) / tan(verticalFOV/2) × (기준 해상도 높이/2) 로 변환.",
+      "TargetProbe.cs: Camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)) + Physics.Raycast(ray, out hit, maxDistance, enemyLayerMask)로 적 조준 판정 → ReticleView.SetHostile(bool).",
+      "HitmarkerView.cs: Play(HitKind kind) — 실행 중 코루틴 핸들을 StopCoroutine 후 재시작. 등장(localScale 1.3→1, 40ms) → 유지(holdMs) → 페이드(CanvasGroup.alpha 1→0, 120ms). kind에 따라 선 sizeDelta·color 변경, Kill이면 KillRing 코루틴 동시 실행.",
+      "새 Input System: InputActionReference moveAction(Value/Vector2), attackAction(Button). OnEnable에서 action.Enable() 후 attackAction.action.performed += OnFire, OnDisable에서 -= 로 구독 해제.",
+      "적중 판정 쪽(Damageable)은 C# event Action<HitKind>로 결과를 알리고 UI는 구독만 한다. 참조는 인스펙터 [SerializeField] 연결을 기본으로 하고, 런타임 탐색은 피한다."
+    ],
+    "steps_ko": [
+      "HUDCanvas와 하위 ReticleCanvas를 만들고 CanvasScaler를 설정한다.",
+      "ReticleRoot 아래 CenterDot과 네 팔 Image를 배치한다. 팔의 pivot을 중심 쪽 끝으로 맞춰 위치값이 곧 '간격'이 되게 하고, 각 Image에 Outline 컴포넌트를 붙인다.",
+      "Weapon.cs에 baseSpread, moveSpreadMult, shotBloom, maxSpread(= baseSpread×4), recoveryTime 필드를 만들고 Update에서 목표 퍼짐(이동 중이면 base×mult)으로 회복시킨다.",
+      "ReticleView.cs가 Weapon.currentSpread를 매 프레임 팔 위치에 반영하게 한다(쓰기 금지, 읽기만).",
+      "TargetProbe.cs로 화면 중앙 레이캐스트를 쏴 적 레이어에 닿으면 조준점 색을 hostileColor로 바꾼다(Color.Lerp, 60ms).",
+      "Hitmarker 프리팹을 만들고 HitmarkerView.Play(Hit/Crit/Kill)를 코루틴으로 구현한다. 치명타는 선을 굵고 길게, 처치는 KillRing 확산(localScale 1→2, alpha 1→0)을 추가한다.",
+      "적 피격 코드에서 HitKind 이벤트를 발생시키고 HitmarkerView가 구독하게 연결한다. 사운드도 같은 이벤트에서 재생해 동기화한다.",
+      "비교 실습: Weapon에 LineRenderer(positionCount 2)를 달아 총구→Physics.Raycast 지점까지 선을 그리고 ReticleCanvas를 끈 상태와 비교한다. 접촉점은 hit.point에 작은 쿼드/스프라이트를 둔다."
+    ],
+    "pitfalls_ko": [
+      "코루틴 중첩: 연사 시 Play를 여러 번 호출하면 페이드 코루틴이 겹쳐 깜빡인다. 실행 중 코루틴 핸들을 저장해 StopCoroutine 후 재시작한다.",
+      "시간 기준을 정해 통일한다. WaitForSeconds·Time.deltaTime(scaled)은 Time.timeScale = 0이면 멈춰 일시정지 중 히트마커가 화면에 얼어붙은 채 남는다. 일시정지·히트스톱 중에도 끝까지 사라지게 하려면 WaitForSecondsRealtime·Time.unscaledDeltaTime을 쓴다.",
+      "퍼짐 표시를 UI에서 따로 애니메이션하면 실제 탄착과 어긋난다. 반드시 Weapon의 값을 읽기만 한다.",
+      "Rigidbody 속도로 이동 여부를 판단할 때는 Unity 6의 linearVelocity를 쓴다(구 velocity는 obsolete). 입력 기반(moveAction 값의 크기)으로 판단하는 편이 더 즉각적이다.",
+      "Image의 Raycast Target을 켜 두면 화면 중앙의 다른 UI 클릭(EventSystem)을 가로막는다.",
+      "Outline 컴포넌트는 정점을 늘리므로 요소가 많은 HUD 전체에 남발하지 말고 조준점처럼 작은 요소에만 쓴다.",
+      "넓은 면적의 빠른 깜빡임(화면 플래시 등)은 초당 3회 이하로 제한한다. 중앙의 작은 히트마커는 괜찮지만 연사 중 처치 링·전체 색 플래시가 연속 재생되지 않게 쿨다운을 둔다."
+    ]
+  },
+  "unity_uitk": {
+    "structure": "<!-- Reticle.uxml -->\n<ui:UXML xmlns:ui=\"UnityEngine.UIElements\">\n  <ui:VisualElement name=\"hud-root\" class=\"hud-root\" picking-mode=\"Ignore\">\n    <ui:VisualElement name=\"reticle\" class=\"reticle\" picking-mode=\"Ignore\">\n      <ui:VisualElement class=\"reticle__dot\" picking-mode=\"Ignore\" />\n      <ui:VisualElement name=\"arm-top\" class=\"reticle__arm reticle__arm--v\" picking-mode=\"Ignore\" />\n      <ui:VisualElement name=\"arm-bottom\" class=\"reticle__arm reticle__arm--v\" picking-mode=\"Ignore\" />\n      <ui:VisualElement name=\"arm-left\" class=\"reticle__arm reticle__arm--h\" picking-mode=\"Ignore\" />\n      <ui:VisualElement name=\"arm-right\" class=\"reticle__arm reticle__arm--h\" picking-mode=\"Ignore\" />\n      <ui:VisualElement name=\"hitmarker\" class=\"hm\" picking-mode=\"Ignore\">\n        <ui:VisualElement class=\"hm__line hm__line--tl\" picking-mode=\"Ignore\" />\n        <ui:VisualElement class=\"hm__line hm__line--tr\" picking-mode=\"Ignore\" />\n        <ui:VisualElement class=\"hm__line hm__line--bl\" picking-mode=\"Ignore\" />\n        <ui:VisualElement class=\"hm__line hm__line--br\" picking-mode=\"Ignore\" />\n        <ui:VisualElement name=\"kill-ring\" class=\"hm__ring\" picking-mode=\"Ignore\" />\n      </ui:VisualElement>\n    </ui:VisualElement>\n  </ui:VisualElement>\n</ui:UXML>\n\nGameObject: HUD (UIDocument: Source Asset = Reticle.uxml, Panel Settings = PanelSettings 에셋[Scale Mode: Scale With Screen Size, Reference Resolution 1920x1080]) + ReticleUitk.cs",
+    "uss_notes_ko": [
+      ".hud-root { position: absolute; left: 0; top: 0; right: 0; bottom: 0; align-items: center; justify-content: center; } 로 화면 중앙 정렬.",
+      ".reticle 자식은 모두 position: absolute. 팔 위치는 C#에서 style.translate로만 바꾼다(left/top 변경은 레이아웃 재계산을 일으킨다).",
+      ".reticle__dot, .reticle__arm { background-color: white; border-width: 1px; border-color: rgba(0, 0, 0, 0.8); transition-property: background-color; transition-duration: 0.06s; } 로 외곽선과 색 전환 확보.",
+      "적 조준 색은 하위 선택자로 직접 지정한다: .reticle--hostile .reticle__dot, .reticle--hostile .reticle__arm { background-color: #ff5a4f; }. USS 변수(var())로도 가능하지만 입문 단계에서는 직접 지정이 디버깅하기 쉽다.",
+      ".hm { opacity: 0; scale: 1.3 1.3; } .hm--show { opacity: 1; scale: 1 1; transition-property: scale, opacity; transition-duration: 0.04s, 0s; transition-timing-function: ease-out-back, linear; }",
+      ".hm--fading { opacity: 0; transition-property: opacity; transition-duration: 0.12s; transition-timing-function: ease-in-cubic; } 로 등장과 소멸 속도를 분리한다(USS에는 easeInQuad 키워드가 없어 ease-in 또는 ease-in-cubic 사용).",
+      ".hm__line--tl { rotate: -45deg; } 등 대각선은 rotate로. .hm--crit .hm__line { width: 3px; height: 16px; background-color: #ffd23f; } 로 형태+색 동시 변경.",
+      ".hm__ring { width: 40px; height: 40px; border-radius: 20px; border-width: 2px; border-color: white; opacity: 0; scale: 1 1; } 처치 링은 두 단계 클래스로: .hm--kill-start .hm__ring { opacity: 1; scale: 1 1; } → 다음 프레임 .hm--kill-out .hm__ring { opacity: 0; scale: 2 2; transition-property: scale, opacity; transition-duration: 0.32s, 0.32s; transition-timing-function: ease-out-cubic, ease-out-cubic; }",
+      "transition 단축 속성보다 transition-property/-duration/-timing-function 개별 속성을 쓰면 값 순서 실수를 피할 수 있다.",
+      "모든 요소 picking-mode=\"Ignore\"(UXML 속성, 요소마다 지정). 매 프레임 translate를 바꾸는 팔에는 C#에서 usageHints = UsageHints.DynamicTransform 을 설정한다."
+    ],
+    "steps_ko": [
+      "Reticle.uxml과 Reticle.uss를 만들고, PanelSettings 에셋(Scale With Screen Size)을 연결한 UIDocument를 씬에 둔다.",
+      "ReticleUitk.cs의 OnEnable에서 GetComponent<UIDocument>().rootVisualElement.Q<VisualElement>(\"arm-top\") 등으로 reticle, 네 팔, hitmarker를 캐시하고 팔의 usageHints를 DynamicTransform으로 지정한다.",
+      "Update에서 Weapon.currentSpread를 읽어 armTop.style.translate = new Translate(0, -spread) 처럼 네 팔을 배치한다.",
+      "TargetProbe 결과에 따라 reticle.EnableInClassList(\"reticle--hostile\", isHostile)로 색 상태를 토글한다.",
+      "히트마커 재생: hm--show/hm--fading/hm--crit/hm--kill-* 클래스를 모두 제거 → 한 프레임 뒤(hitmarker.schedule.Execute(...))에 hm--show(+hm--crit, hm--kill-start) 추가 → 다음 예약에서 hm--kill-out 추가.",
+      "holdMs 뒤 페이드: hitmarker.schedule.Execute(StartFade).StartingIn(holdMs)로 예약하고, StartFade에서 hm--fading을 추가한 뒤 hm--show를 제거한다. 반환된 IVisualElementScheduledItem 핸들을 필드에 저장한다.",
+      "Input System의 attackAction.performed에서 Weapon.Fire를 호출하고, 적중 이벤트(HitKind)를 받아 히트마커를 재생한다."
+    ],
+    "pitfalls_ko": [
+      "같은 프레임에 클래스를 빼고 다시 넣으면 값 변화가 없어 transition이 다시 시작되지 않는다(전환은 이전 프레임과 값이 다를 때만 발생). 한 프레임 미뤄(schedule.Execute) 추가해야 연사 시 매번 튄다.",
+      "USS transition은 시작·끝 두 값만 있어 '1.3배 튐 후 복귀'나 처치 링처럼 '보였다가 퍼지며 사라짐'은 클래스 두 단계로 나누거나 C#에서 직접 보간한다.",
+      "transition이 정의되지 않은 상태로 클래스를 제거하면 즉시 사라진다. 페이드는 반드시 hm--fading을 먼저 추가한 뒤 hm--show를 제거한다.",
+      "picking-mode를 Ignore로 두지 않으면 전체 화면 루트가 다른 UI 클릭을 가로챈다. 부모만이 아니라 자식에도 지정한다.",
+      "style.left/top을 매 프레임 바꾸면 레이아웃 패스가 돈다. translate·scale·rotate는 레이아웃 없이 변환만 갱신한다.",
+      "PanelSettings의 Reference Resolution을 UGUI CanvasScaler와 다르게 두면 두 방식 비교 시 조준점 크기가 달라 보인다.",
+      "연사 중 예약된 페이드 작업이 누적되지 않도록, 새 적중마다 저장해 둔 IVisualElementScheduledItem을 Pause()하고 새로 예약한다(또는 ExecuteLater(holdMs)로 지연을 재설정).",
+      "USS transition은 Time.timeScale과 무관하게 진행된다. UGUI 코루틴 버전과 일시정지 중 동작이 다를 수 있으니 비교 시 유의한다."
+    ]
+  },
+  "inspired_by": [
+    {
+      "game_id": "destiny-2",
+      "title": "Destiny 2",
+      "credit": "© Bungie, Inc.",
+      "borrowed_axes": [
+        "색 체계"
+      ],
+      "what_learned_ko": "평상시 무채색 조준점이 적을 겨눌 때만 경고색으로 바뀌는 '필요할 때만 드러내는' 색 체계를 참고했다. 근거 레코드에 검증된 element가 없어 이 묘사는 기억에 기댄 unverified 수준이며, 카드의 색 전환은 장르 전반의 관용으로 일반화했다. 구체 색값·형태는 원작을 따르지 않는다."
+    },
+    {
+      "game_id": "dead-space-2008",
+      "title": "Dead Space (2008 오리지널)",
+      "credit": "© Electronic Arts Inc.",
+      "borrowed_axes": [
+        "레이아웃 구조"
+      ],
+      "what_learned_ko": "조준 정보를 화면 중앙이 아닌 무기에서 뻗는 월드 공간 선으로 옮겨 오버레이를 줄이는 다이어제틱 배치를 비교 모드로 가져왔다(레이저 존재는 T3 커뮤니티 출처 기반, plausible). 머리가 아닌 특정 부위를 골라 맞히는 전투 설계가 정밀한 접촉점 조준을 뒷받침한다는 점을 '조준 UI는 전투 설계에 맞춘다'는 일반 원리로 정리했다(Wikipedia). 원작의 레이저 색·형태와 사지 절단 모티프는 가져오지 않았다."
+    }
+  ],
+  "original_ko": "조준점 형태(4선+점, 원+점)와 히트마커 X는 장르 전반의 관용 형태를 기준으로 새로 그린 기하 도형이며 원작의 무기별 조준점 디자인을 따라 그리지 않는다. 치명타 강조는 '굵기 3px·길이 16px·노랑 #ffd23f', 처치는 '40px 원이 320ms 동안 2배로 확산하며 소멸'이라는 갤러리 고유 조합으로 만들었고 원작의 해골·특수 아이콘 같은 모티프는 쓰지 않는다. 색은 공통 토큰과 표본 전용 변수(기본 흰색, 적 조준 #ff5a4f, 치명타 #ffd23f, 레이저 라임 #a6f04a)로 새로 정했으며, 원작 UI를 연상시키는 청색 홀로그램 계열은 의도적으로 피했다. 레이저 모드의 약점은 '표적 상단의 밝은 원형 패치'라는 중립 표식으로 정하고 사지 절단·신체 손상 묘사는 넣지 않는다. 무대 배경은 SVG 1점 투시 복도와 무표정 기하학 실루엣 표적으로, 원작의 적·환경·무기 모델을 재현하지 않는다. 화면 문구·폰트·사운드는 없으며, 버튼 라벨은 모두 한국어 교육용 카피로 새로 작성한다.",
+  "references": [
+    {
+      "label": "Destiny 공식 사이트 (Bungie)",
+      "url": "https://www.bungie.net/7/en/Destiny",
+      "type": "official"
+    },
+    {
+      "label": "GDC Vault: Crafting Destruction - The Evolution of the Dead Space User Interface (GDC 2013)",
+      "url": "https://gdcvault.com/play/1017723/Crafting-Destruction-The-Evolution-of",
+      "type": "T1"
+    },
+    {
+      "label": "Dead Space 공식 사이트 (EA)",
+      "url": "https://www.ea.com/games/dead-space",
+      "type": "official"
+    },
+    {
+      "label": "Wikipedia: Dead Space (2008) — 게임플레이(전략적 사지 절단, 무기 탄약 표시)",
+      "url": "https://en.wikipedia.org/wiki/Dead_Space_(2008_video_game)",
+      "type": "T2"
+    },
+    {
+      "label": "GameRant: Dead Space HUD 분석",
+      "url": "https://gamerant.com/dead-space-hud-best-unique-creative/",
+      "type": "T2"
+    },
+    {
+      "label": "Steam 커뮤니티: 리메이크 레이저 조준선 논의(리메이크 한정)",
+      "url": "https://steamcommunity.com/app/1693980/discussions/0/3770110614216861045/",
+      "type": "T3"
+    },
+    {
+      "label": "Unity Manual: USS transitions (easing 키워드 목록 확인)",
+      "url": "https://docs.unity3d.com/Manual/UIE-Transitions.html",
+      "type": "official"
+    },
+    {
+      "label": "Unity Manual: USS supported properties",
+      "url": "https://docs.unity3d.com/Manual/UIE-USS-SupportedProperties.html",
+      "type": "official"
+    },
+    {
+      "label": "Unity Scripting API: UsageHints",
+      "url": "https://docs.unity3d.com/ScriptReference/UIElements.UsageHints.html",
+      "type": "official"
+    },
+    {
+      "label": "Unity Input System 패키지 문서",
+      "url": "https://docs.unity3d.com/Packages/com.unity.inputsystem@latest",
+      "type": "official"
+    }
+  ],
+  "confidence_notes_ko": "Destiny 2 쪽 근거 레코드에는 검증된 element가 없어, Destiny 관련 묘사(적 조준 시 색 변화)는 unverified로 낮추고 borrowed_axes를 1개로 줄였다. 패턴 자체는 게임 중립적으로 일반화했다. Dead Space는 2008 오리지널 기준이며, 레이저 조준선 존재는 T3(리메이크 Steam 스레드) 근거라 plausible, 히트마커 부재 여부는 미확인이다. timings는 모두 업계 통상 권장값이다. Unity 쪽은 USS transition easing 키워드(ease-out-back, ease-out-cubic 등 존재, easeInQuad 키워드는 없음)를 공식 문서로 확인했다. border-radius는 % 지원 여부를 확인하지 않고 px로 바꿨고, USS 변수 대신 하위 선택자 방식을 기본으로 했다. Unity 6.3 LTS에서 강사가 최종 확인 권장: Translate 생성자에 숫자 직접 전달, UsageHints.DynamicTransform 효과.",
+  "critic_changes_ko": [
+    "[과잉 모방] Destiny 2 borrowed_axes에서 '모션 리듬' 제거(근거 레코드에 검증 element 없음). what_learned_ko를 unverified로 명시.",
+    "[과잉 모방] 레이저 색을 청록 #5fe0d0에서 라임 #a6f04a로 변경(원작 계열의 청색 홀로그램 연상 회피). original_ko에 치명타·처치 링의 구체 수치와 중립 약점 표식(표적 상단 원형 패치)을 명시하고 사지 절단 모티프 배제를 적음.",
+    "[과잉 모방] 프리셋 precision-looter의 genre_ko를 'SF 루트 슈터 / 협동 FPS'에서 'SF 협동 FPS'로 축약해 특정 게임 연상을 줄임. 무대의 '머리 영역 = 치명타'를 '약점 영역'으로 일반화.",
+    "[원리 반영] 근거 레코드의 '부위 정밀 조준 설계가 레이저 조준을 뒷받침' 원리를 반영한 hotspot 6(laser_dot, 과업 적합성) 추가. hotspot 5에 레이저 근거가 T3임을 명시. hotspot 2에 '필요할 때만 드러남' 문장 추가. 마지막 principle에 전투 설계 기준 추가.",
+    "[구현 가능성] 레이저 모드에서 퍼짐 파라미터가 무엇을 하는지 모호했던 점을 정리(표시 생략이 비교 포인트). hostile_color가 레이저 모드에서는 접촉점 색에 적용되도록 정의하고, immersive-laser 프리셋 값을 #ff8a3d로 바꿔 레이저 색과 역할 분리. 연사 상한(기본 퍼짐×4)을 states·params에 명시.",
+    "[구현 가능성] states의 trigger_ko에 대응 이벤트 id를 표기해 events↔states 대응을 명확히 함. 무대 scene_ko에 React state + rAF + CSS transform 구현 방식 추가.",
+    "[Unity UGUI] 의미가 모호했던 'Outline(빈 부모, 복제본)' 노드를 제거하고 각 Image에 UnityEngine.UI.Outline 컴포넌트를 쓰도록 수정.",
+    "[Unity UGUI] timeScale pitfall의 논리 오류 수정: 기존 문구는 scaled time을 쓰면 일시정지 중 히트마커가 남지 않는다고 했으나 실제로는 멈춘 채 남음. WaitForSecondsRealtime/unscaledDeltaTime 기준으로 재작성.",
+    "[Unity UGUI] FindFirstObjectByType 권장을 제거하고 [SerializeField] 인스펙터 연결을 기본으로 변경(버전별 Find API 변동 회피, 입문자에게 명확). 각도→px 변환 공식 추가. linearVelocity 설명에 velocity obsolete 명시.",
+    "[Unity UITK] 처치 링이 opacity 0→0으로 전환되어 보이지 않던 버그 수정(kill-start→kill-out 두 단계 클래스). border-radius 50%를 px로 변경. USS에 없는 easeInQuad 대신 ease-in-cubic 사용하는 .hm--fading 정의 추가.",
+    "[Unity UITK] transition 단축 속성 대신 개별 속성 사용 권장. USS 변수 색 토글을 하위 선택자 직접 지정으로 교체. picking-mode를 자식에도 지정. UsageHints.DynamicTransform 팁과 USS transition은 timeScale 무관이라는 비교 주의 추가.",
+    "[Unity UITK] ExecuteLater만 쓰던 예약 흐름을 schedule.Execute(...).StartingIn(holdMs) + 핸들 Pause/재예약으로 명확화하고, 페이드는 hm--fading 추가 후 hm--show 제거 순서임을 pitfall에 추가.",
+    "[교육성] 학습 목표 1에 '같은 값을 탄 발사와 UI가 공유'를 명시하고 목표 5를 '같은 장면에서 전환 비교'로 구체화. 넓은 면적 깜빡임 제한 pitfall을 WCAG 취지에 맞게 정확히 다듬음. arcade 프리셋 look_ko에 적 조준 색=치명타 색으로 인한 구분 약화 관찰 포인트 추가."
+  ]
+}

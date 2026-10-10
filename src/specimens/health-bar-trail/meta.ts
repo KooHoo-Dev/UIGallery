@@ -49,6 +49,18 @@ export const meta: SpecimenMeta = {
       ],
     },
     { key: 'colorShift', label: '체력에 따라 색 변화', type: 'toggle', default: true, hint: '초록 → 노랑 → 빨강. 색만으로 상태를 전달하지 않도록 길이·숫자와 함께 쓴다' },
+    {
+      key: 'healStyle',
+      label: '회복 방식',
+      type: 'select',
+      default: 'preview',
+      options: [
+        { value: 'preview', label: '미리보기 후 채움' },
+        { value: 'slow', label: '천천히 채움' },
+        { value: 'instant', label: '즉시' },
+      ],
+      hint: '미리보기: 회복량을 먼저 보여 주고 메인 바가 따라간다 — 피해(즉시 바 + 따라오는 잔상)와 방향만 반대인 같은 문법',
+    },
   ],
   presets: [
     {
@@ -71,20 +83,22 @@ export const meta: SpecimenMeta = {
     },
   ],
   events: [
-    { id: 'hit', label: '피격' },
-    { id: 'heavy', label: '강한 피격' },
-    { id: 'heal', label: '회복' },
+    { id: 'hit', label: '피격 (-9)' },
+    { id: 'heavy', label: '강한 피격 (-28)' },
+    { id: 'combo', label: '연속 타격 (-5 × 4)' },
+    { id: 'heal', label: '회복 (+30)' },
   ],
   hotspots: [
-    { n: 1, part: 'fill', title: '메인 바는 즉시 줄어든다', body: '현재 체력은 거의 바로(약 60ms) 반영해야 한다. 늦게 줄어들면 "아직 괜찮은 줄" 착각하게 된다.', principle: '즉각 피드백' },
-    { n: 2, part: 'trail', title: '잔상이 피해량을 보여 준다', body: '잃은 만큼 밝은 색으로 잠시 남겨 두었다가 따라 줄인다. 플레이어는 숫자를 읽지 않고도 **방금 얼마나 크게 맞았는지** 안다. 연타 중에는 대기 시간을 다시 채워 피해가 쌓여 보이게 한다.', principle: '즉각 피드백' },
-    { n: 3, part: 'heal', title: '회복은 천천히, 미리보기와 함께', body: '회복량을 줄무늬로 먼저 보여 주고 메인 바가 그 안을 채워 간다. 감소(빠름)와 증가(느림)의 속도 차이 자체가 "좋은 일/나쁜 일"을 구분해 준다.', principle: '시각 위계' },
+    { n: 1, part: 'fill', title: '메인 바는 즉시 줄어든다', body: '현재 체력은 거의 바로(약 60ms) 반영해야 "맞았다"는 인과가 성립한다. 부드러운 연출은 잔상에 맡기고, 메인 바는 언제나 **진짜 현재 값**을 보여 준다.', principle: '즉각 피드백' },
+    { n: 2, part: 'trail', title: '잔상이 "얼마나 잃었나"를 남긴다', body: '잃은 만큼 밝은 색으로 잠시 남겨 두었다가 따라 줄인다. 숫자를 읽지 않고도 **방금 얼마나 크게 맞았는지** 안다. "연속 타격"을 눌러 보자 — 메인 바는 계단식으로 여러 번 줄고, 잔상 띠가 그 합계를 한 덩어리로 묶어 한 번의 큰 피격과 구분된다.', principle: '가독성' },
+    { n: 3, part: 'heal', title: '회복도 같은 문법으로', body: '피해는 "즉시 바 + 따라오는 잔상", 회복은 "즉시 미리보기 + 따라오는 메인 바". 방향만 반대인 같은 구조라 한 번 배운 읽기 방식을 그대로 쓴다. 감소(빠름)와 증가(느림)의 속도 차이도 좋은 일·나쁜 일을 구분해 준다.', principle: '일관성' },
     { n: 4, part: 'vignette', title: '위험은 바 밖에서 알린다', body: '전투 중 시선은 화면 중앙에 있다. 구석의 바를 보지 않아도 **화면 테두리**가 붉어지고 맥박처럼 뛰면 위험을 느낀다. 맥박은 체력이 낮을수록 빨라진다(최대 2Hz).', principle: '몰입' },
     { n: 5, part: 'number', title: '숫자와 눈금은 장르에 맞게', body: '정확한 계산이 필요한 RPG는 숫자·눈금이 도움이 되고, 감각이 중요한 액션은 오히려 방해가 된다. 프리셋을 바꿔 비교해 보자.', principle: '인지 부하' },
   ],
   mistakes: [
     { title: '잔상 없이 즉시 감소', body: '바가 한 번에 줄면 "얼마나 맞았는지"를 기억에 의존해야 한다. 특히 여러 번 연달아 맞을 때 피해가 구분되지 않는다.' },
     { title: '메인 바까지 천천히 감소', body: '부드럽게 보이려고 메인 바를 트윈하면 실제 체력과 화면이 어긋난다. 느린 것은 잔상뿐이어야 한다.' },
+    { title: '연타마다 잔상 대기를 무한 리셋', body: '맞을 때마다 대기 타이머를 처음부터 다시 걸면 연타 중에 잔상이 영원히 줄지 않는다. 다시 채우더라도 **최대 대기(예: 1.2초)** 를 둔다.' },
     { title: '색만으로 위험 표시', body: '적록 색각이상은 남성에게 드물지 않다(약 5~8%). 이런 플레이어는 색 변화를 못 느낀다. 길이·맥동·테두리처럼 색 외의 신호를 함께 쓴다.' },
     { title: '화면 전체를 크게 번쩍임', body: '피격마다 화면 전체가 번쩍이면 눈이 피로하고 광과민성 발작 위험이 있다. 초당 3회 이하로 제한하고, 큰 피격에만 약하게 쓴다.' },
     { title: '동적인 바를 정적 UI와 같은 Canvas에', body: 'Unity UGUI에서 매 프레임 바뀌는 바가 메뉴·아이콘과 같은 Canvas에 있으면 Canvas 전체가 다시 그려진다. 자주 바뀌는 HUD는 별도 Canvas로 분리한다.' },
@@ -93,6 +107,7 @@ export const meta: SpecimenMeta = {
   timings: [
     { event: '피격 → 메인 바 감소', ms: 60, easing: '지수 감쇠 (거의 즉시)', note: '실제 체력과 화면이 어긋나지 않게' },
     { event: '피격 → 잔상 대기', ms: 450, easing: '정지', note: '권장값. 연타 시 다시 채움' },
+    { event: '연타 중 잔상 최대 대기', ms: 1200, easing: '—', note: '권장값. 대기 무한 연장 방지' },
     { event: '잔상 감소', ms: 800, easing: 'linear (55%/초)', note: '권장값. 피해량에 비례해 길어진다' },
     { event: '회복 → 메인 바 채움', ms: 600, easing: 'linear (60%/초)', note: '감소보다 느리게' },
     { event: '피격 흔들림', ms: 250, easing: 'ease-out (감쇠 사인)', note: '피해량에 비례한 진폭' },
@@ -144,8 +159,28 @@ Canvas_Overlay (Sort Order 높게)
       ],
     },
   },
-  inspiredBy: [],
-  original: '사선형 바 모양, 십자 아이콘, 줄무늬 회복 미리보기, 맥박 속도 규칙, 모든 색과 글꼴은 이 갤러리에서 새로 만든 것이다.',
-  references: [],
+  inspiredBy: [
+    {
+      title: 'Hades',
+      credit: '© Supergiant Games',
+      borrowed: ['레이아웃 구조'],
+      learned: '빠른 탑다운 액션에서 **하단 체력 바 + 화면 가장자리 위험 신호**를 함께 쓰는 배치 개념을 대표 사례로 골랐다. 다만 잔상 바·테두리 효과의 세부(색·타이밍)는 공개 자료로 확인하지 못해 일반 패턴으로 재구성했다 — 수업에서 원작 화면을 직접 확인해 비교해 보길 권한다.',
+      link: 'https://www.supergiantgames.com/games/hades/',
+    },
+    {
+      title: 'Dead Space (2008)',
+      credit: '© Electronic Arts',
+      borrowed: [],
+      learned: '비교 사례. 체력을 화면 바가 아니라 **캐릭터 슈트의 등에 붙은 발광 게이지**로 옮긴 정반대 해법(Diegetic). 이 갤러리의 "세계 안 체력 표시" 표본에서 자세히 다룬다.',
+      link: 'https://gdcvault.com/play/1017723/Crafting-Destruction-The-Evolution-of',
+    },
+  ],
+  original: '사선형 바 모양, 십자 아이콘, 흰 잔상, 줄무늬 회복 미리보기, 저체력 기준 눈금, 맥박 속도 규칙(1→2Hz), 연타 최대 대기 규칙, 모든 색과 글꼴은 이 갤러리에서 새로 만든 것이다.',
+  references: [
+    { label: 'Hades 공식 사이트 (Supergiant Games)', url: 'https://www.supergiantgames.com/games/hades/' },
+    { label: 'GDC Vault — Crafting Destruction: The Evolution of the Dead Space User Interface (2013)', url: 'https://gdcvault.com/play/1017723/Crafting-Destruction-The-Evolution-of' },
+    { label: 'W3C — WCAG 2.3.1 번쩍임 기준 (초당 3회 이하)', url: 'https://www.w3.org/WAI/WCAG22/Understanding/three-flashes-or-below-threshold' },
+    { label: 'Unity 6.3 — Image.fillAmount', url: 'https://docs.unity3d.com/Packages/com.unity.ugui@2.0/api/UnityEngine.UI.Image.html' },
+  ],
   flashes: true,
 }

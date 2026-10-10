@@ -4,34 +4,34 @@
   "name_en": "Settings & Accessibility Menu",
   "group": "G",
   "paradigm": "none",
-  "one_liner_ko": "카테고리 탭으로 옵션을 나누고, 프리셋으로 한 번에 켠 뒤, 바꾸는 즉시 옆 미리보기 화면에서 결과를 확인하는 설정 메뉴. 기본값 복원으로 언제든 처음 상태로 되돌릴 수 있다.",
+  "one_liner_ko": "카테고리 탭으로 옵션을 나누고, 유형별 프리셋으로 한 번에 켠 뒤 하나씩 다시 손보며, 바꾸는 즉시 옆 미리보기 화면에서 결과를 확인하는 설정 메뉴. 기본값 복원으로 언제든 처음 상태로 되돌릴 수 있다.",
   "learning_goals_ko": [
-    "많은 옵션을 카테고리 탭과 프리셋으로 나눠 플레이어가 덜 헤매게 만드는 정보 구조를 설계할 수 있다.",
-    "값을 바꾸면 바로 미리보기에 반영되는 구조(설정 데이터 → 이벤트 → 화면 갱신)를 구현할 수 있다.",
-    "글자 크기, 자막 배경, 색각 모드, 흔들림 감소, 고대비를 각각 어떤 렌더링 수단으로 바꾸는지 설명할 수 있다.",
-    "프리셋 적용, 개별 수정, 기본값 복원이 함께 있을 때의 상태(프리셋 / 사용자 지정 / 기본값)를 화면에 드러낼 수 있다.",
-    "콘솔용 넓은 화면 메뉴를 모바일 세로 화면·터치용으로 다시 구성하는 기준을 세울 수 있다."
+    "많은 옵션을 카테고리 탭과 유형별 프리셋으로 나눠 플레이어가 덜 헤매게 만드는 정보 구조를 설계할 수 있다.",
+    "값을 바꾸면 바로 미리보기에 반영되는 구조(설정 데이터 → 변경 이벤트 → 화면 갱신)를 구현할 수 있다.",
+    "글자 크기, 자막 배경, 색각 모드, 고대비, 카메라 흔들림, 모션 줄이기를 각각 어떤 렌더링 수단(폰트 크기, 배경 불투명도, 색 변수, 후처리, 진폭, 전환 시간)으로 바꾸는지 설명할 수 있다.",
+    "프리셋 적용, 개별 수정, 기본값 복원이 함께 있을 때의 상태(기본 / 프리셋 / 사용자 지정)를 화면에 드러낼 수 있다.",
+    "넓은 화면·게임패드용 메뉴를 세로 화면·터치용으로 다시 구성하는 기준(배치 순서, 터치 영역 크기, 대체 입력)을 세울 수 있다."
   ],
   "anatomy": [
     {
       "part_id": "category-tabs",
       "name_ko": "카테고리 탭",
-      "role_ko": "화면·자막·색·모션·조작처럼 옵션을 묶은 탭. 지금 어느 묶음을 보고 있는지 알려 주고, 컨트롤러 숄더 버튼(L1/R1 등)으로 넘긴다."
+      "role_ko": "화면·자막·색·모션·조작처럼 옵션을 묶은 가로 탭 줄. 지금 어느 묶음을 보고 있는지 알려 주고, 게임패드의 좌우 숄더 버튼이나 마우스·터치로 넘긴다. 프리셋으로 바뀐 항목 수를 탭 옆 숫자 배지로 보여 준다."
     },
     {
       "part_id": "preset-bar",
       "name_ko": "프리셋 바",
-      "role_ko": "시각·청각·운동 같은 유형별 프리셋 버튼. 누르면 여러 탭에 흩어진 권장 옵션을 한 번에 바꾸고, 적용 중인 프리셋 이름이나 '사용자 지정'을 표시한다."
+      "role_ko": "시각·청각·운동 같은 유형별 프리셋 버튼과 상태 라벨. 누르면 여러 탭에 흩어진 권장 옵션을 한 번에 바꾸고, 라벨에 '기본', 적용 중인 프리셋 이름, '사용자 지정' 중 하나를 표시한다."
     },
     {
       "part_id": "option-row",
       "name_ko": "옵션 행",
-      "role_ko": "옵션 이름, 현재 값, 조작 위젯을 한 줄에 보여 준다. 포커스를 받은 행은 강조된다."
+      "role_ko": "옵션 이름, 현재 값, 조작 위젯을 한 줄에 보여 준다. 포커스를 받은 행은 배경과 외곽선으로 강조된다."
     },
     {
       "part_id": "value-control",
       "name_ko": "값 조작 위젯",
-      "role_ko": "슬라이더(수치), 좌우 순환 선택(단계형), 토글(켬/끔). 좌우 방향 입력만으로 값을 바꿀 수 있어야 한다."
+      "role_ko": "슬라이더(수치), 좌우 순환 선택(단계형 ◀ 값 ▶), 토글(켬/끔). 모두 '위아래로 행 이동, 좌우로 값 변경' 규칙 하나로 조작된다."
     },
     {
       "part_id": "change-marker",
@@ -41,12 +41,12 @@
     {
       "part_id": "live-preview",
       "name_ko": "즉시 미리보기 창",
-      "role_ko": "동료·적·아이템·배경이 있는 작은 장면. 색각 모드, 고대비, 흔들림 정도가 바뀌면 바로 이 장면에 반영된다."
+      "role_ko": "원·삼각·마름모 실루엣으로 그린 동료·적·아이템과 단순한 배경 지형이 있는 작은 장면. 색각 모드, 고대비, 흔들림 정도가 바뀌면 바로 이 장면에 반영된다."
     },
     {
       "part_id": "subtitle-sample",
       "name_ko": "자막 샘플",
-      "role_ko": "미리보기 아래쪽에 나오는 예시 대사. 글자 크기, 배경 진하기, 화자명 색, 방향 화살표를 실제 게임 화면처럼 보여 준다."
+      "role_ko": "미리보기 아래쪽에 나오는 예시 대사. 글자 크기, 배경 진하기, 화자명 색, 화면 밖 화자 쪽 방향 화살표를 실제 게임 화면처럼 보여 준다."
     },
     {
       "part_id": "description-panel",
@@ -56,44 +56,49 @@
     {
       "part_id": "reset-button",
       "name_ko": "기본값 복원 버튼",
-      "role_ko": "현재 탭 또는 전체를 기본값으로 되돌린다. 실행 전에 확인 창을 띄운다."
+      "role_ko": "현재 탭 또는 전체를 기본값으로 되돌린다. 실행 전에 범위를 고르는 확인 창을 띄운다."
     },
     {
       "part_id": "footer-hints",
       "name_ko": "하단 입력 안내",
-      "role_ko": "뒤로, 복원, 탭 이동 등에 쓰는 버튼 아이콘 안내. 입력 장치가 바뀌면 아이콘도 그에 맞게 바뀐다."
+      "role_ko": "뒤로, 복원, 탭 이동, 고대비 빠른 전환 같은 단축 입력을 중립 기호로 안내한다. 입력 장치(게임패드 ↔ 마우스·터치)가 바뀌면 안내 기호와 문구도 그에 맞게 바뀐다."
     }
   ],
   "states": [
     {
       "name": "기본값",
-      "trigger_ko": "처음 진입하거나 기본값 복원을 마친 직후",
-      "visual_ko": "변경 표시 점이 하나도 없고, 프리셋 바에는 '기본'이 표시된다. 미리보기는 기본 색과 기본 흔들림으로 재생된다."
+      "trigger_ko": "처음 진입하거나 기본값 복원을 확정한 직후",
+      "visual_ko": "변경 표시 점과 탭 배지가 하나도 없고, 프리셋 바 라벨에는 '기본'이 표시된다. 미리보기는 기본 색과 기본 흔들림으로 재생된다."
     },
     {
       "name": "프리셋 적용",
-      "trigger_ko": "프리셋 바에서 시각/청각/운동 중 하나를 선택",
-      "visual_ko": "바뀐 옵션 행이 짧은 간격으로 차례차례 하이라이트되고, 다른 탭에도 바뀐 항목이 몇 개 있는지 탭 옆 숫자 배지로 보여 준다. 프리셋 이름이 활성 상태로 표시된다."
+      "trigger_ko": "프리셋 바에서 시각/청각/운동 중 하나를 선택(apply-preset-vision 이벤트)",
+      "visual_ko": "바뀐 옵션 행이 짧은 간격으로 차례차례 하이라이트되고(모션 줄이기가 켜져 있으면 한꺼번에 정지 강조), 다른 탭에도 바뀐 항목이 몇 개 있는지 탭 옆 숫자 배지로 보여 준다. 라벨에는 프리셋 이름이 활성 상태로 표시된다."
     },
     {
       "name": "사용자 지정",
-      "trigger_ko": "프리셋을 적용한 뒤 개별 옵션을 하나라도 바꿈",
-      "visual_ko": "프리셋 표시가 '프리셋 이름 + 수정됨' 또는 '사용자 지정'으로 바뀐다. 바꾼 행에는 변경 표시 점이 남는다."
+      "trigger_ko": "프리셋을 적용한 뒤 개별 옵션을 하나라도 바꿈(tweak-option 이벤트)",
+      "visual_ko": "라벨이 '프리셋 이름 + 수정됨' 또는 '사용자 지정'으로 바뀐다. 다른 값은 그대로 유지되고, 바꾼 행에는 변경 표시 점이 남는다."
     },
     {
       "name": "미리보기 중",
-      "trigger_ko": "옵션 행에 포커스가 가거나 값을 조정하는 동안",
-      "visual_ko": "미리보기 창에서 해당 옵션과 관계있는 요소(자막, HUD, 대상 외곽선 등)가 강조되고, 값이 바뀌는 즉시 다시 그려진다."
+      "trigger_ko": "옵션 행에 포커스가 가거나 값을 조정하는 동안, 또는 대사 재생·피격 테스트 이벤트 실행",
+      "visual_ko": "미리보기 창에서 해당 옵션과 관계있는 요소(자막, HUD, 대상 외곽선 등)가 강조되고, 값이 바뀌는 즉시 다시 그려진다. 피격 테스트는 camera_shake 값만큼 흔들리거나, 0이면 테두리만 강조된다."
     },
     {
       "name": "고대비 켜짐",
-      "trigger_ko": "고대비 옵션을 바꾸거나 빠른 전환 이벤트를 실행",
-      "visual_ko": "미리보기 배경의 채도와 명도가 낮아지고, 동료·적·아이템이 서로 구별되는 단색으로 칠해진다. 메뉴 UI도 테두리가 굵어진다."
+      "trigger_ko": "고대비 옵션을 off 이외로 바꾸거나 고대비 빠른 전환(quick-contrast) 실행",
+      "visual_ko": "미리보기 배경의 채도와 명도가 낮아지고, 동료·적·아이템이 역할별 단색(단계에 따라 굵은 외곽선 추가)으로 칠해진다. 메뉴 UI도 테두리와 포커스 링이 굵어진다."
+    },
+    {
+      "name": "입력 장치 전환",
+      "trigger_ko": "마지막 입력이 게임패드에서 마우스·터치로(또는 반대로) 바뀜(swap-input 이벤트)",
+      "visual_ko": "하단 입력 안내의 기호와 문구가 해당 장치용으로 바뀐다. 마우스·터치로 바뀌면 포커스 링은 숨기고, 게임패드로 돌아오면 마지막 포커스 행에 다시 표시한다."
     },
     {
       "name": "복원 확인",
-      "trigger_ko": "기본값 복원 버튼을 누름",
-      "visual_ko": "'현재 탭만 / 전체 / 취소'를 고르는 확인 창이 뜨고, 기본 포커스는 '취소'에 있다. 확정하면 변경 표시 점들이 사라진다."
+      "trigger_ko": "기본값 복원 버튼을 누름(reset-defaults 이벤트)",
+      "visual_ko": "'현재 탭만 / 전체 / 취소'를 고르는 확인 창이 뜨고, 기본 포커스는 '취소'에 있다. 확정하면 해당 범위의 변경 표시 점이 사라지고, 전체 복원이면 '기본값' 상태로 돌아간다."
     }
   ],
   "params": [
@@ -106,7 +111,7 @@
       "step": 10,
       "default": "100",
       "unit": "%",
-      "affects_ko": "메뉴 글자와 자막 샘플 크기. 크게 하면 옵션 행 높이가 늘고, 넘치는 행은 줄바꿈된다."
+      "affects_ko": "메뉴 글자, 설명 패널, 자막 샘플 크기를 함께 바꾼다. 크게 하면 옵션 행 높이가 늘고, 넘치는 행은 줄바꿈된다(웹: 루트 font-size 배율 + rem/em)."
     },
     {
       "key": "subtitle_bg",
@@ -125,7 +130,7 @@
       "label_ko": "화자명·방향 표시",
       "type": "toggle",
       "default": "true",
-      "affects_ko": "자막 앞에 화자별 색 이름을 붙이고, 화면 밖 화자 쪽으로 작은 화살표를 표시한다."
+      "affects_ko": "자막 앞에 화자별 색 이름을 붙이고, 화면 밖 화자 쪽으로 작은 화살표를 표시한다. 화자 색은 color_mode 팔레트를 따른다."
     },
     {
       "key": "color_mode",
@@ -138,7 +143,7 @@
         "tritanopia"
       ],
       "default": "off",
-      "affects_ko": "HUD와 미리보기의 아군/적/아이템 색 팔레트를 해당 색각 유형에서도 구별되는 조합으로 바꾼다. 아이콘 모양은 그대로 둔다."
+      "affects_ko": "HUD·미리보기·화자명의 역할 색(아군/적/아이템/위험) 변수 묶음을 해당 색각 유형에서도 구별되는 조합으로 바꾼다. 실루엣 모양은 그대로 둔다(웹: CSS 변수 재정의)."
     },
     {
       "key": "high_contrast",
@@ -146,12 +151,12 @@
       "type": "select",
       "options": [
         "off",
-        "setting1",
-        "setting2",
-        "setting3"
+        "dim-bg",
+        "role-color",
+        "role-outline"
       ],
       "default": "off",
-      "affects_ko": "미리보기 배경의 채도를 낮추고 대상별 대비 색을 입힌다. 설정 번호에 따라 대상 색 조합이 달라진다."
+      "affects_ko": "dim-bg: 미리보기 배경의 채도·명도만 낮춘다. role-color: 배경을 낮추고 대상에 역할별 단색을 입힌다. role-outline: 단색에 굵은 외곽선을 더한다. 대상 색은 color_mode 팔레트에서 가져오고, 메뉴 테두리도 함께 굵어진다(웹: CSS filter/SVG 채우기 교체)."
     },
     {
       "key": "camera_shake",
@@ -162,40 +167,54 @@
       "step": 1,
       "default": "5",
       "unit": "단계",
-      "affects_ko": "피격 이벤트를 실행했을 때 미리보기 장면이 흔들리는 크기. 0이면 흔들리지 않고 테두리만 깜빡인다."
+      "affects_ko": "피격 테스트 때 미리보기 장면이 흔들리는 크기(진폭 = 값 × 1.2px). 0이면 흔들리지 않고 테두리만 강조된다. 메뉴 애니메이션에는 영향을 주지 않는다."
+    },
+    {
+      "key": "reduce_motion",
+      "label_ko": "모션 줄이기",
+      "type": "toggle",
+      "default": "false",
+      "affects_ko": "메뉴 쪽 움직임만 담당한다: 탭 전환 페이드, 팔레트 크로스페이드, 프리셋 순차 하이라이트, 확인 창 확대를 모두 0ms로 바꾸고 깜빡임은 정지 강조로 대체한다. OS의 prefers-reduced-motion이 켜져 있으면 초기값을 켬으로 둔다."
     },
     {
       "key": "menu_layout",
       "label_ko": "메뉴 배치",
       "type": "select",
       "options": [
-        "sidebar-tabs",
+        "split-tabs",
         "single-list-touch"
       ],
-      "default": "sidebar-tabs",
-      "affects_ko": "넓은 화면용 '왼쪽 탭 + 오른쪽 미리보기'와 세로·터치용 '위 미리보기 + 아래 한 줄 목록(큰 터치 영역)' 사이를 전환한다."
+      "default": "split-tabs",
+      "affects_ko": "넓은 화면용 '왼쪽 프리셋·탭·목록 + 오른쪽 미리보기'와 세로·터치용 '위 미리보기 + 아래 접히는 섹션 목록(행 높이 최소 48px)' 사이를 전환한다."
     }
   ],
   "presets": [
     {
       "id": "console-granular",
       "name_ko": "세분화 카테고리형",
-      "genre_ko": "대작 3D 액션 어드벤처(콘솔)",
-      "values_json": "{\"text_scale\":\"100\",\"subtitle_bg\":\"default\",\"speaker_cues\":\"true\",\"color_mode\":\"off\",\"high_contrast\":\"off\",\"camera_shake\":\"5\",\"menu_layout\":\"sidebar-tabs\"}",
-      "look_ko": "왼쪽에 카테고리 탭이 많이 늘어서 있고, 오른쪽에 큰 미리보기가 있다. 옵션 수가 많은 대신 프리셋 바가 맨 위에 고정되어 있어 시작점이 된다."
+      "genre_ko": "옵션이 많은 3D 액션 어드벤처(넓은 화면·게임패드)",
+      "values_json": "{\"text_scale\":\"100\",\"subtitle_bg\":\"default\",\"speaker_cues\":\"true\",\"color_mode\":\"off\",\"high_contrast\":\"off\",\"camera_shake\":\"5\",\"reduce_motion\":\"false\",\"menu_layout\":\"split-tabs\"}",
+      "look_ko": "왼쪽 위에 프리셋 바가 고정되고 그 아래 가로 탭 줄과 긴 옵션 목록이, 오른쪽에 큰 미리보기가 있다. 옵션 수가 많아도 프리셋 바가 시작점이 된다."
     },
     {
       "id": "low-vision-contrast",
       "name_ko": "저시력 고대비형",
-      "genre_ko": "시각 보조 프리셋 적용 상태",
-      "values_json": "{\"text_scale\":\"160\",\"subtitle_bg\":\"heavy\",\"speaker_cues\":\"true\",\"color_mode\":\"off\",\"high_contrast\":\"setting1\",\"camera_shake\":\"2\",\"menu_layout\":\"sidebar-tabs\"}",
-      "look_ko": "글자와 자막이 크고 배경판이 진하다. 미리보기는 거의 무채색이 되고, 대상만 선명한 색으로 떠올라 무엇이 중요한지가 바로 보인다."
+      "genre_ko": "시각 보조 프리셋을 적용한 상태",
+      "values_json": "{\"text_scale\":\"160\",\"subtitle_bg\":\"heavy\",\"speaker_cues\":\"true\",\"color_mode\":\"off\",\"high_contrast\":\"role-outline\",\"camera_shake\":\"2\",\"reduce_motion\":\"false\",\"menu_layout\":\"split-tabs\"}",
+      "look_ko": "글자와 자막이 크고 배경판이 진하다. 미리보기는 거의 무채색이 되고, 대상만 선명한 단색과 굵은 외곽선으로 떠올라 무엇이 중요한지가 바로 보인다."
+    },
+    {
+      "id": "motion-comfort",
+      "name_ko": "멀미 완화형",
+      "genre_ko": "카메라 움직임이 많은 3인칭·1인칭 게임",
+      "values_json": "{\"text_scale\":\"100\",\"subtitle_bg\":\"default\",\"speaker_cues\":\"true\",\"color_mode\":\"off\",\"high_contrast\":\"off\",\"camera_shake\":\"0\",\"reduce_motion\":\"true\",\"menu_layout\":\"split-tabs\"}",
+      "look_ko": "피격 테스트를 눌러도 장면은 움직이지 않고 테두리만 잠깐 강조된다. 탭을 넘기거나 프리셋을 적용해도 페이드나 순차 하이라이트 없이 즉시 바뀐다."
     },
     {
       "id": "mobile-condensed",
       "name_ko": "세로 터치 축약형",
-      "genre_ko": "2D 액션 플랫포머(모바일 포팅)",
-      "values_json": "{\"text_scale\":\"120\",\"subtitle_bg\":\"default\",\"speaker_cues\":\"false\",\"color_mode\":\"deuteranopia\",\"high_contrast\":\"off\",\"camera_shake\":\"3\",\"menu_layout\":\"single-list-touch\"}",
+      "genre_ko": "모바일 액션 게임(세로 화면·터치)",
+      "values_json": "{\"text_scale\":\"120\",\"subtitle_bg\":\"default\",\"speaker_cues\":\"false\",\"color_mode\":\"deuteranopia\",\"high_contrast\":\"off\",\"camera_shake\":\"3\",\"reduce_motion\":\"false\",\"menu_layout\":\"single-list-touch\"}",
       "look_ko": "위쪽에 작은 미리보기, 아래쪽에 큰 터치 영역의 한 줄 목록이 놓인다. 탭 대신 접히는 섹션 제목을 쓰고, 좁은 화면에 맞춰 글자는 기본보다 조금 크게 시작한다."
     }
   ],
@@ -203,6 +222,10 @@
     {
       "id": "apply-preset-vision",
       "label_ko": "시각 프리셋 적용"
+    },
+    {
+      "id": "tweak-option",
+      "label_ko": "옵션 하나 직접 바꾸기(사용자 지정)"
     },
     {
       "id": "play-dialogue",
@@ -214,7 +237,11 @@
     },
     {
       "id": "quick-contrast",
-      "label_ko": "고대비 빠른 전환"
+      "label_ko": "고대비 빠른 전환(단축 입력)"
+    },
+    {
+      "id": "swap-input",
+      "label_ko": "입력 장치 전환(게임패드 ↔ 터치)"
     },
     {
       "id": "reset-defaults",
@@ -232,37 +259,37 @@
       "event_ko": "색각·고대비 팔레트 전환 크로스페이드",
       "duration_ms": 200,
       "easing": "ease-out",
-      "note_ko": "권장값. 흔들림 감소가 켜져 있거나 OS 모션 줄이기가 켜져 있으면 0ms"
+      "note_ko": "권장값. reduce_motion이 켜져 있으면 0ms"
     },
     {
       "event_ko": "프리셋 적용 시 변경 행 순차 하이라이트",
       "duration_ms": 240,
       "easing": "ease-out",
-      "note_ko": "권장값. 행 하나당 240ms 강조, 다음 행은 40ms 간격으로 시작. 전체 1초 이내로 제한"
+      "note_ko": "권장값. 행 하나당 240ms 강조, 다음 행은 40ms 간격으로 시작. 전체 1초 이내로 제한. reduce_motion이면 모든 행을 동시에 정지 강조"
     },
     {
       "event_ko": "카테고리 탭 전환",
       "duration_ms": 150,
       "easing": "ease-out",
-      "note_ko": "권장값. 짧게 페이드만 하고 좌우 슬라이드는 하지 않음(멀미 유발 요소 최소화)"
+      "note_ko": "권장값. 짧게 페이드만 하고 좌우 슬라이드는 하지 않음(멀미 유발 요소 최소화). reduce_motion이면 0ms"
     },
     {
       "event_ko": "자막 샘플 등장",
       "duration_ms": 120,
       "easing": "linear",
-      "note_ko": "권장값. 짧은 페이드인. 자막은 읽혀야 하므로 움직임을 거의 주지 않음"
+      "note_ko": "권장값. 짧은 페이드인. 자막은 읽혀야 하므로 위치 이동은 주지 않음"
     },
     {
       "event_ko": "피격 흔들림",
       "duration_ms": 300,
       "easing": "ease-out (감쇠 진동)",
-      "note_ko": "권장값. 진폭은 camera_shake × 1.2px. 0단계면 흔들림 대신 테두리 120ms 깜빡임"
+      "note_ko": "권장값. 진폭은 camera_shake × 1.2px. 0단계면 흔들림 대신 테두리 120ms 강조(reduce_motion이면 깜빡이지 않고 300ms 정지 강조)"
     },
     {
       "event_ko": "복원 확인 창 열림",
       "duration_ms": 180,
       "easing": "ease-out",
-      "note_ko": "권장값. 살짝 커지면서(0.96 → 1.0) 페이드인, 기본 포커스는 '취소'"
+      "note_ko": "권장값. 살짝 커지면서(0.96 → 1.0) 페이드인, reduce_motion이면 크기 변화 없이 즉시 표시. 기본 포커스는 '취소'"
     }
   ],
   "hotspots": [
@@ -270,51 +297,58 @@
       "n": 1,
       "part_id": "preset-bar",
       "title_ko": "프리셋은 '출발점'이지 '정답'이 아니다",
-      "body_ko": "60개가 넘는 옵션을 처음부터 하나씩 훑게 하면 플레이어가 지친다. 유형별 프리셋이 여러 탭에 걸친 권장값을 한 번에 켜 주고, 그 뒤에도 개별 조정을 허용하기 때문에 빠른 시작과 세밀한 조정을 모두 할 수 있다(라스트 오브 어스 파트 II 공식 블로그 근거).",
+      "body_ko": "수십 개의 옵션을 처음부터 하나씩 훑게 하면 플레이어가 지친다. 장애 유형별 프리셋이 여러 탭에 흩어진 권장값을 한 번에 켜 주면 전체 메뉴를 탐색하지 않고도 필요한 지원을 빨리 얻는다. 그리고 적용 뒤에도 어떤 값이든 다시 고칠 수 있어야 일괄 설정과 세밀한 조정이 함께 성립한다.",
       "principle": "인지 부하"
     },
     {
       "n": 2,
-      "part_id": "live-preview",
-      "title_ko": "바꾸는 즉시 결과가 보인다",
-      "body_ko": "자막 배경을 '진하게'로 바꿨을 때 실제로 얼마나 읽기 쉬워졌는지는 글로 설명해서는 알기 어렵다. 메뉴 옆 미리보기가 값 변경을 바로 그려 주면, 메뉴를 닫고 게임에 들어가 확인하는 왕복을 하지 않아도 된다.",
-      "principle": "즉각 피드백"
-    },
-    {
-      "n": 3,
       "part_id": "subtitle-sample",
-      "title_ko": "자막은 크기·배경·화자·방향을 함께 다룬다",
-      "body_ko": "글자 크기만 키워도 배경이 밝으면 읽히지 않고, 누가 말하는지 모르면 대화를 따라갈 수 없다. 크기, 배경 진하기, 화자 색 이름, 방향 화살표를 묶어 조정하게 하면 소리로만 전달되던 정보를 화면으로 옮길 수 있다.",
+      "title_ko": "소리로만 오던 정보를 화면으로 옮긴다",
+      "body_ko": "글자 크기만 키워도 배경이 밝으면 읽히지 않고, 누가 어디서 말하는지 모르면 대화를 따라갈 수 없다. 크기, 배경 진하기, 화자 색 이름, 화면 밖 화자 방향 화살표를 함께 조정하게 하면, 듣지 못하는 플레이어도 '누가, 어디서, 무엇을' 말했는지 화면만으로 알 수 있다.",
       "principle": "가독성"
     },
     {
+      "n": 3,
+      "part_id": "footer-hints",
+      "title_ko": "상황 따라 바꾸는 옵션은 메뉴 밖 단축 입력으로",
+      "body_ko": "어두운 장면, 적이 많은 장면처럼 필요한 시인성은 순간마다 달라진다. 고대비처럼 수시로 켜고 끄는 옵션은 메뉴를 열지 않고 입력 한 번으로 토글할 수 있게 하고, 그 단축 입력을 하단 안내에 적어 둔다. 단축 입력이 특정 기기에만 있는 조작이라면 다른 기기용 대체 입력을 함께 준비한다.",
+      "principle": "접근성"
+    },
+    {
       "n": 4,
-      "part_id": "change-marker",
-      "title_ko": "무엇을 바꿨는지 표시해 둔다",
-      "body_ko": "프리셋과 개별 수정이 섞이면 플레이어는 지금 상태가 어디서 왔는지 헷갈린다. 기본값과 다른 행에 점을 찍고 탭에 변경 개수를 배지로 보여 주면, 복원할 범위를 스스로 판단할 수 있다.",
-      "principle": "시각 위계"
+      "part_id": "live-preview",
+      "title_ko": "바꾸는 즉시 결과가 보인다",
+      "body_ko": "자막 배경을 '진하게'로 바꿨을 때 실제로 얼마나 읽기 쉬워졌는지는 글 설명만으로는 알기 어렵다. 메뉴 옆 미리보기가 값 변경을 바로 그려 주면, 메뉴를 닫고 게임에 들어가 확인하는 왕복을 하지 않아도 된다. (근거 자료에 없는, 이 갤러리가 교육용으로 더한 장치)",
+      "principle": "즉각 피드백"
     },
     {
       "n": 5,
+      "part_id": "change-marker",
+      "title_ko": "무엇을 바꿨는지 표시해 둔다",
+      "body_ko": "프리셋과 개별 수정이 섞이면 플레이어는 지금 상태가 어디서 왔는지 헷갈린다. 기본값과 다른 행에 점을 찍고 탭에 변경 개수를 배지로 보여 주면, 복원할 범위를 스스로 판단할 수 있다. (교육용 추가 장치)",
+      "principle": "시각 위계"
+    },
+    {
+      "n": 6,
       "part_id": "value-control",
-      "title_ko": "모든 위젯을 좌우 입력 하나로 조작한다",
-      "body_ko": "슬라이더, 단계 선택, 토글이 모두 '위아래로 행 이동, 좌우로 값 변경'이라는 같은 규칙을 따르면, 운동 장애가 있거나 화면을 잘 못 보는 플레이어도 조작을 예측할 수 있다. 터치 레이아웃에서도 같은 순서를 유지한다.",
+      "title_ko": "모든 위젯을 같은 규칙으로 조작한다",
+      "body_ko": "슬라이더, 단계 선택, 토글이 모두 '위아래로 행 이동, 좌우로 값 변경'이라는 같은 규칙을 따르면, 손 움직임이 제한되거나 화면을 잘 못 보는 플레이어도 조작을 예측할 수 있다. 팝업을 여는 드롭다운처럼 규칙에서 벗어나는 위젯은 피한다.",
       "principle": "일관성"
     }
   ],
   "principles": [
     "옵션은 '카테고리 탭 → 옵션 행 → 값' 3단계 깊이를 넘지 않게 한다.",
-    "설정값은 하나의 데이터(ScriptableObject/JSON)에 두고, UI와 게임 화면은 모두 그 데이터의 변경 이벤트를 구독해 갱신한다.",
+    "설정값은 하나의 데이터(ScriptableObject/JSON)에 두고, 메뉴 UI와 게임 화면은 모두 그 데이터의 변경 이벤트를 구독해 갱신한다.",
     "프리셋은 값을 덮어쓰는 함수일 뿐이다. 적용한 뒤에도 모든 값을 다시 수정할 수 있어야 한다.",
-    "색만으로 정보를 구분하지 않는다. 색각 모드를 켜도 아이콘 모양이나 외곽선으로 구별되게 한다.",
-    "흔들림, 깜빡임, 메뉴 전환 애니메이션은 모두 '흔들림 감소' 설정을 따르게 한다.",
+    "색만으로 정보를 구분하지 않는다. 색각 모드를 켜도 실루엣 모양이나 외곽선으로 구별되게 한다.",
+    "장면 흔들림은 '카메라 흔들림' 값을, 메뉴 전환·깜빡임·순차 하이라이트는 '모션 줄이기' 설정을 따르게 한다. 두 설정의 역할을 겹치지 않게 나눈다.",
     "메뉴 자체도 글자 크기와 고대비 설정을 따라야 한다. 설정 메뉴가 가장 먼저 읽혀야 하기 때문이다.",
-    "입력 장치가 바뀌면 레이아웃과 조작 방법을 다시 설계한다. 콘솔 전용 입력(예: 터치패드 스와이프)은 다른 플랫폼에서 대체 입력을 준비한다."
+    "입력 장치가 바뀌면 레이아웃과 조작 안내를 다시 설계한다. 특정 기기에만 있는 입력(터치 표면 제스처, 특수 버튼 등)에 묶인 기능은 다른 기기용 대체 입력을 준비한다."
   ],
   "mistakes": [
     {
       "title_ko": "미리보기 없이 '적용' 버튼으로만 반영",
-      "body_ko": "값을 바꾸고 적용을 누른 뒤 메뉴를 닫아야만 결과가 보이면, 플레이어는 같은 메뉴를 여러 번 왕복하게 된다. 시각 옵션은 반드시 즉시 미리보기와 짝을 지어 둔다."
+      "body_ko": "값을 바꾸고 적용을 누른 뒤 메뉴를 닫아야만 결과가 보이면, 플레이어는 같은 메뉴를 여러 번 왕복하게 된다. 시각 옵션은 즉시 미리보기와 짝을 지어 둔다."
     },
     {
       "title_ko": "글자 크기 설정이 메뉴에는 적용되지 않음",
@@ -326,109 +360,109 @@
     },
     {
       "title_ko": "색각 모드가 색만 바꿈",
-      "body_ko": "빨강/초록을 다른 색 쌍으로 바꿔도, 아이콘 모양이 같고 색으로만 구분하면 여전히 구별하기 어려운 사람이 있다. 적/아군/아이템은 모양이나 외곽선 차이로도 구분되게 한다."
+      "body_ko": "빨강/초록을 다른 색 쌍으로 바꿔도, 모양이 같고 색으로만 구분하면 여전히 구별하기 어려운 사람이 있다. 적/아군/아이템은 모양이나 외곽선 차이로도 구분되게 한다."
     },
     {
       "title_ko": "기본값 복원이 확인 없이 전체를 초기화",
       "body_ko": "한 번 누르는 것으로 수십 개의 조정값이 사라지면 다시 맞추기 매우 번거롭다. 복원 범위(현재 탭/전체)를 고르게 하고, 확인 창의 기본 포커스를 '취소'에 둔다."
+    },
+    {
+      "title_ko": "단축 토글이 특정 기기에만 있음",
+      "body_ko": "빠른 전환을 한 기기의 특수 입력에만 연결하면 다른 기기 사용자는 매번 메뉴를 열어야 한다. 같은 기능을 키보드 키, 터치 버튼 등 장치마다 하나씩 연결하고 하단 안내에 표시한다."
     }
   ],
-  "juice_off_ko": "탭 없이 옵션 40여 개가 한 줄 목록으로 늘어서 있고, 미리보기가 없다. 값을 바꿔도 화면에는 아무 변화가 없으며, '적용' 후 메뉴를 닫아야 결과를 알 수 있다. 메뉴 글자는 글자 크기 설정과 상관없이 작게 고정되어 있고, 어떤 항목을 바꿨는지 표시도 없다. 기본값 복원은 확인 없이 즉시 전체를 초기화하고, 피격 테스트는 흔들림 설정과 상관없이 크게 흔들린다.",
+  "juice_off_ko": "탭과 프리셋 없이 옵션 40여 개가 한 줄 목록으로 늘어서 있고, 미리보기가 없다. 값을 바꿔도 화면에는 아무 변화가 없으며, '적용' 후 메뉴를 닫아야 결과를 알 수 있다. 메뉴 글자는 글자 크기 설정과 상관없이 작게 고정되어 있고, 어떤 항목을 바꿨는지 표시도 없다. 단계형 옵션은 팝업 드롭다운이라 좌우 입력이 먹히지 않는다. 기본값 복원은 확인 없이 즉시 전체를 초기화하고, 피격 테스트는 흔들림 설정과 상관없이 크게 흔들리며, 모션 줄이기를 켜도 탭 전환이 계속 미끄러진다.",
   "stage": {
     "aspect": "both",
     "needs_3d": false,
-    "scene_ko": "16:9: 왼쪽 40%에 카테고리 탭(세로)과 옵션 목록, 위쪽에 프리셋 바, 오른쪽 60%에 미리보기 장면(단순한 2D 실루엣으로 그린 동료 1·적 2·아이템 1·배경 지형)과 그 아래 자막 샘플, 맨 아래 설명 패널과 입력 안내. 9:16(menu_layout=single-list-touch): 위쪽 35%에 미리보기와 자막, 아래쪽에 접히는 섹션 목록(행 높이 최소 48px), 맨 아래 고정된 복원 버튼. 이벤트 버튼은 무대 밖 오른쪽(세로 모드에서는 아래)에 둔다."
+    "scene_ko": "16:9(menu_layout=split-tabs): 왼쪽 40%에 위에서부터 프리셋 바, 가로 카테고리 탭 줄(배지 포함), 옵션 목록. 오른쪽 60%에 미리보기 장면(원·삼각·마름모 실루엣으로 그린 동료 1·적 2·아이템 1과 단순한 배경 지형), 그 아래 자막 샘플, 맨 아래 설명 패널과 입력 안내. 9:16(menu_layout=single-list-touch): 위쪽 35%에 미리보기와 자막, 아래쪽에 접히는 섹션 목록(행 높이 최소 48px), 맨 아래 고정된 복원 버튼. 이벤트 버튼은 무대 밖 오른쪽(세로 모드에서는 아래)에 둔다. 웹 구현은 React 상태 + CSS 변수(색·글자 배율) + SVG 미리보기로 충분하다."
   },
   "unity_ugui": {
-    "hierarchy": "SettingsCanvas (Canvas, CanvasScaler, GraphicRaycaster)\n├─ Root (HorizontalLayoutGroup)\n│  ├─ LeftPanel (VerticalLayoutGroup)\n│  │  ├─ PresetBar (HorizontalLayoutGroup)\n│  │  │  ├─ PresetButton_Vision (Button + TMP_Text)\n│  │  │  ├─ PresetButton_Hearing\n│  │  │  ├─ PresetButton_Motor\n│  │  │  └─ PresetStateLabel (TMP_Text)\n│  │  ├─ CategoryTabs (HorizontalLayoutGroup / ToggleGroup)\n│  │  │  └─ Tab_Display / Tab_Subtitle / Tab_Color / Tab_Motion (Toggle + TMP_Text + Badge)\n│  │  └─ OptionScroll (ScrollRect)\n│  │     └─ Viewport (RectMask2D)\n│  │        └─ Content (VerticalLayoutGroup, ContentSizeFitter)\n│  │           ├─ Row_TextScale (OptionRow: Label, ChangeDot, Slider, ValueText)\n│  │           ├─ Row_SubtitleBg (OptionRow: Label, ChangeDot, StepSelector ◀ 값 ▶)\n│  │           ├─ Row_SpeakerCues (OptionRow: Toggle)\n│  │           ├─ Row_ColorMode (OptionRow: StepSelector)\n│  │           ├─ Row_HighContrast (OptionRow: StepSelector)\n│  │           └─ Row_CameraShake (OptionRow: Slider)\n│  └─ RightPanel (VerticalLayoutGroup)\n│     ├─ PreviewView (RawImage ← 미리보기 전용 Camera의 RenderTexture)\n│     ├─ SubtitleSample (Image 배경 + TMP_Text 화자명/대사 + DirectionArrow)\n│     └─ DescriptionPanel (TMP_Text)\n├─ FooterHints (HorizontalLayoutGroup, 입력 아이콘)\n├─ ResetConfirmDialog (CanvasGroup, 기본 비활성)\n└─ EventSystem (EventSystem + InputSystemUIInputModule)",
+    "hierarchy": "SettingsCanvas (Canvas, CanvasScaler, GraphicRaycaster)\n├─ Root_Landscape (HorizontalLayoutGroup)   ※ 세로 화면용 Root_Portrait(VerticalLayoutGroup) 프리팹을 따로 두고 활성 전환\n│  ├─ LeftPanel (VerticalLayoutGroup)\n│  │  ├─ PresetBar (HorizontalLayoutGroup)\n│  │  │  ├─ PresetButton_Vision (Button + TMP_Text)\n│  │  │  ├─ PresetButton_Hearing\n│  │  │  ├─ PresetButton_Motor\n│  │  │  └─ PresetStateLabel (TMP_Text)\n│  │  ├─ CategoryTabs (HorizontalLayoutGroup + ToggleGroup)\n│  │  │  └─ Tab_Display / Tab_Subtitle / Tab_Color / Tab_Motion (Toggle + TMP_Text + Badge)\n│  │  └─ OptionScroll (ScrollRect)\n│  │     └─ Viewport (RectMask2D)\n│  │        └─ Content (VerticalLayoutGroup, ContentSizeFitter)\n│  │           ├─ Row_TextScale (OptionRow: Label, ChangeDot, Slider, ValueText)\n│  │           ├─ Row_SubtitleBg (OptionRow: Label, ChangeDot, StepSelector ◀ 값 ▶)\n│  │           ├─ Row_SpeakerCues (OptionRow: Toggle)\n│  │           ├─ Row_ColorMode (OptionRow: StepSelector)\n│  │           ├─ Row_HighContrast (OptionRow: StepSelector)\n│  │           ├─ Row_CameraShake (OptionRow: Slider)\n│  │           └─ Row_ReduceMotion (OptionRow: Toggle)\n│  └─ RightPanel (VerticalLayoutGroup)\n│     ├─ PreviewView (RawImage ← 미리보기 전용 Camera의 RenderTexture)\n│     ├─ SubtitleSample (Image 배경 + TMP_Text 화자명/대사 + DirectionArrow)\n│     └─ DescriptionPanel (TMP_Text)\n├─ FooterHints (HorizontalLayoutGroup, 입력 기호 + TMP_Text)\n├─ ResetConfirmDialog (CanvasGroup, 기본 비활성)\n└─ EventSystem (EventSystem + InputSystemUIInputModule)",
     "components_ko": [
-      "CanvasScaler: Scale With Screen Size, 기준 해상도 1920×1080, Match 0.5. 글자 크기 설정은 CanvasScaler로 하지 말고 TMP fontSize 배율로 처리한다.",
-      "AccessibilitySettings (ScriptableObject): textScale, subtitleBg, speakerCues, colorMode, highContrast, cameraShake 필드와 event Action<AccessibilitySettings> Changed. 기본값은 별도의 Defaults 에셋으로 보관.",
+      "CanvasScaler: UI Scale Mode = Scale With Screen Size, Reference Resolution 1920×1080, Match 0.5. 글자 크기 설정은 CanvasScaler로 하지 말고 TMP_Text.fontSize 배율로 처리한다.",
+      "AccessibilitySettings (ScriptableObject): textScale, subtitleBg, speakerCues, colorMode, highContrast, cameraShake, reduceMotion 필드와 event Action<AccessibilitySettings> Changed. 기본값은 별도의 Defaults 에셋으로 보관.",
       "AccessibilityPreset (ScriptableObject): 덮어쓸 필드 목록과 값만 갖고, Apply(settings)로 값을 쓴 뒤 바뀐 항목 목록을 반환한다.",
-      "OptionRow (MonoBehaviour): 라벨, ChangeDot, 설명 문자열, 위젯 참조. Selectable의 OnSelect를 받아 DescriptionPanel을 갱신한다.",
-      "StepSelector: Selectable를 상속하고 OnMove(AxisEventData)에서 좌우 입력으로 값을 순환. 위아래 입력은 base.OnMove로 넘겨 행 이동을 유지한다.",
-      "TextScaler: 씬 안의 모든 TMP_Text 기본 크기를 저장해 두고 textScale에 맞춰 fontSize를 바꾼다. 행에는 LayoutElement를 붙여 높이가 늘어나게 한다.",
-      "ColorPalette (ScriptableObject) × 4: off/protan/deutan/tritan별로 아군·적·아이템·위험 색을 정의. HUD와 미리보기 스프라이트가 역할 키로 색을 조회한다.",
-      "HighContrast: URP Volume(Color Adjustments의 saturation을 크게 낮춤) + 대상 오브젝트의 대비용 단색 머티리얼/외곽선 교체.",
-      "CameraShake: Cinemachine 3의 CinemachineImpulseSource로 발생시키고, 카메라 쪽 CinemachineImpulseListener의 Gain에 cameraShake/10을 곱한다.",
-      "InputSystemUIInputModule: Move/Submit/Cancel 액션 연결. 탭 넘김용 PreviousTab/NextTab 액션(숄더 버튼)을 InputActionAsset에 따로 추가한다.",
+      "OptionRow (MonoBehaviour): 라벨, ChangeDot, 설명 문자열, 위젯 참조를 묶는다. 포커스 감지는 위젯(Selectable) GameObject에 ISelectHandler를 구현한 작은 컴포넌트를 붙여 OnSelect에서 DescriptionPanel을 갱신한다.",
+      "StepSelector: Selectable을 상속하고 OnMove(AxisEventData)를 override해 moveDir이 Left/Right면 값을 순환, Up/Down이면 base.OnMove(eventData)로 넘겨 행 이동을 유지한다.",
+      "TextScaler: 메뉴·자막·HUD의 모든 TMP_Text 기본 fontSize를 저장해 두고 textScale에 맞춰 바꾼다. 행 높이는 VerticalLayoutGroup의 Control Child Size(Height)와 LayoutElement.minHeight로 늘어나게 한다.",
+      "ColorPalette (ScriptableObject) × 4: off/protan/deutan/tritan별로 아군·적·아이템·위험 색을 정의. HUD, 미리보기 스프라이트, 화자명이 역할 키로 색을 조회한다.",
+      "HighContrast: 미리보기 전용 URP Volume(Color Adjustments의 Saturation을 크게 낮춤, Post Exposure로 명도 조정) + 대상 오브젝트의 단색 머티리얼/외곽선 스프라이트 교체.",
+      "CameraShake: Cinemachine 3의 CinemachineImpulseSource.GenerateImpulse()로 발생시키고, 미리보기 CinemachineCamera에 붙인 CinemachineImpulseListener의 Gain을 cameraShake / 10으로 설정한다(Gain 0이면 신호가 완전히 꺼짐).",
+      "InputSystemUIInputModule: Move/Submit/Cancel 액션 연결. 탭 넘김용 PreviousTab/NextTab, 고대비 빠른 전환용 QuickContrast 액션을 InputActionAsset에 따로 추가하고 키보드·게임패드 바인딩을 모두 둔다.",
+      "PlayerInput.onControlsChanged(또는 InputUser 장치 변경)로 마지막 입력 장치를 감지해 FooterHints 기호를 교체한다.",
       "저장: JsonUtility.ToJson으로 직렬화해 Application.persistentDataPath에 저장(또는 PlayerPrefs 문자열)."
     ],
     "steps_ko": [
       "AccessibilitySettings와 Defaults 에셋을 만들고, 값을 바꾸는 메서드마다 Changed 이벤트를 호출하게 한다.",
-      "OptionRow 프리팹 3종(슬라이더/단계 선택/토글)을 만들고, 각 위젯의 onValueChanged에서 설정 데이터에 값을 쓰게 한다. UI는 데이터를 직접 바꾸지 않고 항상 데이터를 거친다.",
+      "OptionRow 프리팹 3종(슬라이더/단계 선택/토글)을 만들고, 각 위젯의 onValueChanged에서 설정 데이터에 값을 쓰게 한다. UI는 화면을 직접 바꾸지 않고 항상 데이터를 거친다.",
       "카테고리 탭은 ToggleGroup으로 묶고, 탭마다 옵션 행 부모 오브젝트를 켜고 끈다. PreviousTab/NextTab 액션의 performed 콜백에서 탭 인덱스를 바꾼다.",
-      "미리보기 전용 Camera를 만들고 RenderTexture로 출력해 RawImage에 표시한다. 미리보기 장면은 별도 레이어에 두고 Culling Mask로 분리한다.",
-      "TextScaler, ColorPalette 적용기, HighContrast 적용기, CameraShake Gain 적용기를 각각 Changed 이벤트에 구독시킨다. 메뉴의 TMP_Text도 TextScaler 대상에 포함한다.",
-      "PresetButton을 누르면 AccessibilityPreset.Apply를 호출하고, 반환된 변경 목록으로 해당 행을 순차 하이라이트(코루틴, 40ms 간격)하고 탭 배지 숫자를 갱신한다. 상태 라벨은 '프리셋명'으로 바꾼다.",
+      "미리보기 전용 Camera를 만들고 Output Texture에 RenderTexture를 지정해 RawImage에 표시한다. 미리보기 장면은 별도 레이어에 두고 Culling Mask와 Volume Mask로 분리한다.",
+      "TextScaler, ColorPalette 적용기, HighContrast 적용기, CameraShake Gain 적용기, 메뉴 애니메이션 속도 적용기(reduceMotion)를 각각 Changed 이벤트에 구독시킨다. 메뉴의 TMP_Text도 TextScaler 대상에 포함한다.",
+      "PresetButton을 누르면 AccessibilityPreset.Apply를 호출하고, 반환된 변경 목록으로 해당 행을 순차 하이라이트(코루틴, WaitForSecondsRealtime(0.04f) 간격)하고 탭 배지 숫자를 갱신한다. reduceMotion이면 모든 행을 한 번에 강조한다. 상태 라벨은 프리셋 이름으로 바꾼다.",
       "프리셋 적용 뒤 사용자가 값을 하나라도 바꾸면 상태 라벨을 '사용자 지정'으로 바꾼다. 각 행의 ChangeDot은 현재 값이 Defaults와 다를 때만 켠다.",
-      "ResetConfirmDialog를 열 때 EventSystem.current.SetSelectedGameObject로 '취소' 버튼에 포커스를 주고, 확정하면 현재 탭 또는 전체 필드를 Defaults 값으로 복사한다.",
-      "OnDisable 또는 메뉴를 닫을 때 JSON으로 저장하고, 게임 시작 시 불러와 Changed를 한 번 호출해 모든 구독자를 동기화한다.",
-      "9:16 대응: 화면 비율을 검사해 Root의 HorizontalLayoutGroup을 VerticalLayoutGroup 배치 프리팹으로 바꾸고, 행 높이를 최소 48dp 기준으로 키운다."
+      "QuickContrast 액션의 performed에서 highContrast를 off ↔ 마지막으로 쓴 단계로 토글한다. 메뉴가 닫혀 있어도 동작하도록 설정 매니저 쪽에 연결한다.",
+      "ResetConfirmDialog를 열 때 EventSystem.current.SetSelectedGameObject로 '취소' 버튼에 포커스를 주고, 확정하면 현재 탭 또는 전체 필드를 Defaults 값으로 복사한 뒤 Changed를 호출한다.",
+      "메뉴를 닫을 때 JSON으로 저장하고, 게임 시작 시 불러와 Changed를 한 번 호출해 모든 구독자를 동기화한다.",
+      "9:16 대응: 화면 비율을 검사해 Root_Landscape와 Root_Portrait 중 하나를 활성화한다(같은 OptionRow 프리팹 재사용). 터치 행 높이는 물리 크기 약 9mm(안드로이드 48dp 권장치)에 맞도록 Screen.dpi로 환산해 LayoutElement.minHeight를 정한다."
     ],
     "pitfalls_ko": [
-      "FindObjectOfType으로 설정 매니저를 찾지 말 것(금지 API). 인스펙터 직렬화 참조나 ScriptableObject 에셋 참조로 연결한다.",
-      "구 Input Manager(Input.GetAxis/GetKey)로 좌우 입력을 읽으면 Input System UI 모듈과 충돌한다. 반드시 Selectable.OnMove나 InputAction 콜백을 사용한다.",
-      "Slider는 기본으로 좌우 입력을 소비하므로, Navigation이 Automatic이면 의도치 않은 행 이동이 생길 수 있다. Explicit 또는 Vertical 내비게이션으로 지정한다.",
-      "CanvasScaler의 scaleFactor로 글자 크기를 키우면 레이아웃 전체가 커져 화면 밖으로 넘친다. 글자는 fontSize로, 행 높이는 LayoutElement로 처리한다.",
+      "FindObjectOfType는 Unity 6.3에서 obsolete다(대체: FindFirstObjectByType / FindAnyObjectByType). 설정 매니저는 이런 검색 대신 인스펙터 직렬화 참조나 ScriptableObject 에셋 참조로 연결한다.",
+      "구 Input Manager(Input.GetAxis/GetKey)로 좌우 입력을 읽으면 Input System UI 모듈과 충돌한다. Selectable.OnMove나 InputAction 콜백을 사용한다.",
+      "Slider는 좌우 입력을 자체 처리하지만, Navigation이 Automatic이면 위아래 이동 시 가장 가까운 Selectable(프리셋 버튼, 미리보기 옆 요소 등)로 엉뚱하게 튈 수 있다. 목록 행은 Vertical 또는 Explicit 내비게이션으로 지정한다.",
+      "CanvasScaler의 scaleFactor로 글자 크기를 키우면 레이아웃 전체가 커져 화면 밖으로 넘친다. 글자는 fontSize로, 행 높이는 레이아웃 그룹·LayoutElement로 처리한다.",
       "ScriptableObject에 런타임 값을 쓰면 에디터 플레이 모드에서는 에셋 파일에 그대로 남는다. 시작할 때 Instantiate로 복사본을 만들어 사용한다.",
-      "포커스된 행이 ScrollRect 밖으로 나가면 화면에 보이지 않는다. OnSelect에서 Content 위치를 조정해 행이 보이도록 스크롤한다.",
-      "팔레트를 바꿀 때 Image.color만 바꾸고 아이콘 모양은 그대로 두면, 색각 모드에서 여전히 구분이 안 되는 경우가 있다. 역할별로 모양도 다르게 만든다."
+      "포커스된 행이 ScrollRect 밖으로 나가면 보이지 않는다. OnSelect에서 Content 위치를 조정해 행이 보이도록 스크롤한다.",
+      "고대비용 Volume을 Global로 두면 실제 게임 화면까지 무채색이 된다. 미리보기 카메라의 Volume Mask와 Volume의 레이어를 맞추고, 카메라의 Post Processing 체크를 켠다.",
+      "메뉴 애니메이션을 Time.deltaTime으로 돌리면 일시정지(Time.timeScale = 0) 메뉴에서 멈춘다. unscaledDeltaTime 또는 WaitForSecondsRealtime을 쓴다.",
+      "팔레트를 바꿀 때 Image.color만 바꾸고 모양은 그대로 두면, 색각 모드에서 여전히 구분이 안 되는 경우가 있다. 역할별로 실루엣 모양도 다르게 만든다."
     ]
   },
   "unity_uitk": {
-    "structure": "SettingsMenu.uxml (UIDocument, PanelSettings: Scale With Screen Size 1920×1080)\n<ui:VisualElement name=\"root\" class=\"settings ts-100\">\n  <ui:VisualElement name=\"left\" class=\"panel-left\">\n    <ui:VisualElement name=\"preset-bar\" class=\"preset-bar\">\n      <ui:Button name=\"preset-vision\" text=\"시각\" />\n      <ui:Button name=\"preset-hearing\" text=\"청각\" />\n      <ui:Button name=\"preset-motor\" text=\"운동\" />\n      <ui:Label name=\"preset-state\" text=\"기본\" />\n    </ui:VisualElement>\n    <ui:TabView name=\"categories\">\n      <ui:Tab label=\"화면\"> <ui:SliderInt name=\"text-scale\" low-value=\"80\" high-value=\"200\" /> </ui:Tab>\n      <ui:Tab label=\"자막\"> <ui:RadioButtonGroup name=\"subtitle-bg\" choices=\"끔,기본,진하게\" /> <ui:Toggle name=\"speaker-cues\" /> </ui:Tab>\n      <ui:Tab label=\"색\"> <ui:DropdownField name=\"color-mode\" /> <ui:DropdownField name=\"high-contrast\" /> </ui:Tab>\n      <ui:Tab label=\"모션\"> <ui:SliderInt name=\"camera-shake\" low-value=\"0\" high-value=\"10\" /> </ui:Tab>\n    </ui:TabView>\n  </ui:VisualElement>\n  <ui:VisualElement name=\"right\" class=\"panel-right\">\n    <ui:VisualElement name=\"preview\" class=\"preview\" />  <!-- RenderTexture를 background-image로 -->\n    <ui:VisualElement name=\"subtitle\" class=\"subtitle bg-default\">\n      <ui:Label name=\"speaker\" class=\"speaker\" /> <ui:Label name=\"line\" class=\"line\" />\n    </ui:VisualElement>\n    <ui:Label name=\"description\" class=\"description\" />\n  </ui:VisualElement>\n  <ui:VisualElement name=\"reset-dialog\" class=\"dialog hidden\" />\n</ui:VisualElement>",
+    "structure": "SettingsMenu.uxml (UIDocument, PanelSettings: Scale Mode = Scale With Screen Size, Reference Resolution 1920×1080)\n<ui:VisualElement name=\"root\" class=\"settings ts-100\">\n  <ui:VisualElement name=\"left\" class=\"panel-left\">\n    <ui:VisualElement name=\"preset-bar\" class=\"preset-bar\">\n      <ui:Button name=\"preset-vision\" text=\"시각\" />\n      <ui:Button name=\"preset-hearing\" text=\"청각\" />\n      <ui:Button name=\"preset-motor\" text=\"운동\" />\n      <ui:Label name=\"preset-state\" text=\"기본\" />\n    </ui:VisualElement>\n    <ui:TabView name=\"categories\">\n      <ui:Tab label=\"화면\"> <ui:SliderInt name=\"text-scale\" low-value=\"80\" high-value=\"200\" /> </ui:Tab>\n      <ui:Tab label=\"자막\"> <StepSelector name=\"subtitle-bg\" /> <ui:Toggle name=\"speaker-cues\" /> </ui:Tab>\n      <ui:Tab label=\"색\"> <StepSelector name=\"color-mode\" /> <StepSelector name=\"high-contrast\" /> </ui:Tab>\n      <ui:Tab label=\"모션\"> <ui:SliderInt name=\"camera-shake\" low-value=\"0\" high-value=\"10\" /> <ui:Toggle name=\"reduce-motion\" /> </ui:Tab>\n    </ui:TabView>\n  </ui:VisualElement>\n  <ui:VisualElement name=\"right\" class=\"panel-right\">\n    <ui:VisualElement name=\"preview\" class=\"preview\" />  <!-- RenderTexture를 style.backgroundImage로 -->\n    <ui:VisualElement name=\"subtitle\" class=\"subtitle bg-default\">\n      <ui:Label name=\"speaker\" class=\"speaker\" /> <ui:Label name=\"line\" class=\"line\" />\n    </ui:VisualElement>\n    <ui:Label name=\"description\" class=\"description\" />\n  </ui:VisualElement>\n  <ui:VisualElement name=\"reset-dialog\" class=\"dialog hidden\" />\n</ui:VisualElement>\n<!-- StepSelector: [UxmlElement] partial class로 만든 ◀ 값 ▶ 커스텀 컨트롤 -->",
     "uss_notes_ko": [
-      "색은 :root 변수로 정의한다(--c-ally, --c-enemy, --c-item, --c-danger). 색각 모드는 루트에 .cb-protan / .cb-deutan / .cb-tritan 클래스를 붙여 같은 변수를 다시 정의하는 방식으로 바꾼다.",
-      "USS는 calc()를 지원하지 않으므로 글자 배율은 .ts-80 ~ .ts-200 단계 클래스를 만들어 각 클래스에서 .line, .label의 font-size를 지정한다. 값이 더 세밀해야 하면 C#에서 style.fontSize를 직접 지정한다.",
-      "자막 배경은 .bg-off { background-color: rgba(0,0,0,0) } / .bg-default { rgba(0,0,0,0.5) } / .bg-heavy { rgba(0,0,0,0.85) } 세 클래스로 바꾼다.",
-      "고대비는 루트에 .high-contrast를 붙여 메뉴 테두리 두께(border-width)를 키우고 포커스 링 색을 진하게 한다. 게임 장면의 고대비는 USS가 아니라 URP Volume에서 처리한다.",
-      "전환 애니메이션은 transition-property: background-color, opacity; transition-duration: 0.2s로 지정하고, 흔들림 감소가 켜져 있으면 루트에 .reduce-motion을 붙여 transition-duration: 0s로 덮어쓴다.",
-      "포커스 표시는 :focus 의사 클래스에 굵은 외곽선을 주고, 변경 표시 점은 .changed 클래스가 있는 행에서만 display: flex로 보이게 한다.",
-      "9:16에서는 루트 클래스를 .portrait로 바꿔 flex-direction: column으로 전환하고, 행에 min-height: 48px를 준다."
+      "색은 :root에 변수로 정의한다(--c-ally, --c-enemy, --c-item, --c-danger). 커스텀 속성은 상속되므로, 색각 모드는 루트 요소에 .cb-protan / .cb-deutan / .cb-tritan 클래스를 붙여 같은 변수를 다시 정의하면 하위 요소 전체에 적용된다.",
+      "USS는 calc()와 rem 단위를 지원하지 않으므로 글자 배율은 .ts-80 ~ .ts-200 단계 클래스를 만들고 '.ts-160 .line', '.ts-160 .label'처럼 하위 선택자로 font-size를 지정한다. 더 세밀해야 하면 C#에서 style.fontSize를 직접 지정한다.",
+      "자막 배경은 .bg-off { background-color: rgba(0,0,0,0) } / .bg-default { background-color: rgba(0,0,0,0.5) } / .bg-heavy { background-color: rgba(0,0,0,0.85) } 세 클래스로 바꾼다.",
+      "고대비는 루트에 .high-contrast를 붙이고 '.high-contrast .option-row'처럼 하위 선택자로 border-width와 포커스 외곽선 색을 키운다. 게임 장면(미리보기)의 고대비는 USS가 아니라 URP Volume에서 처리한다.",
+      "전환 애니메이션은 대상 요소에 transition-property: background-color, opacity; transition-duration: 0.2s로 지정한다. transition-duration은 상속되지 않으므로, 모션 줄이기는 루트 .reduce-motion 클래스와 '.reduce-motion .subtitle, .reduce-motion .option-row { transition-duration: 0s; }' 같은 하위 선택자로 덮어쓴다.",
+      "포커스 표시는 :focus 의사 클래스에 굵은 외곽선을 주고, 변경 표시 점은 '.option-row.changed .change-dot { display: flex; }'로 해당 행에서만 보이게 한다(기본은 display: none).",
+      "9:16에서는 루트에 .portrait 클래스를 붙여 '.portrait' 규칙에서 flex-direction: column으로 전환하고, 행에 min-height: 48px를 준다."
     ],
     "steps_ko": [
       "UIDocument를 가진 GameObject에 SettingsMenu.uxml과 PanelSettings를 연결하고, 컨트롤러 스크립트에서 rootVisualElement.Q<SliderInt>(\"text-scale\") 식으로 요소를 찾는다.",
-      "각 컨트롤의 RegisterValueChangedCallback에서 AccessibilitySettings 데이터에 값을 쓰고, 데이터의 Changed 이벤트에서 루트 클래스(ts-xxx, cb-xxx, bg-xxx, high-contrast)를 다시 지정한다. Unity 6의 런타임 데이터 바인딩(dataSource + DataBinding)을 써도 된다.",
-      "DropdownField의 choices를 코드에서 지정하고(끔/적색맹/녹색맹/청색맹), 선택 인덱스를 enum으로 변환한다.",
-      "미리보기 전용 Camera의 RenderTexture를 preview 요소의 style.backgroundImage = Background.FromRenderTexture(rt)로 연결한다.",
-      "TabView의 탭 전환을 숄더 버튼에 연결: InputAction(PreviousTab/NextTab)의 performed 콜백에서 TabView.selectedTabIndex를 바꾼다.",
-      "프리셋 버튼 clicked에서 프리셋을 적용하고, 바뀐 행에 .flash 클래스를 붙였다가 schedule.Execute(...).StartingIn(240)으로 떼어 순차 하이라이트를 만든다(행마다 40ms 간격).",
+      "단계형 옵션용 StepSelector를 [UxmlElement] 특성을 붙인 partial class(BaseField<int> 상속 등)로 만들고, NavigationMoveEvent의 Left/Right에서 값을 순환시킨다(Up/Down은 그대로 두어 포커스 이동에 쓰이게 한다).",
+      "각 컨트롤의 RegisterValueChangedCallback에서 AccessibilitySettings 데이터에 값을 쓰고, 데이터의 Changed 이벤트에서 루트 클래스(ts-xxx, cb-xxx, bg-xxx, high-contrast, reduce-motion)를 EnableInClassList로 다시 지정한다. Unity 6의 런타임 데이터 바인딩(dataSource + DataBinding)을 써도 된다.",
+      "미리보기 전용 Camera의 RenderTexture를 preview 요소에 style.backgroundImage = Background.FromRenderTexture(rt)로 연결한다.",
+      "TabView의 탭 전환을 숄더 버튼에 연결: InputAction(PreviousTab/NextTab)의 performed 콜백에서 TabView.selectedTabIndex를 바꾸고, activeTabChanged 이벤트에서 탭 배지와 설명 패널을 갱신한다.",
+      "프리셋 버튼 clicked에서 프리셋을 적용하고, 바뀐 행에 .flash 클래스를 붙였다가 schedule.Execute(...).StartingIn(240)으로 떼어 순차 하이라이트를 만든다(행마다 시작을 40ms씩 늦춤). reduce-motion이면 동시에 붙인다.",
       "기본값과 다른 컨트롤의 부모 행에 EnableInClassList(\"changed\", true)를 적용하고, 탭 라벨 옆 배지 텍스트를 갱신한다.",
       "복원 버튼에서 reset-dialog의 .hidden 클래스를 제거하고 '취소' 버튼에 Focus()를 호출한다. 확정 시 Defaults 값을 복사한다.",
-      "EventSystem에 InputSystemUIInputModule을 두어 게임패드 Move/Submit/Cancel이 UI Toolkit 포커스 이동으로 전달되게 한다."
+      "씬에 EventSystem과 InputSystemUIInputModule을 두면 게임패드 Move/Submit/Cancel이 UI Toolkit 패널에도 내비게이션 이벤트로 전달된다. QuickContrast 액션은 별도 InputAction으로 연결한다."
     ],
     "pitfalls_ko": [
-      "SliderInt는 포커스를 받으면 좌우 입력을 소비하지만, DropdownField는 Submit으로 팝업을 연다. 컨트롤러 사용자를 위해 단계형 옵션은 좌우 순환 커스텀 컨트롤(◀ 값 ▶)로 만드는 편이 조작이 일관된다.",
-      "rem 단위나 calc()는 USS에서 사용할 수 없다. 글자 크기 배율을 변수 하나로 처리하려 하지 말고 단계 클래스나 C# style 지정으로 처리한다.",
-      "루트 클래스를 바꿔도 transition이 걸린 속성만 부드럽게 바뀐다. font-size까지 전환 애니메이션을 주면 레이아웃이 매 프레임 다시 계산되어 무거워지므로 font-size는 즉시 바꾼다.",
-      "TabView는 Unity 6 이전 버전에는 없다. 오래된 프로젝트라면 Button 행 + 패널 display 전환으로 대신 만든다.",
-      "UI Toolkit 텍스트에는 TMP 폰트 에셋이 아닌 FontAsset(UI Toolkit용)을 PanelSettings 또는 USS -unity-font-definition으로 지정해야 한글이 깨지지 않는다.",
-      "FindObjectOfType으로 UIDocument를 찾지 말고 [SerializeField]로 참조를 연결한다."
+      "DropdownField는 Submit으로 팝업을 열고, RadioButtonGroup은 항목마다 포커스가 나뉘어 '좌우로 값 변경' 규칙이 깨진다. 컨트롤러 사용자를 위해 단계형 옵션은 ◀ 값 ▶ 커스텀 컨트롤로 통일한다.",
+      "rem 단위나 calc()는 USS에서 사용할 수 없다. 글자 크기 배율을 변수 하나로 계산하려 하지 말고 단계 클래스나 C# style 지정으로 처리한다.",
+      "transition은 상속되지 않는 속성이라 루트 클래스 하나로 하위 요소의 전환을 끌 수 없다. 하위 선택자로 대상 요소마다 덮어쓴다.",
+      "font-size에 전환 애니메이션을 주면 레이아웃이 매 프레임 다시 계산되어 무거워진다. font-size는 즉시 바꾸고, 색·불투명도만 transition을 건다.",
+      "TabView는 Unity 6 이전 버전에는 없다. 오래된 프로젝트라면 Button 줄 + 패널 display 전환으로 대신 만든다.",
+      "UI Toolkit 텍스트는 TMP 폰트 에셋이 아니라 Text Core의 FontAsset을 쓴다. 한글 글리프가 있는 FontAsset을 PanelSettings의 Text Settings 기본 폰트나 USS -unity-font-definition으로 지정해야 한글이 깨지지 않는다.",
+      "FindObjectOfType(6.3에서 obsolete)로 UIDocument를 찾지 말고 [SerializeField]로 참조를 연결한다."
     ]
   },
   "inspired_by": [
     {
       "game_id": "the-last-of-us-part-ii",
       "title": "The Last of Us Part II (2020, PS4 오리지널판)",
-      "credit": "© Sony Interactive Entertainment",
+      "credit": "© 2020 Sony Interactive Entertainment LLC",
       "borrowed_axes": [
-        "레이아웃 구조",
-        "색 체계"
+        "정보 구조(유형별 프리셋 → 개별 조정)",
+        "자막·고대비 옵션 구성"
       ],
-      "what_learned_ko": "유형별(시각/청각/운동) 프리셋이 여러 카테고리에 흩어진 권장 옵션을 한 번에 켜고 그 뒤에도 개별 조정을 허용하는 구조, 크기·배경·화자명·방향 화살표를 묶은 자막 체계, 배경 색을 억제하고 대상에 대비 색을 입히는 고대비 개념을 가져왔다. 근거는 공식 블로그와 PlayStation 접근성 페이지의 텍스트이며, 실제 화면의 배치와 색은 직접 확인하지 않았다."
-    },
-    {
-      "game_id": "prince-of-persia-the-lost-crown",
-      "title": "Prince of Persia: The Lost Crown (2024 콘솔·PC판 / 2025 모바일 포팅판)",
-      "credit": "© Ubisoft Entertainment",
-      "borrowed_axes": [
-        "레이아웃 구조"
-      ],
-      "what_learned_ko": "같은 설정 체계를 모바일 세로 화면과 터치 입력으로 옮길 때 메뉴를 다시 구성해야 한다는 관점을 menu_layout 파라미터와 '세로 터치 축약형' 프리셋으로 표현했다. 다만 이 게임의 실제 접근성 옵션 목록과 모바일 메뉴 구성, GDC 강연 내용은 이번 근거 레코드에 검증된 요소가 없어 확인하지 못했다(unverified)."
+      "what_learned_ko": "시각/청각/운동 유형별 프리셋이 여러 카테고리에 흩어진 권장 옵션을 한 번에 켜고 그 뒤에도 개별 조정을 허용하는 구조, 크기·배경·화자명·방향 표시를 묶은 자막 옵션 구성, 배경 색을 억제하고 대상에 대비 색을 입히는 고대비 개념과 메뉴 밖 단축 토글이라는 아이디어를 가져왔다. 근거는 공식 블로그와 PlayStation 접근성 페이지의 텍스트이며, 실제 화면의 배치·색·위젯 모양은 직접 확인하지 않았고 카드에서 쓰지도 않았다."
     }
   ],
-  "original_ko": "원작의 메뉴 화면, 폰트, 아이콘, 색상값은 쓰지 않는다. 미리보기 장면은 사람·적·아이템을 원·삼각·마름모 같은 단순한 기하 실루엣으로 새로 그리며, 실제 게임 캐릭터나 배경을 본뜨지 않는다. 자막 샘플 대사와 화자 이름은 수업용으로 새로 쓴 가상의 인물(예: '하린', '도윤')과 짧은 일상 대사를 사용한다. 탭 이름, 옵션 이름, 설명 문구는 모두 한국어로 새로 작성한다. 색각 팔레트는 원작 값을 추정하지 않고, 갤러리용으로 새로 정한 역할 색(아군·적·아이템·위험)을 색각 유형별로 다시 구성한다. 고대비 Setting 1/2/3도 원작 색 조합이 아니라 이 갤러리용으로 새로 정의한다. 타이포는 갤러리 공용 한글 산세리프를 쓰고, 입력 안내 아이콘은 특정 콘솔 브랜드가 아닌 중립적인 기호(◀ ▶, 확인, 뒤로)로 표시한다. 원작에 없는 '변경 표시 점', '탭 배지', '복원 범위 선택'은 교육 목적으로 추가한 요소다.",
+  "original_ko": "원작의 메뉴 화면, 폰트, 아이콘, 색상값, 옵션 명칭은 쓰지 않는다. 미리보기 장면은 동료·적·아이템을 원·삼각·마름모 같은 단순한 기하 실루엣으로 새로 그리며, 실제 게임 캐릭터나 배경을 본뜨지 않는다. 자막 샘플 대사와 화자 이름은 수업용으로 새로 쓴 가상의 인물(예: '하린', '도윤')과 짧은 일상 대사를 사용한다. 탭 이름, 옵션 이름, 설명 문구는 모두 한국어로 새로 작성한다. 색각 팔레트는 원작 값을 추정하지 않고 갤러리용 역할 색(아군·적·아이템·위험)을 색각 유형별로 다시 구성한다. 고대비는 원작의 번호식 단계 대신 '배경만 억제 / 역할 단색 / 단색 + 외곽선'이라는 의미 있는 3단계로 새로 정의한다. 타이포는 갤러리 공용 한글 산세리프를 쓰고, 입력 안내는 특정 콘솔 브랜드 버튼명이 아닌 중립 기호(◀ ▶, 확인, 뒤로)로 표시한다. 원작에 없는 '즉시 미리보기', '변경 표시 점', '탭 배지', '복원 범위 선택', '모션 줄이기와 카메라 흔들림의 역할 분리', '세로 터치 재배치'는 교육 목적으로 추가한 요소다.",
   "references": [
     {
       "label": "PlayStation 공식 - The Last of Us Part II 접근성 페이지",
@@ -461,11 +495,6 @@
       "type": "T2"
     },
     {
-      "label": "Ubisoft 공식 - Prince of Persia: The Lost Crown",
-      "url": "https://www.ubisoft.com/en-us/game/prince-of-persia/the-lost-crown",
-      "type": "official"
-    },
-    {
       "label": "Game Accessibility Guidelines",
       "url": "https://gameaccessibilityguidelines.com/",
       "type": "guideline"
@@ -474,7 +503,47 @@
       "label": "Xbox Accessibility Guidelines",
       "url": "https://learn.microsoft.com/en-us/gaming/accessibility/guidelines",
       "type": "guideline"
+    },
+    {
+      "label": "Unity 6.3 Scripting API - UIElements.TabView (selectedTabIndex, activeTabChanged)",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/UIElements.TabView.html",
+      "type": "docs"
+    },
+    {
+      "label": "Unity 6.3 Scripting API - Background.FromRenderTexture",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/UIElements.Background.FromRenderTexture.html",
+      "type": "docs"
+    },
+    {
+      "label": "Unity 6.3 Scripting API - Object.FindObjectOfType (obsolete)",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Object.FindObjectOfType.html",
+      "type": "docs"
+    },
+    {
+      "label": "Cinemachine 3.1 - CinemachineImpulseListener (Gain)",
+      "url": "https://docs.unity3d.com/Packages/com.unity.cinemachine@3.1/api/Unity.Cinemachine.CinemachineImpulseListener.html",
+      "type": "docs"
     }
   ],
-  "confidence_notes_ko": "라스트 오브 어스 파트 II(2020 PS4 오리지널판, Remastered 제외)의 옵션 체계(프리셋 3종, 자막 옵션, 색각 모드, 고대비 3단계, 멀미 방지 슬라이더 범위)는 근거 레코드의 T1 텍스트(공식 블로그·PlayStation 페이지)에 기반한다. 다만 실제 메뉴의 탭 배치·색·위젯 모양·애니메이션은 직접 보지 못했으므로 카드의 시각 설계는 일반화한 재구성이다(plausible). 프린스 오브 페르시아: 로스트 크라운은 근거 레코드의 elements가 비어 있고, 이번 세션의 웹 검색 한도가 소진되어 추가 확인을 하지 못했다. 이 게임의 TGA 2024 접근성 수상, 모바일 포팅 메뉴 구성, GDC 강연 내용은 모두 unverified이며 카드에서는 '플랫폼 전환 시 재구성'이라는 일반 원리로만 사용했다. timings의 모든 수치는 1차 자료에 없는 권장값이다. Unity 레시피는 Unity 6 LTS 기준의 일반적인 API(TabView, InputSystemUIInputModule, Cinemachine 3 ImpulseListener Gain)를 바탕으로 했고, 6.3 버전에서의 세부 동작은 실행해 검증하지 않았다."
+  "confidence_notes_ko": "분석 대상은 The Last of Us Part II 2020 PS4 오리지널판이다(2024 Remastered는 제외). 유형별 프리셋 3종, 프리셋 적용 뒤 개별 조정, 자막 옵션 구성, 색각 모드, 고대비 개념, 단축 토글은 근거 레코드의 T1 텍스트(공식 블로그·PlayStation 접근성 페이지)에 기반한다. 실제 메뉴의 탭 배치·색·위젯 모양·애니메이션은 직접 보지 못했으므로 카드의 시각 설계는 일반화한 재구성이다(plausible). 즉시 미리보기, 변경 표시 점, 탭 배지, 복원 범위 선택, 모션 줄이기 분리는 근거 자료에 없는 교육용 추가 장치다. Prince of Persia: The Lost Crown은 근거 레코드의 elements가 비어 있고 이번 검수에서도 웹 검색 한도가 소진되어 확인하지 못했으므로, 출처 없는 차용 표기를 피하려고 inspired_by와 references에서 뺐다. 세로 터치 재배치는 특정 게임이 아니라 일반 원리로만 다룬다. timings의 모든 수치는 1차 자료에 없는 권장값이다. Unity 레시피 중 TabView.selectedTabIndex/activeTabChanged, Background.FromRenderTexture, FindObjectOfType의 obsolete 상태(6.3), CinemachineImpulseListener.Gain은 공식 문서로 확인했다. 그 밖의 API(Selectable.OnMove, InputSystemUIInputModule로 UI Toolkit 내비게이션 전달, [UxmlElement] 커스텀 컨트롤, USS 하위 선택자·변수 상속)는 Unity 6 문서 지식에 기반하며, 6.3에서 실행해 검증하지 않았다.",
+  "critic_changes_ko": [
+    "[과잉 모방] hotspot 1 본문의 게임명 언급과 원작 고유 수치('60개가 넘는')를 지우고 '수십 개'로 일반화했다.",
+    "[과잉 모방] high_contrast 옵션 setting1/2/3(원작 단계 명칭을 그대로 옮김)을 의미 있는 새 단계 dim-bg / role-color / role-outline로 바꾸고, 프리셋 값(setting1 → role-outline)과 original_ko를 함께 고쳤다.",
+    "[과잉 모방] category-tabs 역할의 특정 콘솔 버튼명(L1/R1)을 '좌우 숄더 버튼'으로 바꿨다. principles의 '터치패드 스와이프' 예시도 '특정 기기 전용 입력(터치 표면 제스처 등)'으로 일반화했다.",
+    "[과잉 모방] TLOU2 borrowed_axes를 실제로 확인하지 않은 '레이아웃 구조·색 체계'에서 근거가 있는 '정보 구조(유형별 프리셋 → 개별 조정)', '자막·고대비 옵션 구성'으로 바꿨다. credit을 근거 레코드 표기(© 2020 Sony Interactive Entertainment LLC)에 맞췄다.",
+    "[근거] Prince of Persia: The Lost Crown은 검증된 요소가 0개인데 '레이아웃 구조'를 빌렸다고 표기되어 있어 inspired_by와 references에서 뺐다. mobile-condensed 프리셋의 장르도 '모바일 액션 게임(세로 화면·터치)'으로 일반화했다.",
+    "[원리 반영] 근거 레코드의 '왜 효과적인가' 4번(메뉴 진입 없이 고대비 토글)을 반영하는 hotspot(footer-hints, 단축 입력)을 추가하고, 관련 실수 항목('단축 토글이 특정 기기에만 있음')도 더했다. hotspot 2(자막)는 청각 정보를 화면으로 옮긴다는 근거 문장 쪽으로 다시 썼다.",
+    "[원리 반영] 근거에 없는 미리보기·변경 표시 hotspot에는 '교육용 추가 장치'라고 명시했다.",
+    "[구현 가능성] timings와 principles가 존재하지 않는 '흔들림 감소' 설정을 참조하고 있어, reduce_motion 토글 param을 추가하고 camera_shake(장면 흔들림)와 역할이 겹치지 않도록 '메뉴 쪽 움직임만 담당'으로 나눴다. 모든 프리셋에 reduce_motion 값을 넣고, 이 설정을 보여 주는 '멀미 완화형' 프리셋을 추가했다.",
+    "[구현 가능성] '사용자 지정' 상태와 '입력 장치 전환'(footer-hints 역할)에 대응하는 이벤트가 없어 tweak-option, swap-input 이벤트와 '입력 장치 전환' 상태를 추가하고, 각 state의 trigger에 이벤트 id를 적었다.",
+    "[구현 가능성] stage는 '세로 탭'인데 UGUI 계층·숄더 버튼 조작은 가로 탭이라 모순되어, 가로 탭 줄로 통일하고 menu_layout 옵션 sidebar-tabs를 split-tabs로 바꿨다.",
+    "[Unity UGUI] FindObjectOfType를 '금지 API'가 아니라 6.3 공식 문서 기준 obsolete(대체 FindFirstObjectByType/FindAnyObjectByType)로 정확히 기재했다.",
+    "[Unity UGUI] OptionRow(MonoBehaviour)가 Selectable의 OnSelect를 받는다는 서술을 ISelectHandler 구현 컴포넌트로 고쳤다. Slider 내비게이션 함정을 '좌우는 Slider가 처리, 위아래가 Automatic 탐색으로 엉뚱하게 튐'으로 정확히 고쳤다.",
+    "[Unity UGUI] 런타임에 HorizontalLayoutGroup을 VerticalLayoutGroup으로 '바꾸는' 방식을 가로/세로 Root 프리팹 활성 전환으로 고치고, UGUI에 없는 dp 단위를 Screen.dpi 환산 + LayoutElement.minHeight로 바꿨다.",
+    "[Unity UGUI] Global Volume이 실제 게임까지 무채색으로 만드는 문제, 일시정지 중 Time.deltaTime 애니메이션이 멈추는 문제를 함정에 추가했다. CinemachineImpulseListener.Gain 설명을 공식 문서(0이면 완전 무음)에 맞췄다.",
+    "[Unity UITK] transition-duration은 상속되지 않으므로 루트 .reduce-motion 클래스 하나로는 하위 전환이 꺼지지 않는다는 오류를 하위 선택자 방식으로 고쳤다. 고대비 테두리, 글자 배율 클래스도 하위 선택자로 명시했다.",
+    "[Unity UITK] UXML의 RadioButtonGroup/DropdownField를 자체 함정 항목과 일관되게 [UxmlElement] 커스텀 StepSelector로 바꾸고 구현 단계를 추가했다. TabView.selectedTabIndex와 activeTabChanged, Background.FromRenderTexture는 6.3 공식 문서로 확인해 유지했다. 한글 폰트 함정은 Text Core FontAsset + PanelSettings Text Settings로 정확히 했다.",
+    "[교육성] 학습 목표 3번을 각 옵션 → 렌더링 수단(폰트 크기, 불투명도, 색 변수, 후처리, 진폭, 전환 시간)으로 구체화하고, 5번에 판단 기준(배치 순서, 터치 영역, 대체 입력)을 명시했다. juice_off_ko에 드롭다운·모션 줄이기 무시 사례를 더했다.",
+    "[출처] 검수에 사용한 Unity 공식 문서 4건을 references에 추가했다."
+  ]
 }

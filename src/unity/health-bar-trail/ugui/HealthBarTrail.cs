@@ -19,6 +19,7 @@ public class HealthBarTrail : MonoBehaviour
     [Header("값")]
     [SerializeField] float maxHealth = 100f;
     [SerializeField, Tooltip("잔상이 줄어들기 시작할 때까지 대기 (초)")] float trailDelay = 0.45f;
+    [SerializeField, Tooltip("연타 중 잔상이 기다릴 수 있는 최대 시간 (초)")] float maxHold = 1.2f;
     [SerializeField, Tooltip("잔상 감소 속도 (최대 체력 대비 비율/초)")] float trailSpeed = 0.55f;
     [SerializeField, Tooltip("회복 채움 속도 (비율/초)")] float healSpeed = 0.6f;
     [SerializeField, Range(0f, 1f)] float lowThreshold = 0.3f;
@@ -28,15 +29,18 @@ public class HealthBarTrail : MonoBehaviour
     float shownFill = 1f;   // 화면의 메인 바
     float shownTrail = 1f;  // 화면의 잔상
     float holdTimer;
+    float heldTime;     // 이번 잔상이 지금까지 기다린 시간
     float beatPhase;
 
     public void TakeDamage(float amount)
     {
         float before = health;
         health = Mathf.Clamp01(health - amount / maxHealth);
-        shownFill = health;                           // 메인 바는 즉시
-        shownTrail = Mathf.Max(shownTrail, before);   // 잔상은 맞기 전 위치에 남긴다
-        holdTimer = trailDelay;                       // 연타하면 대기 시간을 다시 채운다
+        if (shownTrail <= shownFill + 0.0001f) heldTime = 0f;   // 잔상이 다 따라잡았으면 새로 시작
+        shownFill = health;                                     // 메인 바는 즉시
+        shownTrail = Mathf.Max(shownTrail, before);             // 잔상은 맞기 전 위치에 남긴다
+        // 연타하면 대기 시간을 다시 채우되, 총 대기는 maxHold 를 넘지 않는다
+        holdTimer = Mathf.Min(trailDelay, Mathf.Max(0f, maxHold - heldTime));
     }
 
     public void Heal(float amount)
@@ -54,7 +58,7 @@ public class HealthBarTrail : MonoBehaviour
             shownFill = Mathf.MoveTowards(shownFill, health, healSpeed * dt);
 
         // 잔상: 대기 → 메인 바를 따라 감소
-        if (holdTimer > 0f) holdTimer -= dt;
+        if (holdTimer > 0f) { holdTimer -= dt; heldTime += dt; }
         else shownTrail = Mathf.MoveTowards(shownTrail, shownFill, trailSpeed * dt);
 
         // 저체력 맥박: 체력이 낮을수록 1Hz → 2Hz 로 빨라진다

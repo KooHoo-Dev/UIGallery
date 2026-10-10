@@ -4,102 +4,112 @@
   "name_en": "Circular Minimap",
   "group": "B",
   "paradigm": "non-diegetic",
-  "one_liner_ko": "화면 구석의 원 하나에 '내 주변'을 압축해 보여 주는 HUD. 회전형이냐 북쪽 고정형이냐, 아이콘 위계를 어떻게 세우느냐, 범위 밖 목표를 어떻게 가장자리에 붙이느냐가 품질을 가른다.",
+  "one_liner_ko": "화면 구석의 원 하나에 '내 주변'을 압축해 보여 주는 HUD다. 품질은 네 가지에서 갈린다. 회전형과 북쪽 고정형 중 무엇으로 할지(또는 플레이어가 고르게 할지), 아이콘 위계를 어떻게 세울지, 범위 밖 목표를 가장자리에 어떻게 붙일지, 확대·축소를 어떻게 보간할지다.",
   "learning_goals_ko": [
-    "플레이어 중심 회전형과 북쪽 고정형의 차이를 설명하고, 장르에 맞는 방식을 고를 수 있다.",
-    "월드 좌표를 미니맵 좌표로 바꾸는 식(오프셋 × 축척 × 회전)을 직접 구현할 수 있다.",
-    "범위 밖 목표를 원 가장자리에 클램프하고 방향 화살표로 표시할 수 있다.",
-    "아이콘을 크기·색·모양·레이어 순서로 3단계 위계로 나눌 수 있다.",
-    "Unity UGUI에서 원형 클리핑에는 RectMask2D가 아니라 Mask(스텐실)가 필요한 이유를 설명할 수 있다.",
-    "'미니맵을 아예 넣지 않는' 설계(환경 신호로 길 안내)도 선택지임을 이해하고 트레이드오프를 말할 수 있다."
+    "플레이어 중심 회전형과 북쪽 고정형의 차이를 설명하고, 장르에 맞는 기본값을 고를 수 있다. 두 방식을 설정에서 고르게 하는 이유도 말할 수 있다.",
+    "월드 좌표를 미니맵 좌표로 바꾸는 식(오프셋 × 축척 × 회전)을 직접 구현할 수 있다. 회전 부호가 좌표계에 따라 바뀐다는 점(UGUI는 y-up·반시계 +, UITK는 y-down·시계 +)도 설명할 수 있다.",
+    "범위 밖 목표를 원 가장자리에 클램프하고 방향 화살표와 거리로 표시할 수 있다.",
+    "아이콘을 크기·색·모양·그리기 순서로 3단계 위계로 나눌 수 있다.",
+    "Unity UGUI에서 원형 클리핑에 RectMask2D가 아니라 Mask(스텐실)가 필요한 이유와 그 비용을 설명할 수 있다.",
+    "미니맵을 아예 넣지 않고 환경 신호로 길을 안내하는 설계도 선택지라는 점을 이해하고, 그 트레이드오프를 말할 수 있다."
   ],
   "anatomy": [
     {
       "part_id": "frame_ring",
       "name_ko": "테두리 링",
-      "role_ko": "미니맵의 경계를 보여 주고 배경과 분리한다. 북쪽 표시와 방위 눈금이 붙는 자리."
+      "role_ko": "미니맵 경계를 보여 주고 배경과 분리한다. 북쪽 표시와 방위 눈금이 붙는 자리다."
     },
     {
       "part_id": "mask_area",
       "name_ko": "원형 마스크 영역",
-      "role_ko": "지도 레이어를 원 모양으로 잘라 내는 창. 바깥 내용은 보이지 않는다."
+      "role_ko": "지도 레이어를 원 모양으로 잘라 내는 창이다. 바깥 내용은 보이지 않는다."
     },
     {
       "part_id": "map_layer",
       "name_ko": "지도 레이어",
-      "role_ko": "지형·길·건물 그림. 회전형에서는 이 레이어 전체가 플레이어 방향 반대로 돈다."
+      "role_ko": "지형·길·건물 그림이다. 플레이어가 늘 중심에 오도록 반대 방향으로 이동한다. 회전형에서는 레이어 전체가 카메라 방향만큼 반대로 돈다."
     },
     {
       "part_id": "player_marker",
       "name_ko": "플레이어 마커",
-      "role_ko": "원 중심에 고정된 화살표. 북쪽 고정형에서는 화살표가 돌고, 회전형에서는 항상 위를 향한다."
+      "role_ko": "원 중심에 고정된 화살표다. 북쪽 고정형에서는 화살표가 돌고, 회전형에서는 항상 위를 향한다."
     },
     {
       "part_id": "view_cone",
       "name_ko": "시야 원뿔",
-      "role_ko": "카메라가 보는 방향과 범위를 반투명 부채꼴로 표시. 화면 속 시점과 미니맵을 연결해 준다."
+      "role_ko": "카메라가 보는 방향과 범위를 반투명 부채꼴로 표시해 화면 속 시점과 미니맵을 연결한다."
     },
     {
       "part_id": "north_indicator",
       "name_ko": "북쪽 표시(N)",
-      "role_ko": "회전형에서 링 위를 따라 움직이며 절대 방위를 잃지 않게 해 준다."
+      "role_ko": "회전형에서 링을 따라 움직이며 절대 방위를 잃지 않게 해 준다."
     },
     {
       "part_id": "icon_layer",
       "name_ko": "아이콘 레이어",
-      "role_ko": "목표·관심 지점·적 등 월드 오브젝트의 위치 표시. 위계에 따라 크기·색·그리기 순서가 다르다."
+      "role_ko": "목표·관심 지점·적의 위치 표시다. 위계에 따라 크기·색·그리기 순서가 다르다. 지도와 같이 회전하지 않고 위치만 바뀐다."
     },
     {
       "part_id": "edge_marker",
       "name_ko": "가장자리 클램프 마커",
-      "role_ko": "범위 밖 목표를 원 테두리에 붙여 방향을 알려 주는 화살표 아이콘. 마스크 바깥 레이어에 둬야 잘리지 않는다."
+      "role_ko": "범위 밖 목표를 원 테두리에 붙여 방향을 알려 주는 쐐기 화살표 아이콘이다. 잘리지 않도록 마스크 바깥 레이어에 둔다."
     },
     {
       "part_id": "distance_label",
       "name_ko": "거리 표시",
-      "role_ko": "클램프된 주요 목표까지 남은 거리(m). 가장 중요한 목표 하나에만 붙인다."
+      "role_ko": "클램프된 주요 목표까지 남은 거리(m)다. 가장 중요한 목표 하나에만 붙인다."
     },
     {
       "part_id": "zoom_control",
       "name_ko": "확대·축소 컨트롤",
-      "role_ko": "축척을 바꾸는 버튼/휠/숄더 입력. 축척이 바뀌면 같은 목표가 원 안팎으로 오간다."
+      "role_ko": "축척을 바꾸는 버튼·휠·숄더 입력이다. 축척이 바뀌면 같은 목표가 원 안팎을 오간다."
+    },
+    {
+      "part_id": "orientation_setting",
+      "name_ko": "방향 방식 설정",
+      "role_ko": "설정 메뉴에서 회전형과 고정형을 고르는 토글이다. 미니맵 위가 아니라 옵션 화면에 있지만, 미니맵 설계의 일부다."
+    },
+    {
+      "part_id": "env_cue",
+      "name_ko": "환경 방향 신호",
+      "role_ko": "'미니맵 없음' 모드 전용이다. 월드 위에 목표 쪽으로 흐르는 추상 흐름선 파티클을 그려, HUD 없이 방향만 알려 준다."
     }
   ],
   "states": [
     {
       "name": "idle",
       "trigger_ko": "플레이어가 이동 중이고 주요 목표가 원 안에 있음",
-      "visual_ko": "지도가 플레이어를 따라 부드럽게 흐르고, 목표 아이콘이 원 안의 실제 위치에 표시된다."
+      "visual_ko": "지도가 플레이어를 따라 부드럽게 흐르고, 목표 아이콘은 원 안의 실제 위치에 표시된다."
     },
     {
       "name": "rotating",
-      "trigger_ko": "카메라/플레이어가 방향을 바꿈(회전형 모드)",
-      "visual_ko": "지도 레이어와 N 표시가 반대 방향으로 돌고, 중심 화살표는 위를 유지한다. 아이콘 자체는 똑바로 선다(역회전)."
+      "trigger_ko": "카메라·플레이어가 방향을 바꿈(turn_90 이벤트)",
+      "visual_ko": "회전형에서는 지도 레이어와 N 표시가 반대로 돌고 중심 화살표는 위를 유지한다. 아이콘은 위치만 바뀌고 똑바로 서 있다. 북쪽 고정형에서는 지도가 그대로이고 중심 화살표와 시야 원뿔만 돈다."
     },
     {
       "name": "zooming",
-      "trigger_ko": "확대·축소 입력",
-      "visual_ko": "축척이 보간되며 바뀌고, 그 사이 일부 아이콘이 원 안팎으로 넘나들며 클램프 상태가 바뀐다."
+      "trigger_ko": "확대·축소 입력(zoom_step 이벤트 또는 zoom 파라미터 변경)",
+      "visual_ko": "축척이 보간되며 바뀌고, 그 사이 일부 아이콘이 원 안팎을 넘나들며 클램프 상태가 바뀐다."
     },
     {
       "name": "target_clamped",
-      "trigger_ko": "주요 목표가 표시 반경 밖으로 나감",
-      "visual_ko": "목표 아이콘이 테두리 안쪽에 붙고, 바깥을 향하는 작은 화살표와 거리 숫자가 함께 표시된다. 크기는 약간 줄고 테두리 색으로 강조."
+      "trigger_ko": "주요 목표가 표시 반경 밖으로 나감(add_far_objective 이벤트, 확대, 이동)",
+      "visual_ko": "목표 아이콘이 테두리 안쪽에 붙고, 바깥을 향하는 작은 쐐기 화살표와 거리 숫자가 함께 나온다. 크기는 조금 줄고 테두리 색으로 강조한다."
     },
     {
       "name": "ping_alert",
-      "trigger_ko": "적 감지·위험 발생",
-      "visual_ko": "해당 위치에서 원형 파동이 한 번 퍼지고, 적 아이콘이 잠시 강조된 뒤 평상시 크기로 돌아온다."
+      "trigger_ko": "적 감지·위험 발생(enemy_ping 이벤트)",
+      "visual_ko": "해당 위치에서 원형 파동이 한 번 퍼지고, 위험 아이콘이 잠시 강조된 뒤 평상시 크기로 돌아온다."
     },
     {
       "name": "arrived",
-      "trigger_ko": "목표 반경 안에 도착",
-      "visual_ko": "목표 아이콘이 짧게 커졌다 사라지고, 다음 목표가 있으면 새 아이콘이 등장한다."
+      "trigger_ko": "목표 반경 안에 도착(arrive_objective 이벤트)",
+      "visual_ko": "목표 아이콘이 짧게 커졌다 사라지고, 다음 목표 아이콘이 살짝 튀어나오며 등장한다."
     },
     {
       "name": "hidden_environment",
-      "trigger_ko": "'미니맵 없음' 모드",
-      "visual_ko": "원형 미니맵이 사라지고, 목표 방향으로 흐르는 바람 줄무늬(파티클)가 무대 위에 나타나 길을 안내한다."
+      "trigger_ko": "orientation 파라미터를 'none'으로 바꿈(이벤트가 아니라 파라미터로 진입)",
+      "visual_ko": "원형 미니맵이 사라지고, 월드 위에 목표 방향으로 흐르는 흰 흐름선 파티클이 나타난다. 이 모드에서도 turn_90과 arrive_objective는 흐름선 방향과 다음 목표 전환에 반영된다."
     }
   ],
   "params": [
@@ -113,7 +123,7 @@
         "north_up",
         "none"
       ],
-      "affects_ko": "rotate=플레이어 중심 회전형(지도가 돎), north_up=북쪽 고정형(화살표가 돎), none=미니맵 제거 후 환경 신호(바람 줄무늬)로 안내"
+      "affects_ko": "rotate는 플레이어 중심 회전형(지도가 돎), north_up은 북쪽 고정형(화살표가 돎), none은 미니맵을 없애고 환경 흐름선으로 안내한다. none일 때는 zoom·size·edge_clamp·view_cone·bg_opacity를 비활성(회색)으로 표시한다."
     },
     {
       "key": "zoom",
@@ -124,7 +134,7 @@
       "step": 0.1,
       "default": "1",
       "unit": "x",
-      "affects_ko": "원 안에 담기는 월드 범위. 높이면 주변이 자세하지만 목표가 쉽게 범위 밖으로 나가 클램프된다."
+      "affects_ko": "원 안에 담기는 월드 범위다. 높이면 주변이 자세히 보이지만 목표가 쉽게 범위 밖으로 나가 클램프된다."
     },
     {
       "key": "size",
@@ -135,14 +145,14 @@
       "step": 10,
       "default": "180",
       "unit": "px",
-      "affects_ko": "화면 점유율과 아이콘 판독성의 균형. 너무 크면 게임 화면을 가리고, 너무 작으면 아이콘이 뭉친다."
+      "affects_ko": "화면 점유율과 아이콘 판독성의 균형이다. 너무 크면 게임 화면을 가리고, 너무 작으면 아이콘이 뭉친다."
     },
     {
       "key": "edge_clamp",
       "label_ko": "범위 밖 목표 가장자리 표시",
       "type": "toggle",
       "default": "true",
-      "affects_ko": "끄면 원 밖 목표가 그냥 사라져 플레이어가 방향을 잃는다. 켜면 테두리에 붙은 화살표+거리로 표시된다."
+      "affects_ko": "끄면 원 밖의 목표가 그냥 사라져 방향을 잃는다. 켜면 테두리에 붙은 화살표와 거리로 표시된다."
     },
     {
       "key": "icon_hierarchy",
@@ -153,14 +163,14 @@
         "three_tier",
         "flat"
       ],
-      "affects_ko": "three_tier=주요 목표(크고 밝음)·위험(빨강 계열·펄스)·주변 정보(작고 흐림)로 구분. flat=모두 같은 크기·채도라 무엇이 중요한지 구분 안 됨."
+      "affects_ko": "three_tier는 주요 목표(크고 밝음), 위험(코랄 레드·일회성 펄스), 주변 정보(작고 흐림)로 나눈다. flat은 모두 같은 크기·채도라 무엇이 중요한지 구분되지 않는다. none 모드에서는 흐름선을 주요 목표에만 그릴지(three_tier), 모든 목표에 그릴지(flat)를 정한다."
     },
     {
       "key": "view_cone",
       "label_ko": "시야 원뿔",
       "type": "toggle",
       "default": "true",
-      "affects_ko": "카메라가 보는 방향을 부채꼴로 표시. 북쪽 고정형에서 특히 '지금 어느 쪽을 보는지' 이해를 돕는다."
+      "affects_ko": "카메라가 보는 방향을 부채꼴로 표시한다. 북쪽 고정형에서 '지금 어느 쪽을 보는지' 이해를 특히 많이 돕는다."
     },
     {
       "key": "bg_opacity",
@@ -171,7 +181,7 @@
       "step": 0.05,
       "default": "0.75",
       "unit": "",
-      "affects_ko": "낮추면 게임 화면이 비쳐 몰입감이 늘지만 밝은 장면에서 아이콘 대비가 떨어진다."
+      "affects_ko": "낮추면 게임 화면이 비쳐 몰입감이 늘지만, 밝은 장면에서 아이콘 대비가 떨어진다."
     }
   ],
   "presets": [
@@ -180,21 +190,21 @@
       "name_ko": "오픈월드 탐험형 · 플레이어 중심 회전",
       "genre_ko": "3인칭 오픈월드 액션 RPG",
       "values_json": "{\"orientation\":\"rotate\",\"zoom\":\"1.2\",\"size\":\"180\",\"edge_clamp\":\"true\",\"icon_hierarchy\":\"three_tier\",\"view_cone\":\"true\",\"bg_opacity\":\"0.75\"}",
-      "look_ko": "좌상단 중형 원. 지도가 카메라를 따라 돌아 '앞=위'가 항상 성립하고, 테두리 N 표시가 움직이며, 주요 목표는 범위 밖이면 가장자리에 붙는다."
+      "look_ko": "좌상단 중형 원. 지도가 카메라를 따라 돌아 '앞=위'가 항상 성립한다. 테두리의 N 표시가 움직이고, 주요 목표는 범위 밖으로 나가면 가장자리에 붙는다."
     },
     {
       "id": "tactical_north_up",
       "name_ko": "전술 작전형 · 북쪽 고정 광역",
       "genre_ko": "전술 슈터·RTS·팀 협동(콜아웃 공유)",
       "values_json": "{\"orientation\":\"north_up\",\"zoom\":\"0.7\",\"size\":\"240\",\"edge_clamp\":\"true\",\"icon_hierarchy\":\"three_tier\",\"view_cone\":\"true\",\"bg_opacity\":\"0.9\"}",
-      "look_ko": "큰 원에 넓은 범위가 담기고 지도는 고정, 중심 화살표와 시야 원뿔만 돈다. '북동쪽 건물' 같은 절대 방위로 팀원과 소통하기 좋다."
+      "look_ko": "큰 원에 넓은 범위가 담기고 지도는 고정된다. 중심 화살표와 시야 원뿔만 돈다. '북동쪽 건물' 같은 절대 방위로 팀원과 소통하기 좋다. 아이콘이 많은 맵에서 위치를 외우기도 쉽다."
     },
     {
       "id": "immersion_no_map",
       "name_ko": "몰입 우선형 · 미니맵 없이 환경 신호",
       "genre_ko": "시네마틱 오픈월드·탐험 어드벤처",
       "values_json": "{\"orientation\":\"none\",\"zoom\":\"1\",\"size\":\"180\",\"edge_clamp\":\"false\",\"icon_hierarchy\":\"three_tier\",\"view_cone\":\"false\",\"bg_opacity\":\"0.2\"}",
-      "look_ko": "HUD에서 원이 사라지고 화면 속 바람 줄무늬가 목표 쪽으로 흐른다. 화면은 깨끗하지만 정밀한 위치·거리 정보는 포기한다."
+      "look_ko": "HUD에서 원이 사라지고, 화면 속 흰 흐름선이 주요 목표 쪽으로 흐른다. 화면은 깨끗하지만 정확한 위치·거리 정보는 포기한다."
     }
   ],
   "events": [
@@ -207,12 +217,8 @@
       "label_ko": "먼 곳에 목표 추가(범위 밖)"
     },
     {
-      "id": "zoom_in",
-      "label_ko": "확대"
-    },
-    {
-      "id": "zoom_out",
-      "label_ko": "축소"
+      "id": "zoom_step",
+      "label_ko": "확대·축소 단계 전환(0.7x → 1.2x → 2.5x 순환)"
     },
     {
       "id": "enemy_ping",
@@ -227,8 +233,8 @@
     {
       "event_ko": "회전형 지도 회전 추종(카메라 방향 → 지도 각도)",
       "duration_ms": 120,
-      "easing": "exponential smoothing (lerp 계수 ≈ 1-exp(-dt*12))",
-      "note_ko": "권장값. 0이면 카메라 흔들림이 그대로 전달돼 어지럽고, 300ms 이상이면 방향이 늦게 따라와 헷갈린다."
+      "easing": "지수 스무딩: t = 1 - exp(-dt / τ), τ ≈ 0.12s (각도는 최단 경로로 보간)",
+      "note_ko": "권장값. τ는 각도 차이의 약 63%를 따라잡는 시간이다. 0이면 카메라 흔들림이 그대로 전해져 어지럽고, 300ms를 넘으면 방향이 늦게 따라와 헷갈린다. 359°→1° 경계에서 한 바퀴 도는 일을 막으려면 각도 차이를 -180~180으로 감싼다."
     },
     {
       "event_ko": "확대·축소 축척 보간",
@@ -240,13 +246,13 @@
       "event_ko": "원 안 ↔ 가장자리 클램프 전환",
       "duration_ms": 150,
       "easing": "ease-out-quad",
-      "note_ko": "권장값. 아이콘 크기·화살표 표시만 짧게 전환. 위치는 매 프레임 계산하므로 보간하지 않는다."
+      "note_ko": "권장값. 아이콘 크기와 화살표 표시만 짧게 전환한다. 위치는 매 프레임 계산하므로 보간하지 않는다."
     },
     {
       "event_ko": "적 감지 핑 파동",
       "duration_ms": 600,
       "easing": "ease-out-quad (scale 0.4→1.6, alpha 1→0)",
-      "note_ko": "권장값. 1회만 재생. 반복 깜박임은 인지 부하를 키운다."
+      "note_ko": "권장값. 한 번만 재생한다. 반복해서 깜박이면 인지 부하가 커지고, 공통 점멸 제한(초당 3회 이하)에도 걸린다."
     },
     {
       "event_ko": "새 목표 아이콘 등장",
@@ -261,145 +267,154 @@
       "note_ko": "권장값."
     },
     {
-      "event_ko": "환경 신호(바람 줄무늬) 한 주기",
+      "event_ko": "환경 흐름선 한 주기",
       "duration_ms": 1200,
       "easing": "ease-in-out-sine",
-      "note_ko": "권장값. 미니맵 없음 모드 전용. 너무 빠르면 HUD처럼 시끄럽고 너무 느리면 방향이 안 읽힌다."
+      "note_ko": "권장값. 미니맵 없음 모드 전용이다. 너무 빠르면 HUD처럼 시끄럽고, 너무 느리면 방향이 읽히지 않는다. prefers-reduced-motion이면 정지된 화살표 선으로 대체한다."
     }
   ],
   "hotspots": [
     {
       "n": 1,
-      "part_id": "player_marker",
-      "title_ko": "중심 고정 화살표 = '나는 여기'",
-      "body_ko": "플레이어는 늘 원의 정중앙에 있다. 시선이 매번 같은 기준점에서 출발하므로, 나머지 아이콘은 '나로부터 어느 쪽·얼마나'로만 읽으면 된다. 회전형에서는 화살표가 항상 위를 보므로 '위=앞'이라는 규칙이 한 번 학습되면 깨지지 않는다.",
-      "principle": "일관성"
+      "part_id": "orientation_setting",
+      "title_ko": "회전형이냐 고정형이냐, 플레이어가 고른다",
+      "body_ko": "회전형은 '위=앞'이라 길 찾기가 직관적이고, 고정형은 방위와 아이콘 위치가 늘 같아 외우기 쉽다. 사람마다 맞는 쪽이 달라서, 잘 만든 게임은 설정에서 둘 중 하나를 고르게 한다. orientation을 rotate와 north_up으로 번갈아 바꾸며 어느 쪽이 편한지 직접 비교해 보자.",
+      "principle": "접근성"
     },
     {
       "n": 2,
       "part_id": "edge_marker",
       "title_ko": "범위 밖 목표는 사라지지 않고 테두리에 붙는다",
-      "body_ko": "목표가 축척 밖으로 나가도 원 가장자리에 방향 화살표와 거리로 남는다. 플레이어는 지도를 열지 않고도 '어느 쪽으로 몇 m'를 즉시 판단한다. 크기를 약간 줄여 '원 안의 실제 위치'와 구분하는 것이 요점.",
+      "body_ko": "목표가 축척 밖으로 나가도 원 가장자리에 방향 화살표와 거리로 남는다. 전체 지도를 열지 않아도 '어느 쪽으로 몇 m'를 바로 판단할 수 있다. 크기를 조금 줄여 '원 안의 실제 위치'와 구분하는 것이 요점이다.",
       "principle": "즉각 피드백"
     },
     {
       "n": 3,
       "part_id": "icon_layer",
       "title_ko": "아이콘 3단계 위계",
-      "body_ko": "주요 목표는 가장 크고 밝고 맨 위에, 위험(적)은 빨강 계열과 일회성 펄스로, 상점·채집 같은 주변 정보는 작고 낮은 채도로 아래에 그린다. 겹칠 때도 무엇이 중요한지 한눈에 읽힌다.",
+      "body_ko": "주요 목표는 가장 크고 밝게 맨 위에 그린다. 위험은 코랄 레드와 한 번의 펄스로, 상점·채집 같은 주변 정보는 작고 채도 낮게 아래에 그린다. 아이콘이 겹쳐도 무엇이 중요한지 한눈에 읽힌다. 모양까지 다르게 하면 색을 구분하기 어려운 사람도 읽을 수 있다. flat 모드로 바꿔 차이를 비교해 보자.",
       "principle": "시각 위계"
     },
     {
       "n": 4,
       "part_id": "north_indicator",
       "title_ko": "회전형에도 N은 필요하다",
-      "body_ko": "지도가 돌면 절대 방위를 잃기 쉽다. 테두리를 따라 움직이는 N 하나가 전체 지도(북쪽 고정)를 열었을 때와 미니맵을 연결해 준다.",
+      "body_ko": "지도가 돌면 절대 방위를 잃기 쉽다. 테두리를 따라 움직이는 N 하나가 북쪽 고정인 전체 지도와 미니맵을 이어 준다. 전체 지도를 열었을 때 머릿속에서 방향을 다시 맞추는 수고가 줄어든다.",
       "principle": "인지 부하"
     },
     {
       "n": 5,
-      "part_id": "frame_ring",
-      "title_ko": "반투명 배경 + 또렷한 링",
-      "body_ko": "배경은 반투명으로 게임 화면을 덜 가리고, 링은 불투명 윤곽으로 HUD 경계를 분명히 한다. 밝은 설원·어두운 동굴 어디서나 아이콘 대비를 지키는 장치.",
-      "principle": "가독성"
+      "part_id": "env_cue",
+      "title_ko": "미니맵을 빼면 얻는 것과 잃는 것",
+      "body_ko": "HUD 원을 없애고 월드 속 흐름선으로 방향만 알려 주면 시선이 화면 구석이 아니라 장면 안에 머문다. 대신 정확한 거리와 여러 목표를 함께 보는 능력은 잃는다. none 모드와 회전형을 번갈아 켜 보며 이 교환을 체감해 보자.",
+      "principle": "몰입"
     }
   ],
   "principles": [
-    "가독성",
-    "시각 위계",
+    "접근성",
     "즉각 피드백",
-    "일관성",
+    "시각 위계",
     "인지 부하",
-    "몰입"
+    "몰입",
+    "가독성"
   ],
   "mistakes": [
     {
       "title_ko": "아이콘까지 지도와 함께 회전",
-      "body_ko": "회전형에서 아이콘을 지도 레이어 자식으로 두면 아이콘·글자도 같이 돌아 거꾸로 선다. 아이콘은 위치만 회전시키고, 자기 회전은 역회전(또는 별도 레이어)으로 똑바로 유지해야 한다."
+      "body_ko": "회전형에서 아이콘을 회전하는 지도 레이어의 자식으로 두면 아이콘과 글자도 같이 돌아 거꾸로 선다. 아이콘은 회전하지 않는 형제 레이어에 두고, 위치만 회전된 오프셋으로 계산한다."
     },
     {
       "title_ko": "범위 밖 목표가 그냥 사라짐",
-      "body_ko": "축척을 키우거나 멀리 이동하면 목표가 마스크에 잘려 없어진다. 플레이어는 전체 지도를 열어야만 방향을 알 수 있다. 클램프 마커를 마스크 바깥 레이어에 둬야 한다."
+      "body_ko": "축척을 키우거나 멀리 이동하면 목표가 마스크에 잘려 없어진다. 그러면 전체 지도를 열어야만 방향을 알 수 있다. 클램프 마커는 마스크 바깥 레이어에 둔다."
     },
     {
       "title_ko": "모든 아이콘이 같은 크기·같은 채도",
-      "body_ko": "상점·채집물·목표·적이 동등하게 그려지면 원 안이 '아이콘 수프'가 된다. 주요 목표 1개만 가장 강하게, 나머지는 단계적으로 약하게."
+      "body_ko": "상점·채집물·목표·적이 똑같이 그려지면 원 안이 '아이콘 수프'가 된다. 주요 목표 하나만 가장 강하게 하고, 나머지는 단계적으로 약하게 그린다."
     },
     {
-      "title_ko": "카메라 흔들림을 지도에 그대로 전달",
-      "body_ko": "카메라 yaw를 매 프레임 그대로 지도 회전에 넣으면 피격 흔들림·미세 조준까지 지도가 떨려 멀미가 난다. 짧은 스무딩을 넣고, 카메라 쉐이크 오프셋은 제외한다."
+      "title_ko": "방향 방식을 하나로 강제",
+      "body_ko": "회전형만, 또는 고정형만 제공하면 반대쪽을 편하게 느끼는 플레이어는 계속 방향을 헷갈린다. 장르에 맞는 기본값을 정하되, 설정에서 바꿀 수 있게 한다. 그러려면 코드에서 두 방식이 같은 변환 함수를 공유하도록 처음부터 설계해야 한다."
     },
     {
       "title_ko": "원형인데 RectMask2D 사용",
-      "body_ko": "RectMask2D는 사각형 영역만 자른다. 원형 이미지 위에 써도 모서리 바깥이 그대로 보인다. 원형 클리핑은 Mask(스텐실) 또는 원형 알파를 쓰는 셰이더로 처리한다."
+      "body_ko": "RectMask2D는 사각형 영역만 자른다. 원형 이미지 위에 붙여도 모서리 바깥이 그대로 보인다. 원형 클리핑은 Mask(스텐실)나 원형 알파 셰이더로 처리한다."
     }
   ],
-  "juice_off_ko": "효과 끄기 시: 지도가 카메라 각도를 스무딩 없이 즉시 따라가 덜덜 떨리고, 확대·축소는 한 프레임에 툭 바뀌어 아이콘이 순간이동한다. 아이콘은 지도와 함께 돌아 거꾸로 서며, 모든 아이콘이 같은 크기·같은 흰색이다. 범위 밖 목표는 테두리에 붙지 않고 사라지고, 적 감지 핑도 파동 없이 아이콘만 조용히 생긴다. N 표시와 시야 원뿔이 없어 지금 어느 쪽을 보는지 알 수 없다.",
+  "juice_off_ko": "효과를 끄면 이렇게 된다. 지도가 카메라 각도를 스무딩 없이 바로 따라가 덜덜 떨리고, 확대·축소는 한 프레임에 툭 바뀌어 아이콘이 순간이동한다. 아이콘은 지도와 함께 돌아 거꾸로 서고, 모두 같은 크기·같은 흰색이다. 범위 밖 목표는 테두리에 붙지 않고 사라지며, 적 감지 핑도 파동 없이 아이콘만 조용히 생긴다. N 표시와 시야 원뿔이 없어 지금 어느 쪽을 보는지 알 수 없다. none 모드에서는 흐름선이 움직이지 않는 정적인 선으로 남아 방향이 잘 읽히지 않는다.",
   "stage": {
     "aspect": "both",
     "needs_3d": false,
-    "scene_ko": "위에서 내려다본 2D 절차 생성 지형(풀밭·길·물·바위)을 '월드'로 깔고, 플레이어 점이 천천히 배회한다. 화면 좌상단(9:16에서는 상단 중앙 아래)에 원형 미니맵을 두고, 무대 버튼으로 카메라 회전·목표 추가·확대/축소·적 핑을 발생시킨다. 'none' 모드에서는 미니맵 대신 월드 위에 목표 쪽으로 흐르는 바람 줄무늬를 그린다. 월드 뷰는 플레이어 시점처럼 카메라 방향에 맞춰 회전해 미니맵과의 대응을 비교할 수 있게 한다."
+    "scene_ko": "위에서 내려다본 2D 절차 생성 지형(풀밭·길·물·바위)을 '월드'로 깔고, 그 위를 플레이어 점이 천천히 돌아다닌다. 원형 미니맵은 16:9에서 화면 좌상단, 9:16에서 상단 중앙 바로 아래에 둔다. 무대 버튼으로 카메라 회전, 먼 목표 추가, 확대·축소 단계, 적 핑, 목표 도착을 일으킨다. 'none' 모드에서는 미니맵 대신 월드 위에 목표 쪽으로 흐르는 흰 흐름선 파티클을 그린다. 월드 뷰도 카메라 방향에 맞춰 회전해 미니맵과의 대응을 비교할 수 있다. 웹 구현은 미니맵을 SVG(clipPath 원 + g transform rotate/translate)로, 월드는 Canvas 2D로 그린다. 외부 리소스와 비트맵은 쓰지 않는다."
   },
   "unity_ugui": {
-    "hierarchy": "Canvas (Screen Space - Overlay)\n└─ MinimapRoot (RectTransform, 앵커 좌상단, 180x180)\n   ├─ Background (Image: 원형 스프라이트, 반투명 검정)\n   ├─ MaskCircle (Image: 원형 스프라이트 + Mask, Show Mask Graphic 끔)\n   │  └─ MapPivot (RectTransform, 중심 pivot 0.5/0.5 — 회전형에서 Z 회전)\n   │     ├─ MapImage (RawImage: 지도 텍스처 또는 미니맵 카메라 RenderTexture)\n   │     └─ InRangeIcons (아이콘 프리팹들, Raycast Target 끔)\n   ├─ ViewCone (Image: 부채꼴, Filled Radial360)\n   ├─ PlayerArrow (Image, 정중앙)\n   ├─ Ring (Image: 테두리 링)\n   ├─ NorthIndicator (RectTransform, 링 위 궤도)\n   ├─ EdgeMarkers (마스크 바깥! 클램프된 아이콘 + 방향 화살표 + 거리 TMP_Text)\n   └─ ZoomButtons (Button x2)",
+    "hierarchy": "Canvas (Screen Space - Overlay, CanvasScaler)\n└─ MinimapCanvas (Canvas — 하위 Canvas, 매 프레임 갱신을 메인 HUD와 분리)\n   └─ MinimapRoot (RectTransform, 앵커 좌상단, 180x180, pivot 0.5/0.5)\n      ├─ Background (Image: 원형 스프라이트, 반투명 검정)\n      ├─ MaskCircle (Image: 원형 스프라이트 + Mask, Show Mask Graphic 끔)\n      │  ├─ MapPivot (RectTransform, 중심 pivot — 회전형에서 Z 회전, localScale = zoom)\n      │  │  └─ MapImage (RawImage: 미리 구운 지도 텍스처 또는 미니맵 카메라 RenderTexture\n      │  │               anchoredPosition = -플레이어 위치 × pixelsPerMeter)\n      │  └─ InRangeIcons (회전하지 않는 레이어, 아이콘 프리팹, Raycast Target 끔)\n      ├─ ViewCone (Image: Type Filled, Fill Method Radial 360)\n      ├─ PlayerArrow (Image, 정중앙)\n      ├─ Ring (Image: 테두리 링)\n      ├─ NorthIndicator (TextMeshProUGUI 'N', 링 반경 위)\n      ├─ EdgeMarkers (마스크 바깥! 클램프 아이콘 + 쐐기 화살표 + 거리 TextMeshProUGUI)\n      └─ ZoomButtons (Button x2)\n\nSettingsPanel (별도 Canvas)\n└─ OrientationDropdown (TMP_Dropdown: 회전형 / 북쪽 고정형)",
     "components_ko": [
-      "Canvas + CanvasScaler: Scale With Screen Size, 기준 1920x1080, Match 0.5. 미니맵 전용 하위 Canvas를 두면 매 프레임 갱신이 메인 HUD 리빌드를 유발하지 않는다.",
-      "Mask: 스텐실 버퍼로 자식을 부모 Image 모양(원)으로 자른다. 원형에는 필수. 경계는 하드 엣지.",
-      "RectMask2D: 스텐실 없이 사각형만 자른다. 빠르지만 원형 불가 → 사각 미니맵이나 스크롤 리스트용.",
-      "RawImage: 지도 텍스처 또는 Orthographic 미니맵 카메라의 RenderTexture 표시. 회전형에서는 RawImage 대신 MapPivot을 돌리거나 uvRect로 스크롤.",
-      "Image(Filled, Radial 360): 시야 원뿔 부채꼴. fillAmount로 시야각 표현.",
-      "TextMeshPro - Text(UI): 거리 라벨.",
-      "InputActionReference(새 Input System): Zoom 액션(마우스 휠 Y / 게임패드 숄더)과 Look 액션.",
-      "MinimapController(MonoBehaviour): [SerializeField]로 플레이어 Transform, 카메라 Transform, 아이콘 목록을 직접 연결(Find 계열 검색 금지)."
+      "Canvas + CanvasScaler: UI Scale Mode는 Scale With Screen Size, Reference Resolution 1920x1080, Match 0.5. 미니맵 전용 하위 Canvas를 두면 매 프레임 갱신이 메인 HUD 전체 리빌드를 일으키지 않는다.",
+      "Mask: 같은 GameObject의 Image(원형 스프라이트) 모양으로 자식을 스텐실로 잘라 낸다. 원형 클리핑에 필수이고 경계는 하드 엣지다. Show Mask Graphic을 끄면 마스크 이미지 자체는 보이지 않는다.",
+      "RectMask2D: 스텐실 없이 RectTransform의 사각형 영역만 자른다. 추가 드로우콜이 없어 빠르지만 원형은 안 된다. 사각 미니맵이나 스크롤 리스트용이다.",
+      "RawImage: 지도 텍스처나 Orthographic 미니맵 카메라의 RenderTexture를 표시한다. 회전은 MapPivot에서 처리하고, RawImage는 이동만 한다.",
+      "Image (Type: Filled, Fill Method: Radial 360): 시야 원뿔 부채꼴. fillAmount = 시야각/360, Fill Origin은 Top. 부채꼴이 정면 중심으로 펼쳐지도록 Z 회전에 시야각 절반을 더해 보정한다(Clockwise 체크 기준).",
+      "TextMeshProUGUI / TMP_Dropdown: 거리 라벨, N 표시, 설정의 방향 방식 선택.",
+      "InputActionReference (Input System 패키지): Zoom 액션(<Mouse>/scroll/y, 게임패드 숄더)과 Look 액션.",
+      "MinimapController (MonoBehaviour): [SerializeField]로 플레이어·카메라 Transform과 아이콘 목록을 인스펙터에서 직접 연결한다. Find 계열 검색은 쓰지 않는다.",
+      "MinimapIconDef (ScriptableObject): tier, 크기, 색, 모양 스프라이트, 그리기 순서를 데이터로 정의한다."
     ],
     "steps_ko": [
-      "원형 스프라이트로 MaskCircle을 만들고 Mask를 붙인 뒤 Show Mask Graphic을 끈다(배경은 별도 Background Image로).",
-      "월드→미니맵 변환을 만든다: offset = (target.position - player.position)의 xz 성분 × pixelsPerMeter × zoom.",
-      "회전형이면 offset을 -cameraYaw만큼 회전(Quaternion.Euler(0,0,cameraYaw) 적용)하고, MapPivot.localEulerAngles.z = cameraYaw로 지도도 돌린다. PlayerArrow는 고정. 북쪽 고정형이면 지도 고정, PlayerArrow와 ViewCone만 -yaw로 회전.",
-      "아이콘 자체는 지도와 같이 돌지 않게 위치만 지정하고 localRotation은 identity 유지(아이콘을 MapPivot 자식으로 두면 역회전 필요).",
-      "클램프: offset.magnitude > radius - margin 이면 offset.normalized × (radius - margin) 위치의 EdgeMarkers 쪽 아이콘을 켜고, 화살표를 Atan2로 바깥 방향 회전, 거리 라벨 갱신. 원 안이면 InRangeIcons 쪽을 켠다.",
-      "아이콘 위계: ScriptableObject(MinimapIconDef)에 tier, 크기, 색, sortOrder를 정의하고 SetSiblingIndex로 그리기 순서를 맞춘다.",
-      "줌: InputAction의 performed 값으로 targetZoom을 바꾸고 LateUpdate에서 Mathf.SmoothDamp로 보간.",
-      "카메라 각도 스무딩: Mathf.SmoothDampAngle 또는 지수 보간으로 120ms 정도. 카메라 쉐이크 오프셋은 제외한 '원래 yaw'를 쓴다.",
-      "갱신은 LateUpdate에서(카메라·플레이어 이동이 끝난 뒤) 수행해 1프레임 지연 떨림을 막는다.",
-      "Play 모드에서 축척을 바꿔 가며 목표가 원 안 ↔ 가장자리로 자연스럽게 넘어가는지 확인한다."
+      "원형 스프라이트로 MaskCircle을 만들고 Mask를 붙인 뒤 Show Mask Graphic을 끈다. 배경색은 별도 Background Image로 처리한다.",
+      "월드→미니맵 변환 함수 하나를 만든다. d = target.position - player.position, offset = new Vector2(d.x, d.z) × pixelsPerMeter × zoom. UGUI는 y가 위로 증가하므로 월드 z를 그대로 y로 쓴다.",
+      "지도 이동: MapImage.anchoredPosition = -new Vector2(player.x, player.z) × pixelsPerMeter, 축척은 MapPivot.localScale = Vector3.one × zoom.",
+      "회전형: yaw = 카메라 eulerAngles.y(위에서 볼 때 시계 방향 +). MapPivot.localEulerAngles = new Vector3(0, 0, yaw)로 지도를 화면 반시계로 돌린다. 아이콘 위치도 Quaternion.Euler(0, 0, yaw) * offset으로 계산하고 PlayerArrow는 고정한다. 북쪽 고정형: 지도와 아이콘은 회전하지 않고, PlayerArrow와 ViewCone에만 Z = -yaw를 준다. 두 방식은 enum 하나로 분기하고 변환 함수는 공유한다.",
+      "N 표시: 회전형에서는 Quaternion.Euler(0, 0, yaw) * (Vector2.up × ringRadius) 위치에 두고, 글자 회전은 0으로 유지한다.",
+      "아이콘은 회전하지 않는 InRangeIcons 아래에 두고 localRotation을 identity로 유지한다. 그러면 역회전 코드가 필요 없다.",
+      "클램프: offset.magnitude > radius - margin이면 EdgeMarkers 풀의 아이콘을 offset.normalized × (radius - margin)에 켠다. 화살표는 Mathf.Atan2(offset.y, offset.x) × Mathf.Rad2Deg - 90으로 바깥을 향하게 돌리고 거리 라벨을 갱신한다. 원 안이면 InRangeIcons 쪽 아이콘을 켠다.",
+      "아이콘 위계: MinimapIconDef의 tier에 따라 크기·색·모양을 적용하고, Transform.SetSiblingIndex로 그리기 순서를 맞춘다(뒤 형제일수록 위에 그려진다).",
+      "줌: Zoom 액션의 performed 콜백에서 targetZoom을 바꾸고, LateUpdate에서 Mathf.SmoothDamp로 보간한다.",
+      "각도 스무딩: Mathf.LerpAngle(current, target, 1 - Mathf.Exp(-Time.deltaTime / 0.12f))로 지수 보간한다. 카메라 쉐이크 오프셋을 뺀 원래 yaw를 쓴다.",
+      "설정: OrientationDropdown.onValueChanged에서 MinimapController의 모드를 바꾸고 PlayerPrefs에 저장한다. 시작할 때 저장값을 읽어 적용한다.",
+      "모든 갱신은 LateUpdate에서 한다. 카메라와 플레이어 이동이 끝난 뒤 계산해야 1프레임 지연 떨림이 없다. Play 모드에서 축척을 바꿔 목표가 원 안과 가장자리를 자연스럽게 오가는지 확인한다."
     ],
     "pitfalls_ko": [
-      "원형에 RectMask2D를 쓰면 사각형으로 잘린다. 원형은 Mask(스텐실) 필요.",
-      "Mask는 스텐실이라 하드 엣지다. 부드러운 페이드 테두리를 원하면 원형 알파 마스크 텍스처를 쓰는 커스텀 셰이더/머티리얼로 처리하거나 링 이미지로 경계를 덮는다.",
-      "EdgeMarkers를 MaskCircle 안에 두면 테두리 화살표가 반쯤 잘린다. 반드시 마스크 바깥 형제 레이어로.",
-      "Mask를 여러 겹 중첩하면 스텐실 단계와 배치(draw call)가 늘어난다. 미니맵 마스크는 1단으로.",
-      "미니맵 카메라+RenderTexture는 모바일에서 비용이 크다. 정적 지도는 미리 구운 텍스처를 쓰고, 해상도·갱신 빈도를 낮춘다.",
-      "아이콘 Image의 Raycast Target을 끄지 않으면 클릭이 미니맵에 먹혀 게임 입력을 가로챌 수 있다.",
-      "구 Input Manager(Input.GetAxis 등)와 FindObjectOfType는 사용하지 않는다. 입력은 InputAction, 참조는 인스펙터 연결."
+      "원형에 RectMask2D를 쓰면 사각형으로 잘린다. 원형은 Mask(스텐실)가 필요하다.",
+      "Mask는 스텐실이라 경계가 하드 엣지다. 부드러운 페이드 테두리를 원하면 원형 알파 마스크 텍스처를 쓰는 커스텀 셰이더를 쓰거나, 링 이미지로 경계를 덮는다.",
+      "EdgeMarkers를 MaskCircle 안에 두면 테두리 화살표가 반쯤 잘린다. 반드시 마스크 바깥 형제 레이어로 둔다.",
+      "Mask를 여러 겹 중첩하면 스텐실 단계와 드로우콜이 늘어난다. 미니맵 마스크는 한 단계로 유지한다.",
+      "미니맵 카메라와 RenderTexture는 모바일에서 비용이 크다. 정적인 지도는 미리 구운 텍스처를 쓰고, 해상도와 갱신 빈도를 낮춘다.",
+      "카메라 yaw를 매 프레임 그대로 넣으면 피격 흔들림에도 지도가 떨린다. 쉐이크 전 yaw를 쓰고 스무딩한다.",
+      "아이콘 Image의 Raycast Target을 끄지 않으면 미니맵이 클릭을 가로챌 수 있다.",
+      "회전 부호를 헷갈리기 쉽다. 월드 yaw는 위에서 볼 때 시계 방향이 +, UI Z 회전은 화면 반시계가 +다. 그래서 회전형 지도는 +yaw, 북쪽 고정형 화살표는 -yaw다.",
+      "구 Input Manager(Input.GetAxis 등)는 쓰지 않는다. FindObjectOfType는 Unity 6에서 obsolete다. 입력은 InputAction으로 받고, 참조는 인스펙터에서 연결한다."
     ]
   },
   "unity_uitk": {
-    "structure": "<ui:UXML xmlns:ui=\"UnityEngine.UIElements\">\n  <ui:VisualElement name=\"minimap-root\" class=\"minimap\">\n    <ui:VisualElement name=\"mask\" class=\"minimap__mask\">        <!-- border-radius 50% + overflow hidden -->\n      <ui:VisualElement name=\"map-pivot\" class=\"minimap__pivot\"> <!-- 회전형에서 rotate -->\n        <ui:VisualElement name=\"map-image\" class=\"minimap__map\" />\n        <ui:VisualElement name=\"icons-in\" class=\"minimap__icons\" />\n      </ui:VisualElement>\n    </ui:VisualElement>\n    <ui:VisualElement name=\"view-cone\" class=\"minimap__cone\" />\n    <ui:VisualElement name=\"player\" class=\"minimap__player\" />\n    <ui:VisualElement name=\"ring\" class=\"minimap__ring\" />\n    <ui:Label name=\"north\" text=\"N\" class=\"minimap__north\" />\n    <ui:VisualElement name=\"icons-edge\" class=\"minimap__edge\" />  <!-- 마스크 바깥 -->\n  </ui:VisualElement>\n</ui:UXML>",
+    "structure": "<ui:UXML xmlns:ui=\"UnityEngine.UIElements\">\n  <ui:VisualElement name=\"minimap-root\" class=\"minimap\" picking-mode=\"Ignore\">\n    <ui:VisualElement name=\"mask\" class=\"minimap__mask\" picking-mode=\"Ignore\">        <!-- border-radius 50% + overflow hidden -->\n      <ui:VisualElement name=\"map-pivot\" class=\"minimap__pivot\" picking-mode=\"Ignore\"> <!-- 회전형 rotate, 줌 scale -->\n        <ui:VisualElement name=\"map-image\" class=\"minimap__map\" picking-mode=\"Ignore\" />\n      </ui:VisualElement>\n      <ui:VisualElement name=\"icons-in\" class=\"minimap__icons\" picking-mode=\"Ignore\" />  <!-- 회전하지 않음 -->\n    </ui:VisualElement>\n    <ui:VisualElement name=\"view-cone\" class=\"minimap__cone\" picking-mode=\"Ignore\" />   <!-- Painter2D 부채꼴 -->\n    <ui:VisualElement name=\"player\" class=\"minimap__player\" picking-mode=\"Ignore\" />\n    <ui:VisualElement name=\"ring\" class=\"minimap__ring\" picking-mode=\"Ignore\" />\n    <ui:Label name=\"north\" text=\"N\" class=\"minimap__north\" picking-mode=\"Ignore\" />\n    <ui:VisualElement name=\"icons-edge\" class=\"minimap__edge\" picking-mode=\"Ignore\" />  <!-- 마스크 바깥 -->\n  </ui:VisualElement>\n</ui:UXML>\n\n<!-- 설정 화면(별도 UXML) -->\n<ui:DropdownField name=\"orientation\" label=\"미니맵 방향\" choices=\"회전형,북쪽 고정형\" index=\"0\" />",
     "uss_notes_ko": [
-      ".minimap__mask { width:100%; height:100%; border-radius:50%; overflow:hidden; } — 둥근 모서리/원형 마스크는 스텐실 방식으로 처리된다(사각 클리핑보다 비쌈).",
-      ".minimap__pivot { position:absolute; transform-origin:center; } — 회전은 style.rotate, 이동은 style.translate로. left/top을 매 프레임 바꾸면 레이아웃 재계산이 일어난다.",
-      ".minimap__icons > *, .minimap__edge > * { position:absolute; } 아이콘 위계는 .icon--primary / .icon--danger / .icon--minor 클래스로 width·background-color·opacity를 분리.",
-      "마스크 조상에 UsageHints.MaskContainer를 지정하면 스텐실 상태 변경으로 인한 배치 끊김을 줄일 수 있다.",
-      "확대·축소, 아이콘 등장 같은 상태 전환은 transition-property: scale, opacity; transition-duration: 0.25s; transition-timing-function: ease-out-cubic 처럼 USS 트랜지션으로. 매 프레임 따라가는 위치/회전은 코드에서 직접 설정.",
-      "모든 미니맵 요소에 picking-mode: Ignore를 지정해 게임 입력을 가로채지 않게 한다."
+      ".minimap__mask { position:absolute; width:100%; height:100%; border-radius:50%; overflow:hidden; } — 둥근 마스크는 사각 클리핑이 아니라 스텐실로 처리되어 더 비싸다.",
+      ".minimap__pivot { position:absolute; width:100%; height:100%; transform-origin:center; } — 회전은 style.rotate, 줌은 style.scale, 이동은 style.translate로 준다. left/top을 매 프레임 바꾸면 레이아웃 재계산이 일어난다.",
+      ".minimap__icons > *, .minimap__edge > * { position:absolute; } 아이콘 위계는 .icon--primary / .icon--danger / .icon--minor 클래스로 width·height·background-color·opacity를 나눈다.",
+      "마스크 조상 요소에 usageHints = UsageHints.MaskContainer를 지정하면 스텐실 상태 변경으로 배치가 끊기는 일을 줄일 수 있다.",
+      "줌·아이콘 등장 같은 상태 전환은 USS 트랜지션으로 처리한다. 예: transition-property: scale, opacity; transition-duration: 0.25s; transition-timing-function: ease-out-cubic. USS에는 quad 계열 키워드가 없으므로 quad 대신 ease-out이나 ease-out-sine을 쓴다. 매 프레임 따라가는 위치·회전은 코드에서 직접 설정한다.",
+      "picking-mode는 USS 속성이 아니다. UXML 속성 picking-mode=\"Ignore\" 또는 C# element.pickingMode = PickingMode.Ignore로 지정해 게임 입력을 가로채지 않게 한다."
     ],
     "steps_ko": [
-      "UIDocument 컴포넌트에 PanelSettings(Scale With Screen Size)와 위 UXML을 연결한다.",
-      "MinimapView(MonoBehaviour)의 OnEnable에서 rootVisualElement.Q(\"map-pivot\") 등으로 요소를 캐싱한다.",
-      "LateUpdate에서 UGUI와 같은 식으로 offset을 계산해 아이콘 style.translate = new Translate(x, y)로 배치한다(원 중심 기준이 되도록 절반 크기 보정).",
-      "회전형이면 pivot.style.rotate = new Rotate(cameraYaw), N 라벨은 링 반경 위 위치로 이동. 북쪽 고정형이면 player·view-cone만 회전.",
-      "클램프된 아이콘은 icons-edge로 옮기거나 그쪽 풀에서 꺼내 표시하고, 화살표 회전과 거리 Label 텍스트를 갱신한다.",
-      "줌 입력은 새 Input System의 InputAction으로 받아 targetZoom을 바꾸고, 축척은 코드 보간(SmoothDamp)한다.",
-      "Player Settings에서 depth/stencil 버퍼가 켜져 있는지 확인해 원형 마스크가 모든 플랫폼에서 동작하게 한다."
+      "UIDocument에 PanelSettings(Scale Mode: Scale With Screen Size)와 위 UXML을 연결한다.",
+      "MinimapView(MonoBehaviour)의 OnEnable에서 rootVisualElement.Q<VisualElement>(\"map-pivot\") 등으로 요소를 찾아 캐싱한다.",
+      "지도 표시: 미리 구운 텍스처는 USS background-image로, RenderTexture는 style.backgroundImage = new StyleBackground(Background.FromRenderTexture(rt))로 지정한다.",
+      "LateUpdate에서 UGUI와 같은 변환 함수로 offset을 계산한다. UITK는 y가 아래로 증가하므로 화면 좌표는 (offset.x, -offset.y)다. 아이콘은 style.translate = new Translate(cx + x - w/2, cy - y - h/2)처럼 원 중심과 아이콘 절반 크기를 보정해 놓는다.",
+      "회전형: UITK rotate는 화면 시계 방향이 +이므로 지도를 반시계로 돌리려면 pivot.style.rotate = new Rotate(-yaw). 아이콘 offset도 같은 방향으로 회전해 계산하고, N 라벨은 링 반경 위로 이동만 한다. 북쪽 고정형: player와 view-cone에 new Rotate(yaw)를 준다.",
+      "시야 원뿔: view-cone.generateVisualContent에 콜백을 등록하고 ctx.painter2D로 BeginPath → MoveTo(center) → Arc(center, r, Angle.Degrees(-90 - fov/2), Angle.Degrees(-90 + fov/2), ArcDirection.Clockwise) → ClosePath → Fill 순으로 그린다. 시야각이 바뀌면 MarkDirtyRepaint()를 부른다.",
+      "클램프된 아이콘은 icons-edge 쪽 풀에서 꺼내 표시하고, 화살표 회전과 거리 Label 텍스트를 갱신한다.",
+      "줌은 Input System의 InputAction으로 받아 targetZoom을 바꾸고, Mathf.SmoothDamp로 보간한 뒤 pivot.style.scale에 반영한다.",
+      "설정 화면의 DropdownField에 RegisterValueChangedCallback을 걸어 모드를 바꾸고 PlayerPrefs에 저장한다.",
+      "Player Settings에서 Depth and Stencil Buffers가 켜져 있는지 확인한다. 원형 마스크가 모든 플랫폼에서 제대로 그려지게 하기 위해서다."
     ],
     "pitfalls_ko": [
-      "overflow:hidden만 주고 border-radius를 빼면 사각형으로 잘린다.",
-      "클램프 아이콘을 mask 안에 두면 잘린다. 형제 요소(icons-edge)로 분리.",
-      "마스크를 중첩하면 배치가 깨진다. 미니맵 내부에 또 다른 둥근 overflow:hidden 요소를 만들지 말 것.",
-      "style.left/top으로 매 프레임 이동하면 레이아웃 패스가 돌아 비싸다. translate/rotate 사용.",
-      "Label이 pivot 자식이면 함께 회전한다. 텍스트는 회전하지 않는 레이어에 둔다.",
-      "Player Settings의 depth/stencil 버퍼가 꺼져 있으면 원형 마스크가 제대로 렌더링되지 않는다."
+      "overflow:hidden만 주고 border-radius를 빠뜨리면 사각형으로 잘린다.",
+      "클램프 아이콘을 mask 안에 두면 잘린다. 형제 요소(icons-edge)로 분리한다.",
+      "마스크를 중첩하면 배치가 깨진다. 미니맵 안에 또 다른 둥근 overflow:hidden 요소를 만들지 않는다.",
+      "style.left/top으로 매 프레임 이동하면 레이아웃 패스가 돌아 비싸다. translate·rotate·scale을 쓴다.",
+      "Label이나 아이콘을 map-pivot의 자식으로 두면 지도와 함께 회전한다. 회전하지 않는 icons-in에 둔다.",
+      "UGUI 식을 그대로 옮기면 y와 회전 방향이 뒤집힌다. UITK는 y가 아래로 증가하고 rotate는 시계 방향이 +다.",
+      "picking-mode를 USS에 적으면 무시된다. UXML 속성이나 C# pickingMode로 지정한다."
     ]
   },
   "inspired_by": [
@@ -408,32 +423,46 @@
       "title": "Genshin Impact (원신)",
       "credit": "© miHoYo / © HoYoverse",
       "borrowed_axes": [
-        "레이아웃 구조",
-        "형태·기울기"
+        "레이아웃 구조"
       ],
-      "what_learned_ko": "화면 구석의 원형 창, 중심의 플레이어 화살표와 시야 원뿔, 범위 밖 목표를 가장자리에 붙이는 구성을 '구조'로만 참고했다. 회전형/북쪽 고정 여부와 아이콘 위계는 화면을 직접 확인하지 못해 plausible 수준이며, 갤러리에서는 두 방식을 모두 토글로 제공한다."
+      "what_learned_ko": "확인된 근거는 하나다. 설정의 '기타(Other)' 메뉴에서 미니맵을 고정형과 회전형 중 고를 수 있다(v1.5 기준). 여기서 '방향 방식은 플레이어가 고르게 한다'는 설계를 배웠고, orientation 파라미터와 핫스팟 1로 옮겼다. 화면 구석 원형 창, 중심 화살표, 가장자리 목표 표시 같은 배치는 일반적인 구조로만 참고했으며 원신 화면으로 확인하지 못했다(plausible 이하). 원작 아이콘·색·장식은 쓰지 않는다."
     },
     {
       "game_id": "ghost-of-tsushima",
-      "title": "Ghost of Tsushima",
+      "title": "Ghost of Tsushima (2020 PS4 오리지널판)",
       "credit": "© Sony Interactive Entertainment",
       "borrowed_axes": [
         "모션 리듬"
       ],
-      "what_learned_ko": "미니맵·마커 대신 바람이 목표 방향을 가리키는 '환경 신호' 아이디어를 'none' 모드의 바람 줄무늬 리듬으로만 차용했다. '미니맵이 정말 필요한가'라는 설계 질문을 학생이 직접 전환해 보며 체감하게 한다."
+      "what_learned_ko": "웨이포인트 대신 바람으로 목표 방향을 알려 주고 HUD를 최소화한 설계(Wikipedia 요약 기준)에서 '미니맵을 넣지 않는 것도 선택지'라는 대조점을 가져왔다. none 모드 흐름선의 주기(약 1.2초 리듬)만 차용했다. 원작의 바람·잎·풀 연출은 재현하지 않고 추상적인 흰 선분 파티클로 바꿨다."
     }
   ],
-  "original_ko": "지도 그림은 원작 지형이 아닌 절차 생성 2D 타일(풀·길·물·바위)로 새로 만든다. 아이콘은 원작 아이콘을 쓰지 않고 기하 도형으로 새로 그린다: 주요 목표=채운 마름모, 위험=삼각형, 주변 정보=작은 원, 클램프 화살표=쐐기형. 색은 갤러리 자체 토큰(주요=앰버, 위험=코랄 레드, 주변=회청색)을 쓰고 원작 팔레트·장식 테두리·폰트는 복제하지 않는다. 링은 장식 없는 단색 두 겹 선, N 표시는 시스템 산세리프. 거리 라벨 카피는 '128 m' 같은 숫자+단위만. 'none' 모드의 바람은 원작 연출(잎·풀 흔들림)을 재현하지 않고 추상적인 흰 줄무늬 파티클로 표현한다.",
+  "original_ko": "지도는 원작 지형이 아니라 절차 생성한 2D 타일(풀·길·물·바위)로 새로 만든다. 아이콘도 기하 도형으로 새로 그린다. 주요 목표는 채운 마름모, 위험은 삼각형, 주변 정보는 작은 원, 클램프 화살표는 쐐기형이다. 색은 갤러리 자체 토큰을 쓴다(주요=앰버, 위험=코랄 레드, 주변=회청색). 원작 팔레트, 장식 테두리, 폰트는 복제하지 않는다. 링은 장식 없는 단색 두 겹 선이고, N 표시는 시스템 산세리프, 거리 라벨은 '128 m'처럼 숫자와 단위만 쓴다. 회전형/고정형/없음을 한 화면에서 즉시 전환하는 비교 무대 자체가 새로 만든 교육 장치다. none 모드의 환경 신호는 특정 게임의 바람 연출을 재현하지 않고, 목표 쪽으로 일정 간격으로 흐르는 짧은 흰 선분(흐름선)으로 표현한다. 잎·풀·천 흔들림 같은 자연물 모티프는 쓰지 않는다.",
   "references": [
+    {
+      "label": "Can I Play That — Genshin Impact 접근성 메뉴 분석(v1.5, 미니맵 고정/회전 옵션)",
+      "url": "https://caniplaythat.com/2021/05/06/genshin-impact-accessibility-menu-deep-dive/",
+      "type": "T2"
+    },
     {
       "label": "Genshin Impact 공식 사이트",
       "url": "https://genshin.hoyoverse.com/en/home",
       "type": "official"
     },
     {
-      "label": "Ghost of Tsushima 공식 페이지(PlayStation) — Guiding Wind 소개",
+      "label": "Ghost of Tsushima 공식 페이지(PlayStation, 접근성 항목 포함)",
       "url": "https://www.playstation.com/en-us/games/ghost-of-tsushima/",
       "type": "official"
+    },
+    {
+      "label": "Wikipedia — Ghost of Tsushima(바람 안내·최소 HUD 요약, 원 인터뷰 인용 포함)",
+      "url": "https://en.wikipedia.org/wiki/Ghost_of_Tsushima",
+      "type": "T2"
+    },
+    {
+      "label": "ResetEra — 미니맵 회전 vs 고정 토론(커뮤니티 의견)",
+      "url": "https://www.resetera.com/threads/mini-maps-rotation-enabled-or-fixed.365054/page-5",
+      "type": "T3"
     },
     {
       "label": "Unity UGUI Manual — Mask",
@@ -449,7 +478,22 @@
       "label": "Unity 6.3 Manual — UI Toolkit masking",
       "url": "https://docs.unity3d.com/6000.3/Documentation/Manual/UIE-masking.html",
       "type": "docs"
+    },
+    {
+      "label": "Unity 6.3 Manual — USS transitions",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/Manual/UIE-Transitions.html",
+      "type": "docs"
+    },
+    {
+      "label": "Unity 6.3 Scripting API — Painter2D.Arc",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/UIElements.Painter2D.Arc.html",
+      "type": "docs"
+    },
+    {
+      "label": "Game UI Database(사람이 직접 여는 참고 링크, AI 미접근)",
+      "url": "https://www.gameuidatabase.com/",
+      "type": "human-only"
     }
   ],
-  "confidence_notes_ko": "분석 대상 버전: Genshin Impact는 글로벌 정식 서비스판(PC/모바일/콘솔 공용 UI) 기준이지만, 이 카드의 원신 시각 서술(좌상단 원형, 시야 원뿔, 가장자리 목표 표시)은 화면을 직접 보지 못해 'plausible'이다. 회전형/북쪽 고정 여부, N 표시 동작, 아이콘 위계는 기억에 기댄 부분이 있어 'unverified'이므로 실제 게임 화면으로 검증해야 한다. Ghost of Tsushima는 근거 레코드 조사가 보류(미수행) 상태다. Guiding Wind가 전통적 UI 마커 대신 바람으로 방향을 안내한다는 내용은 PlayStation 공식 제품 페이지(Director's Cut 기준) 요약으로만 확인했다. '바람이 나침반·미니맵을 대신한다'는 개발자 인터뷰 원문은 이번 세션에서 확인하지 못했다(검색 한도 소진, 추정한 PlayStation Blog URL은 404). Unity 관련 서술(Mask=스텐실, RectMask2D=스텐실 없는 사각/2D 전용, UITK overflow:hidden+border-radius=스텐실, MaskContainer 힌트)은 Unity 공식 문서로 확인했다. timings는 근거가 없어 모두 업계 통상 권장값이다."
+  "confidence_notes_ko": "분석 대상 버전: 원신은 글로벌 정식 서비스판이고, 확인된 근거는 v1.5(2021년 5월) 시점이다. 고스트 오브 쓰시마는 2020 PS4 오리지널판이고 Director's Cut은 다루지 않는다. 확인됨: 원신 설정의 '기타(Other)' 메뉴에서 미니맵을 고정형/회전형으로 바꿀 수 있다(Can I Play That, T2). 옵션의 정확한 이름(예: 'Auto Rotate')은 확인하지 못했다. 원신 미니맵이 좌상단 원형이라는 점, 시야 원뿔, 범위 밖 목표 가장자리 표시, 미니맵 아이콘 위계는 출처가 없어 unverified다. 퀘스트 아이콘 체계(주황 다이아몬드 등)는 퀘스트 탭 기준이고 미니맵에도 같은지는 plausible이다. 고스트 오브 쓰시마: 이번 세션에서 Wikipedia를 다시 열어 바람이 목표를 안내하고(웨이포인트 없음) HUD가 최소화됐다는 요약과 Fleming의 '네거티브 스페이스' 발언 인용을 확인했다. ESPN 인터뷰 원문은 열지 못했다(WebSearch 한도 소진). PlayStation 공식 페이지에는 바람 안내나 미니맵 언급이 없고 HUD 텍스트 가독성 접근성 항목만 있다. 따라서 '미니맵이 없다'는 표현은 Wikipedia 요약에 기댄 것이다. 핫스팟 2~5와 흔한 실수의 대부분은 게임 근거가 아니라 일반 HUD 설계 원리에 기반한다. Unity: 이번 세션에서 UGUI Mask(스텐실, 부모 모양으로 자식 마스킹)와 RectMask2D(사각형만, 스텐실·추가 드로우콜 없음, 성능 우위) 문서를 다시 확인했다. UITK 관련 서술(스텐실 기반 둥근 마스크, MaskContainer 힌트, USS easing 키워드, Painter2D.Arc)은 이전 단계의 Unity 6.3 문서 확인을 따랐다. UGUI Z 회전은 반시계 +, UITK rotate는 시계 +라는 부호 규칙은 좌표계 관례에 따른 것이며 문서 문구로 직접 확인하지는 못했다(plausible). 강사가 Play 모드에서 확인하길 권한다. timings는 모두 근거 없는 업계 통상 권장값이다. gameuidatabase.com, interfaceingame.com에는 접근하지 않았다."
 }

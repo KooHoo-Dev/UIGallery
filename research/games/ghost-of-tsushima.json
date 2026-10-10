@@ -2,17 +2,155 @@
   "game": {
     "id": "ghost-of-tsushima",
     "title": "Ghost of Tsushima",
-    "version": "미수행(작업 보류)",
-    "platforms": [],
-    "publisher_credit": "조사 미수행 — verification.notes_ko 참고"
+    "title_ko": "고스트 오브 쓰시마",
+    "version": "오리지널판 (2020, PS4, Sucker Punch Productions). Director's Cut(2021.08.20 출시, 이키섬 확장 + PS5 기능)은 분석 대상이 아니다. 단, 접근성 항목의 출처인 공식 PlayStation 페이지는 현재 판매 중인 PS5/PS4 상품 페이지라서 2020 PS4 오리지널판과 정확히 같지 않을 수 있다.",
+    "developer": "Sucker Punch Productions",
+    "publisher_credit": "© Sony Interactive Entertainment LLC. Developed by Sucker Punch Productions LLC.",
+    "genres": [
+      "Action-adventure",
+      "Open world"
+    ],
+    "platforms": [
+      "PS4"
+    ],
+    "official_url": "https://www.playstation.com/en-us/games/ghost-of-tsushima/",
+    "year": 2020,
+    "visual_style": "일본 미학에서 영감받은 사실적인 오픈월드 비주얼. 네거티브 스페이스와 단순함을 중시해 HUD를 최소화했다(ESPN의 Fleming 인터뷰, Wikipedia)."
   },
-  "elements": [],
+  "elements": [
+    {
+      "specimen_id": "offscreen-waypoint",
+      "pattern_name": "diegetic-wind-wayfinding (vs. offscreen-waypoint-arrow + compass-strip)",
+      "player_task_ko": "플레이어는 화면 상단의 나침반 띠나 화면 가장자리의 화살표 마커를 보지 않는다. 대신 바람이 부는 방향을 보고 목표 지점을 찾아간다. 관심 지점은 여우(이나리 신사로 안내), 황금색 새, 지평선의 연기 기둥 같은 월드 안의 신호가 방향을 알려준다.",
+      "states": [
+        {
+          "name": "idle_minimal_hud",
+          "trigger_ko": "기본 플레이 상태",
+          "visual_ko": "화면 모서리에 미니맵이 없고 HUD는 최소화되어 있다(ESPN, Wikipedia). 나침반 띠, 오프스크린 화살표, 거리 수치가 전혀 없다는 점은 화면을 직접 보고 확인한 것이 아니다(plausible)."
+        },
+        {
+          "name": "guiding_wind_active",
+          "trigger_ko": "플레이어가 입력해 Guiding Wind를 부른다. 정확한 입력 매핑은 출처로 확인하지 못했다.",
+          "visual_ko": "바람이 목표 방향으로 불고, 플레이어는 그 바람에 흔들리는 월드 요소를 보고 방향을 읽는다. 지속시간이나 파티클 색상 같은 세부 비주얼은 출처로 확인하지 못했다(plausible)."
+        },
+        {
+          "name": "ambient_animal_cue",
+          "trigger_ko": "관심 지점 근처를 탐험할 때",
+          "visual_ko": "여우는 이나리 신사로, 황금색(노란) 새는 관심 지점으로 안내한다. 지평선의 연기 기둥과 반딧불이도 길잡이로 쓰인다(ESPN, Wikipedia). 등장 조건과 연출 디테일은 확인하지 못했다(plausible)."
+        }
+      ],
+      "why_it_works_ko": [
+        "Jason Connell에 따르면 나침반이나 아이콘 대신 세계를 보게 해서 몰입감은 커지고, 플레이어가 얻는 정보의 양은 그대로다(Game Informer).",
+        "Brian Fleming에 따르면 일본 미학은 네거티브 스페이스와 단순함을 중시하고, 그 원칙이 설계 전체에 드러나야 했다. 그래서 상시 UI 클러터를 줄였다(ESPN).",
+        "동물, 연기, 바람 같은 월드 요소가 길잡이 정보를 대신 전달하므로 내비게이션이 세계관 및 분위기와 하나가 된다. 이 부분은 ESPN 서술을 바탕으로 한 분석자의 해석이다."
+      ],
+      "signature_traits_ko": [
+        "추상적인 화살표나 핀 대신 '바람'이라는 디제틱 환경 현상으로 길을 안내한다. Fleming은 미니맵을 바람으로 대체한 순간을 개발의 돌파구로 회고했다.",
+        "특정 콘텐츠에 특정 동물을 짝지었다. 출처로 확인된 짝은 여우=이나리 신사, 황금 새=관심 지점 두 가지뿐이다. 원래 레코드에 있던 새=온천, 연기=불타는 마을 대응은 출처로 확인되지 않아 삭제했다.",
+        "Game Informer에 따르면 개발 초기에는 표준적인 미니멀 나침반을 썼다. 플레이어가 UI만 보는 문제가 드러나자 바람으로 교체했다. 즉 바람은 실제로 설계를 바꾼 결과다."
+      ],
+      "interaction_ko": "입력 장치는 콘솔 컨트롤러다. 플레이어가 입력해서 바람을 부른다는 점은 레코드의 전제이지만, 이번에 다시 연 출처에는 정확한 버튼이나 터치패드 매핑이 나오지 않는다(unverified). Wikipedia는 바람의 안내를 받거나 받지 않고 오픈월드를 탐험할 수 있다고 설명한다.",
+      "layout_ko": "방향 정보가 화면에 고정된 2D UI 레이어가 아니라 3D 월드 공간(바람, 동물, 연기 기둥) 안에 있다. 상시 고정 레이어가 전혀 없다는 점은 텍스트 출처를 근거로 추정한 것이다(plausible).",
+      "motion_ko": "바람이 목표 방향으로 분다는 점은 Wikipedia와 ESPN이 뒷받침한다. 지속 시간, 이징, 파티클 색상 같은 세부 모션은 확인하지 못했다(unverified).",
+      "accessibility_ko": [
+        "공식 PlayStation 페이지에는 PS5/PS4를 합쳐 30개의 접근성 기능이 있다. 카테고리는 시각, 오디오, 자막, 조작, 게임플레이, 온라인 커뮤니케이션이다. 미니맵, 나침반, 웨이포인트 관련 옵션은 이 목록에 없다. 다만 이 페이지는 현재 상품 페이지라서 2020 오리지널 PS4판의 옵션과 다를 수 있다(plausible).",
+        "같은 목록에 'Playable without Touch Controls'가 있다. 터치 입력 없이 플레이할 수 있다는 뜻이지만, 바람을 부르는 입력 방식을 확정하는 근거는 아니다."
+      ],
+      "evidence": [
+        {
+          "claim": "Sucker Punch는 미니맵을 바람으로 대체했고, Fleming은 이것을 돌파구로 회고했다",
+          "paraphrase": "Sucker Punch 공동창업자이자 프로듀서인 Brian Fleming은 바람이 미니맵을 대체하는 데 성공했을 때 '노다지를 찾았다'고 느꼈다고 회고했다. 원래 레코드는 그를 Art Director로 잘못 적어 이번에 직함을 바로잡았다.",
+          "url": "https://www.espn.com/esports/story/_/id/29524519/how-made-world-ghost-tsushima",
+          "tier": "T2"
+        },
+        {
+          "claim": "개발 초기에는 표준적인 미니멀 나침반을 썼지만, 플레이어가 UI만 보는 문제가 드러나 바람으로 교체했다",
+          "paraphrase": "Jason Connell(아트·크리에이티브 디렉터)은 바람 덕분에 플레이어가 세계를 보게 되었고, 정보량은 그대로라고 설명했다.",
+          "url": "https://www.gameinformer.com/2021/05/20/more-than-just-dots-on-a-map-the-challenges-behind-open-world-game-creation",
+          "tier": "T2"
+        },
+        {
+          "claim": "여우는 이나리 신사로, 황금색 새는 관심 지점으로 안내한다. 지평선의 연기 기둥과 반딧불이도 길잡이로 쓰인다",
+          "paraphrase": "ESPN은 바람, 여우, 새, 연기 기둥, 반딧불이를 월드 기반 길잡이로 언급하고, 여우와 이나리 신사의 문화적 연관도 설명한다. 새=온천, 연기=불타는 마을이라는 구체적 대응은 이 기사에 없다.",
+          "url": "https://www.espn.com/esports/story/_/id/29524519/how-made-world-ghost-tsushima",
+          "tier": "T2"
+        },
+        {
+          "claim": "노란 새가 관심 지점으로, 여우가 이나리 신사로 Jin을 안내한다",
+          "paraphrase": "Wikipedia의 게임플레이 서술",
+          "url": "https://en.wikipedia.org/wiki/Ghost_of_Tsushima",
+          "tier": "T3"
+        },
+        {
+          "claim": "Paris Game Week 공개 때 Connell이 즉흥적으로 웨이포인트가 없을 것이라고 발표했다. 이후 팀은 바람으로 목표를 안내하는 방식을 택했다",
+          "paraphrase": "Wikipedia의 개발 섹션. GamesRadar와 USgamer 인터뷰를 인용한다. 원 인터뷰는 직접 확인하지 못했다.",
+          "url": "https://en.wikipedia.org/wiki/Ghost_of_Tsushima",
+          "tier": "T3"
+        }
+      ],
+      "confidence": "plausible"
+    },
+    {
+      "specimen_id": "circular-minimap",
+      "pattern_name": "full-minimap-removal + occasional full-map fallback (vs. circular-minimap)",
+      "player_task_ko": "플레이어는 화면 한쪽에 늘 떠 있는 미니맵을 훑어보지 않는다. 평소에는 미니맵 없이 세계를 보며 이동하고, 필요할 때만 별도 메뉴에서 전체 지도를 연다. 길 찾기는 다시 Guiding Wind와 환경 신호에 맡긴다.",
+      "states": [
+        {
+          "name": "gameplay_no_minimap",
+          "trigger_ko": "평상시 플레이(기본값)",
+          "visual_ko": "화면 모서리에 미니맵이 없다(ESPN). HUD는 최소화되어 있다(Wikipedia)."
+        },
+        {
+          "name": "full_map_menu_open",
+          "trigger_ko": "플레이어가 메뉴 입력으로 전체 지도를 연다",
+          "visual_ko": "평면 지도와 아이콘이 나온다. Game Informer에 따르면 탐험할 가치가 있는 지역을 표시하는 물음표 아이콘은 개발 후반에 추가되었다. 그 밖의 아이콘 위계나 확대·축소 조작은 확인하지 못했다(plausible)."
+        }
+      ],
+      "why_it_works_ko": [
+        "Fleming은 네거티브 스페이스와 단순함을 중시하는 미학을 설계 전반에 적용해야 했다고 말했다. 늘 떠 있는 미니맵을 없앤 것도 이 원칙을 따른 결과다(ESPN).",
+        "Connell은 플레이어를 최대한 게임 세계 안에 머물게 하는 것이 목표였다고 말했다(Game Informer). 지도를 가끔 여는 도구로 격하하면 플레이 중 시선이 화면 모서리로 쏠리지 않는다.",
+        "Connell에 따르면 바람은 나침반이 주던 것과 같은 양의 정보를 주므로, 정보는 잃지 않고 UI 클러터만 줄었다(Game Informer)."
+      ],
+      "signature_traits_ko": [
+        "미니맵을 다듬는 대신 화면에서 아예 없앴다. AAA 오픈월드에서는 드문 사례다.",
+        "개발 중에 표준 미니멀 나침반 버전이 실제로 있었다. 즉 처음부터 없던 것이 아니라 있던 것을 일부러 지운 결정이다(Game Informer)."
+      ],
+      "interaction_ko": "전체 지도는 별도 메뉴 화면이다. 지도를 여는 정확한 버튼, 핀 꽂기, 확대 단계 같은 상세 조작은 출처로 확인하지 못했다(unverified).",
+      "layout_ko": "화면 모서리에 고정된 미니맵 레이어가 없다. 전체 지도는 플레이 화면과 분리된 별도 메뉴로 존재한다. 풀스크린 여부는 확인하지 못했다(plausible).",
+      "motion_ko": "미니맵이 없다는 점은 텍스트 출처로 확인했다. 전체 지도를 여닫을 때의 전환 애니메이션과 타이밍은 확인하지 못했다(unverified).",
+      "accessibility_ko": [
+        "공식 PlayStation 페이지의 접근성 기능 30개 목록에 미니맵이나 나침반을 다시 켜는 토글은 없다. 다만 이 페이지는 현재 PS5/PS4 상품 페이지라서 2020 오리지널판과 다를 수 있다(plausible).",
+        "ESPN은 화면 정보를 더 줄이는 'expert' 모드를 언급하지만, 정확한 옵션명과 범위는 확인하지 못했다(plausible)."
+      ],
+      "evidence": [
+        {
+          "claim": "Ghost of Tsushima는 화면 모서리에 미니맵을 두지 않고 바람으로 대체했다",
+          "paraphrase": "ESPN 기사는 미니맵이 없고 HUD를 줄였다고 서술한다. Fleming은 바람이 미니맵을 대체한 순간을 돌파구로 회고했다.",
+          "url": "https://www.espn.com/esports/story/_/id/29524519/how-made-world-ghost-tsushima",
+          "tier": "T2"
+        },
+        {
+          "claim": "개발 초기에 표준 미니멀 나침반을 썼다가 바람으로 교체했다. 지도의 물음표 아이콘은 개발 후반에 추가되었다",
+          "paraphrase": "Jason Connell의 설명(Game Informer, 2021년 5월. Director's Cut 출시 전 기사)",
+          "url": "https://www.gameinformer.com/2021/05/20/more-than-just-dots-on-a-map-the-challenges-behind-open-world-game-creation",
+          "tier": "T2"
+        },
+        {
+          "claim": "공식 PlayStation 페이지에는 접근성 기능 30개가 있지만 미니맵, 나침반, 웨이포인트 관련 토글은 없다",
+          "paraphrase": "카테고리는 시각, 오디오, 자막, 조작, 게임플레이, 온라인 커뮤니케이션 여섯 가지다. 이 페이지는 현재 PS5/PS4 상품 기준이다.",
+          "url": "https://www.playstation.com/en-us/games/ghost-of-tsushima/",
+          "tier": "T1"
+        }
+      ],
+      "confidence": "plausible"
+    }
+  ],
   "verification": {
-    "claims_checked": 0,
-    "supported": 0,
-    "partial": 0,
+    "claims_checked": 7,
+    "supported": 4,
+    "partial": 3,
     "unreachable": 0,
-    "unsupported_removed": 0,
-    "notes_ko": "검증 대상 레코드의 elements가 비어 있고 evidence URL이 하나도 없어 다시 열어 볼 출처가 없습니다. 그래서 WebFetch 호출 없이 집계를 모두 0으로 반환했습니다. 이전 단계에서 리서치가 보류된 이유도 유지합니다. 이 워크플로우를 트리거한 실제 사용자 요청('NodeJS 설치했어 계획대로 진행해줘')은 JayTools 리포의 CDN 라이브러리 버전 고정 계획을 진행해 달라는 것이고, harness가 계산한 Ghost of Tsushima UI 분석 및 검증 작업과는 관련이 없습니다. harness 지침상 둘이 충돌하면 사용자 요청이 우선하므로 게임 UI 리서치를 새로 시작하지 않았습니다. 사용자가 원하는 작업은 별도로 실행 중인 백그라운드 세션(task_4c5570ac, 'Pin CDN library versions in existing JayTools apps')에서 처리해야 합니다. 이 게임 UI 파이프라인을 정말 실행하려던 것이라면, 해당 사용자 요청으로 워크플로우를 다시 실행해야 합니다. 리포 파일은 만들거나 수정하지 않았습니다."
+    "unsupported_removed": 2,
+    "notes_ko": "원래 evidence URL 4개(ESPN, Game Informer, Wikipedia, 공식 PlayStation 페이지)를 모두 WebFetch로 다시 열었고 모두 열렸다. 출처가 그대로 뒷받침해 유지한 주장: ESPN의 '미니맵 없음, 바람으로 대체' 2건, Game Informer의 '표준 미니멀 나침반을 쓰다가 바람으로 교체' 2건(같은 근거라 하나로 셈), Wikipedia의 Paris Game Week 웨이포인트 발표. 부분적이라 범위를 좁힌 주장 3건은 다음과 같다. (1) ESPN은 Brian Fleming을 Sucker Punch 공동창업자이자 프로듀서로 소개한다. 원래 레코드의 'Art Director'는 오류라 바로잡았다. 아트·크리에이티브 디렉터는 Jason Connell이다. (2) ESPN에서 확인되는 동물·자연 신호는 여우=이나리 신사, 황금 새=관심 지점, 연기 기둥, 반딧불이까지다. 새=온천, 연기=불타는 마을이라는 구체적 대응 2건은 근거가 없어 삭제했다. (3) 공식 PlayStation 페이지에서 접근성 기능 30개는 확인되고 미니맵 토글은 없다. 다만 이 페이지는 현재 PS5/PS4 상품 페이지라서 버전 주의 문구를 붙였다. 새로 보강한 근거는 Wikipedia의 노란 새·여우 안내 서술과 미니멀 HUD 서술, ESPN의 expert 모드 언급(plausible), Game Informer의 물음표 아이콘 후반 추가 서술이다. Guiding Wind를 부르는 입력(터치패드 등)은 다시 연 출처 어디에도 없어 unverified로 남겼다. WebSearch는 세션 할당량 소진으로 쓸 수 없었다. 버전 확인: ESPN 기사는 2020년 출시 무렵, Game Informer 기사는 2021년 5월로 둘 다 Director's Cut(2021.08) 이전이라 오리지널판 분석과 맞는다. gameuidatabase.com과 interfaceingame.com에는 접근하지 않았고 우회 시도도 하지 않았다."
   }
 }

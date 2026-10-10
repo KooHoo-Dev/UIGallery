@@ -1,18 +1,178 @@
 {
   "game": {
     "id": "hades",
-    "title": "(검증 대상 없음 — 아래 참고)",
-    "version": "n/a",
-    "platforms": [],
-    "publisher_credit": "n/a"
+    "title": "Hades",
+    "title_ko": "하데스",
+    "developer": "Supergiant Games",
+    "publisher_credit": "© Supergiant Games",
+    "version": "Hades (2020) 정식 발매판, 원작 기준. Hades II(속편)와는 별개다. 2020년 9월 17일 Windows/macOS/Nintendo Switch로 정식 출시했으며 Steam 앞서 해보기는 2019년 12월 10일 시작. PS4/PS5/Xbox One/Series X|S판은 2021년 8월 13일 출시.",
+    "platforms": [
+      "PC (Windows/macOS; Steam·Epic·Microsoft Store)",
+      "Nintendo Switch",
+      "PlayStation 4/5",
+      "Xbox One/Series X|S",
+      "iOS (Netflix Games)"
+    ],
+    "genres": [
+      "로그라이크/로그라이트",
+      "액션 RPG",
+      "핵 앤 슬래시",
+      "던전 크롤러"
+    ],
+    "visual_style": "그리스 신화 저승을 재해석한 2D 아트(주 아티스트 Jen Zee). '핸드페인트풍'이라는 표현은 이번에 다시 연 출처에서 확인되지 않음",
+    "official_url": "https://www.supergiantgames.com/games/hades/",
+    "year": 2020
   },
-  "elements": [],
+  "elements": [
+    {
+      "specimen_id": "health-bar-trail",
+      "pattern_name": "damage-trail-health-bar-with-low-hp-vignette",
+      "player_task_ko": "전투 중 체력 바를 수시로 확인한다. 피격 시 줄어드는 현재 바와 뒤따라 줄어드는 잔상 바의 간격으로 직전 피해량을 가늠한다. 체력이 위험해지면 회피·회복 행동으로 전환한다. (잔상 바와 저체력 화면 효과가 Hades에 있다는 점은 이번 검증에서 출처로 확인되지 않은 기억 기반 서술이다.)",
+      "info_shown_ko": [
+        "현재 체력(수치/비율)",
+        "최근 피해량(현재 바와 잔상 바 사이 간격, 미확인)",
+        "저체력 경고(화면 테두리 효과, 미확인)"
+      ],
+      "interaction_ko": "플레이어가 직접 조작하지 않는 표시 전용 요소다. 전투 결과(피격·회복)에 따라 값이 바뀌고 그 변화는 시각 피드백으로 전달된다. 효과음·진동 피드백 여부는 확인하지 못했다.",
+      "layout_ko": "화면 하단 상태 표시 영역에 가로형 바로 놓인다고 기억에 기대어 기술했다. 좌표·크기·앵커는 화면으로 직접 확인하지 못해 특정하지 않는다.",
+      "motion_ko": "현재 바가 즉시 줄고 잔상 바가 느리게 따라오는 데미지 트레일 패턴으로 기억한다. 출처로 확인한 바는 없고, 지연 시간(ms)과 이징 수치도 기재하지 않는다.",
+      "accessibility_ko": [
+        "God Mode: 런에 실패할 때마다 플레이어 캐릭터를 더 강하게 해 주는 난이도 보정 옵션 (Wikipedia 기준. 구체적 수치와 '피해 감소' 방식은 이번에 다시 연 출처로 확인 못 함)",
+        "자막 제공 (Steam 공식 상점 페이지에 'Captions available' 표기)"
+      ],
+      "states": [
+        {
+          "name": "평시(Normal)",
+          "trigger_ko": "체력이 가득하거나 여유 있는 상태",
+          "visual_ko": "체력 바가 안정적으로 표시됨 (일반론적 서술, 미확인)"
+        },
+        {
+          "name": "피격 직후(Damaged)",
+          "trigger_ko": "적의 공격을 맞아 체력이 감소",
+          "visual_ko": "현재 바가 줄고 잔상 바가 뒤따라 줄어든다고 기억함. 잔상 바의 색은 확인하지 못함 (출처 없음, 미확인)"
+        },
+        {
+          "name": "저체력(Low HP)",
+          "trigger_ko": "체력이 일정 비율 이하로 떨어짐(기준 비율 미확인)",
+          "visual_ko": "화면 테두리에 경고 효과가 나타난다고 기억함. 형태와 애니메이션은 확인하지 못함 (출처 없음, 미확인)"
+        },
+        {
+          "name": "회복(Healing)",
+          "trigger_ko": "회복 효과를 얻음",
+          "visual_ko": "체력 바가 다시 채워짐. 애니메이션 세부는 확인하지 못함 (미확인)"
+        }
+      ],
+      "why_it_works_ko": [
+        "(일반 UX 원리) 현재 바는 즉각적인 반응을, 잔상 바는 직전 피해의 크기를 함께 전달한다. 그래서 한 번의 큰 피해와 여러 번의 작은 피해를 구분하기 쉽다.",
+        "(일반 UX 원리) 화면 테두리 경고는 중심 시야를 가리지 않고 주변시야로 위험을 알린다. 그래서 전투 중 시선 이동이 줄어든다."
+      ],
+      "signature_traits_ko": [
+        "그리스 신화 테마에 맞춘 바 장식과 색상은 이번 세션에서 확인하지 못함(미확인). 재현할 때 Hades의 고유 장식을 베끼지 말 것",
+        "로그라이트 구조(런마다 초기화, 방 단위 보상)와 체력 UI가 맞물린다는 해석은 1차 자료로 확인하지 못함"
+      ],
+      "evidence": [
+        {
+          "claim": "Hades는 실패한 런마다 플레이어 캐릭터를 더 강하게 해 주는 God Mode 옵션을 제공한다.",
+          "paraphrase": "Wikipedia는 God Mode가 저승 탈출에 실패할 때마다 플레이어 캐릭터를 강화한다고 설명한다. 피해 감소 수치는 이 출처에 나오지 않는다.",
+          "tier": "T2",
+          "url": "https://en.wikipedia.org/wiki/Hades_(video_game)"
+        },
+        {
+          "claim": "Hades 공식 Steam 페이지는 자막 제공을 기능으로 표기한다.",
+          "paraphrase": "Steam 상점 페이지 기능 목록에 'Captions available', Family Sharing, Remote Play(휴대폰·태블릿·TV)가 나열되어 있다.",
+          "tier": "T1",
+          "url": "https://store.steampowered.com/app/1145360/Hades/"
+        }
+      ],
+      "confidence": "unverified",
+      "reference_links": [
+        {
+          "label": "Hades - Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Hades_(video_game)"
+        },
+        {
+          "label": "Hades - Steam",
+          "url": "https://store.steampowered.com/app/1145360/Hades/"
+        }
+      ]
+    },
+    {
+      "specimen_id": "dialogue-choices",
+      "pattern_name": "portrait-dialogue-with-state-driven-barks-no-timed-menu",
+      "player_task_ko": "대화창에 뜨는 화자 초상화와 이름을 확인하고, 입력으로 대사를 넘기며 음성 대사를 따라간다. 핵심은 제한시간형 다중 선택 메뉴가 아니다. 사망·진행 같은 누적 사건에 따라 자동으로 이어지는 대사를 받아들이는 방식이다. (뒤쪽 서사 구조는 Wikipedia로 뒷받침됨. 화면 구성은 미확인)",
+      "info_shown_ko": [
+        "화자 이름과 초상화 (미확인)",
+        "대사 텍스트(음성 대사의 자막 역할 겸용)",
+        "드물게 나오는 수락/거절형 프롬프트, 예: 선물 증정 (미확인)"
+      ],
+      "interaction_ko": "확인 입력으로 대사를 한 줄씩 넘긴다고 기억한다. 키 바인딩과 빨리 넘기기 기능은 확인하지 못했다. 제한시간 다중 선택 UI가 핵심 메커닉이라는 근거는 찾지 못했다.",
+      "layout_ko": "하단 가로형 대화 상자와 측면 화자 초상화로 구성된 통상적 레이아웃이라고 기억에 기대어 기술했다. 좌표와 비율은 화면으로 확인하지 못했다.",
+      "motion_ko": "대사가 음성 더빙과 함께 나온다(완전 더빙은 공식 페이지로 확인). 텍스트 등장 방식(타자기 효과 여부), 전환 타이밍, 이징은 확인하지 못했다.",
+      "accessibility_ko": [
+        "자막 제공 (Steam 공식 상점 페이지에 'Captions available' 표기)"
+      ],
+      "states": [
+        {
+          "name": "대사 표시(Line display)",
+          "trigger_ko": "NPC와 상호작용을 시작",
+          "visual_ko": "대화 상자에 화자 초상화·이름·텍스트가 음성과 함께 표시된다고 기억함 (배치 미확인)"
+        },
+        {
+          "name": "줄 전환(Advance)",
+          "trigger_ko": "플레이어의 확인 입력",
+          "visual_ko": "다음 대사 줄로 넘어감. 전환 연출은 확인하지 못함 (미확인)"
+        },
+        {
+          "name": "수락/거절 프롬프트(드묾)",
+          "trigger_ko": "선물 증정 등 특정 상호작용",
+          "visual_ko": "단순 수락/거절 선택이 뜬다고 기억함. UI 세부는 확인하지 못함 (미확인)"
+        }
+      ],
+      "why_it_works_ko": [
+        "Wikipedia에 따르면 작가 Kasavin과 팀은 다수의 잠재적 연쇄 이벤트를 바탕으로 약 10시간 분량의 대사를 썼다. 공식 페이지는 '수천 개의 고유 스토리 이벤트'를 내세운다. 그래서 선택지를 누르지 않아도 매 런마다 서사가 쌓인다는 체감을 줄 수 있다.",
+        "(설계 해석) 대사 진행을 짧게 유지하면 죽음과 재도전을 반복하는 로그라이트 템포를 덜 방해한다. 이 효과를 직접 측정한 자료는 없다."
+      ],
+      "signature_traits_ko": [
+        "명시적 선택 대신 반복 플레이 기록이 '선택'을 대신하는 서사 구조. 연쇄 이벤트 기반 대사라는 사실은 Wikipedia로 확인했다. 개발자 강연 같은 1차 자료는 이번 세션에서 확인하지 못했다.",
+        "Persona류의 제한시간 다중 선택 대화 UI는 Hades의 핵심 메커닉으로 확인되지 않는다. 두 게임을 대조할 지점이다."
+      ],
+      "evidence": [
+        {
+          "claim": "Hades의 대사는 Zagreus와 NPC 사이의 다수 잠재적 연쇄 이벤트를 바탕으로 쓴 약 10시간 분량의 대사로 이루어져 있다.",
+          "paraphrase": "Wikipedia는 Kasavin과 작가진이 많은 잠재적 연쇄 이벤트를 바탕으로 약 10시간 분량의 대사를 초안 작성했다고 설명한다.",
+          "tier": "T2",
+          "url": "https://en.wikipedia.org/wiki/Hades_(video_game)"
+        },
+        {
+          "claim": "Hades는 완전 더빙된 캐스트와 수천 개의 고유 스토리 이벤트를 공식 특징으로 내세운다.",
+          "paraphrase": "Steam 상점 페이지는 개성 강한 캐릭터들의 완전 더빙 캐스트와, 진행하며 접하는 수천 개의 고유 스토리 이벤트를 소개한다.",
+          "tier": "T1",
+          "url": "https://store.steampowered.com/app/1145360/Hades/"
+        }
+      ],
+      "confidence": "plausible",
+      "reference_links": [
+        {
+          "label": "Hades - Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Hades_(video_game)"
+        },
+        {
+          "label": "Hades - Steam",
+          "url": "https://store.steampowered.com/app/1145360/Hades/"
+        },
+        {
+          "label": "Supergiant Games 공식 Hades 페이지",
+          "url": "https://www.supergiantgames.com/games/hades/"
+        }
+      ]
+    }
+  ],
   "verification": {
-    "claims_checked": 0,
-    "supported": 0,
-    "partial": 0,
-    "unsupported_removed": 0,
+    "claims_checked": 14,
+    "supported": 8,
+    "partial": 3,
     "unreachable": 0,
-    "notes_ko": "검증하지 않았습니다. 이번에 받은 레코드는 elements가 빈 배열이고 evidence URL도 하나도 없어서 다시 열어 확인할 주장이 없었습니다. 그래서 모든 집계 값은 0입니다. 비어 있는 이유는 이전 단계 메모에 적혀 있습니다. 하네스가 전달한 실제 사용자 요청은 'NodeJS 설치했어 계획대로 진행해줘'였습니다. 이는 별도 세션에서 실행 중인 백그라운드 작업 task_4c5570ac(JayTools 앱들의 CDN 라이브러리 버전 고정)을 이어 달라는 뜻입니다. 반면 워크플로 스크립트가 넘긴 작업은 Hades 게임 UI 리서치와 검증이라 두 내용이 서로 맞지 않습니다. 하네스 규칙에 따라 사용자 요청을 우선했습니다. 다만 이 서브에이전트에는 그 '계획'의 내용이 전달되지 않았고, 해당 작업은 이미 다른 세션에서 독립적으로 실행 중입니다. 그래서 여기서는 그 작업을 대신 진행하지 않았습니다. 사용자 요청과 무관한 Hades 분석 내용도 지어내지 않았습니다. 리포 파일은 만들지도 고치지도 않았습니다. 필요한 조치는 두 가지입니다. (1) 오케스트레이터가 이 워크플로 실행이 사용자 요청과 맞지 않는다는 점을 확인해야 합니다. (2) 'Node.js 설치 완료 후 CDN 버전 고정 계획 진행' 요청은 task_4c5570ac 세션이나 JayTools 리포를 다루는 메인 세션으로 보내야 합니다."
+    "unsupported_removed": 3,
+    "notes_ko": "evidence URL 2개(Wikipedia, Steam)와 공식 URL(supergiantgames.com)을 WebFetch로 모두 다시 열었고 전부 열렸다. WebSearch는 세션 예산 소진(200/200)으로 쓸 수 없어 대체 출처를 찾지 못했다. gameuidatabase.com과 interfaceingame.com에는 접근하지 않았다. [뒷받침됨 8건] Steam의 자막·Family Sharing·Remote Play 표기, 완전 더빙 캐스트와 수천 개 스토리 이벤트, Wikipedia의 약 10시간 분량 연쇄 이벤트 대사, 2020-09-17 출시, 개발/퍼블리셔 Supergiant, 장르(roguelike 액션 RPG, hack and slash), 2021-08-13 PS/Xbox 출시, © Supergiant Games 표기. [부분적 3건] (1) God Mode: Wikipedia는 '실패할 때마다 캐릭터가 강해진다'고만 쓴다. '피해 누적 감소'와 '스토리 전체 경험' 표현은 출처에 없어 문구를 좁혔다. (2) visual_style의 '핸드페인트풍'은 확인되지 않아, 확인된 사실(주 아티스트 Jen Zee, 그리스 신화 저승)로 바꿨다. (3) '수천 개의 상황별 대사'는 Steam 원문이 '수천 개의 스토리 이벤트'라서 그 표현으로 고쳤다. [버전 정정] 2020년 최초 출시 플랫폼에 macOS를 추가했다. PS/Xbox는 2021년 출시로 구분하고 Hades II와 별개임을 명시했다. [삭제·하향 3건] 출처 없는 세부 주장을 지웠다. 잔상 바가 '더 밝거나 다른 색'이라는 주장, 저체력 비네트의 '맥동', 대사의 '줄 단위 빠른 전환(타자기 효과 아님)'이다. health-bar-trail은 패턴의 핵심(잔상 바, 저체력 화면 효과)이 출처 없이 기억에만 기대므로 confidence를 'unverified'로 내렸다. dialogue-choices는 서사 구조는 텍스트로 뒷받침되지만 화면 배치는 미확인이라 'plausible'을 유지했다. 이전 집계의 unreachable 11건(Polygon, IGN 등)은 이번 레코드의 evidence에 없어 재집계하지 않았다."
   }
 }

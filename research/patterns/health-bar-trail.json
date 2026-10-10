@@ -1,0 +1,565 @@
+{
+  "specimen_id": "health-bar-trail",
+  "name_ko": "체력 바: 잔상 + 저체력 화면 효과",
+  "name_en": "Health Bar with Damage Trail and Low-HP Screen Effect",
+  "group": "A",
+  "paradigm": "non-diegetic + meta (비교 모드: diegetic)",
+  "one_liner_ko": "맞으면 앞 바는 바로 줄고, 뒤의 잔상 바가 잠시 뒤 따라 줄어 '방금 얼마나 잃었는지'를 보여 준다. 위험 구간에 들어가면 화면 가장자리가 붉게 맥동해서 바를 보지 않아도 위험을 알 수 있다.",
+  "learning_goals_ko": [
+    "메인 바(즉시)와 잔상 바(지연)를 겹쳐 **현재 값**과 **변화량**을 함께 전달하는 2중 바 구조를 설명할 수 있다.",
+    "잔상 대기·감소 시간을 바꿔 보고, 그 값이 피격의 무게감과 '한 번의 큰 피해 대 여러 번의 작은 피해' 구분에 주는 영향을 말할 수 있다.",
+    "저체력 경고를 바 밖의 화면 효과(meta)로 두는 이유(주변시, 시선 이동 감소)와, 과할 때의 부작용(시야 가림, 광과민성)을 구분할 수 있다.",
+    "같은 체력 정보를 캐릭터 몸의 칸 게이지(diegetic)로 옮기는 대안과 그 장단점(몰입 대 가독성, 카메라 의존)을 비교할 수 있다.",
+    "Unity UGUI의 `Image`(Filled)·`fillAmount`와 UI Toolkit의 `style.width = Length.Percent()`로 같은 패턴을 구현하고, `Update`에서 대기·감소 타이머를 직접 작성할 수 있다."
+  ],
+  "anatomy": [
+    {
+      "part_id": "frame",
+      "name_ko": "바 프레임/배경",
+      "role_ko": "최대 체력 길이를 보여 주는 틀. 비어 있는 어두운 영역이 '잃은 양'을 재는 기준이다. 최대 체력이 늘면 틀도 같은 비율로 길어진다."
+    },
+    {
+      "part_id": "trail",
+      "name_ko": "잔상 바(Damage Trail)",
+      "role_ko": "메인 바 뒤에 깔린 밝은 바. 피격 직후에는 이전 값에 머물다가 대기 후 현재 값까지 줄어든다. 그 사이 드러나는 띠가 방금 받은 피해량이다."
+    },
+    {
+      "part_id": "heal",
+      "name_ko": "회복 미리보기 바",
+      "role_ko": "회복할 때 목표 값까지 먼저 늘어나는 줄무늬 바. 메인 바가 그 안을 따라 채운다. 잔상과 방향만 반대인 같은 구조다."
+    },
+    {
+      "part_id": "fill",
+      "name_ko": "메인 바(Fill)",
+      "role_ko": "실제 현재 체력. 피격하면 지연 없이 바로 줄어 즉각 피드백을 맡는다. 색 체계 설정에 따라 단계별로 색이 바뀐다."
+    },
+    {
+      "part_id": "number",
+      "name_ko": "수치 라벨",
+      "role_ko": "'72 / 100' 같은 정확한 값. 바로 대략을 읽고 라벨로 정확히 확인한다. 색이 아닌 단서 역할도 한다."
+    },
+    {
+      "part_id": "threshold",
+      "name_ko": "저체력 기준 눈금",
+      "role_ko": "바 위의 작은 세로 눈금. 저체력 경고가 시작되는 지점을 미리 알려 줘서 '몇 대 더 맞으면 위험한지' 예측하게 한다."
+    },
+    {
+      "part_id": "vignette",
+      "name_ko": "저체력 비네트 + 맥동",
+      "role_ko": "화면 가장자리를 붉게 물들이는 전체 화면 레이어(meta, 입력 통과). 기준 아래에서 나타나 체력이 낮을수록 진해지고, 심장 박동처럼 불투명도가 오르내린다."
+    },
+    {
+      "part_id": "body-gauge",
+      "name_ko": "몸에 붙은 칸 게이지(비교 모드)",
+      "role_ko": "화면 고정 바 대신, 뒷모습 캐릭터 실루엣의 등 윗부분(어깨 아래)에 가로로 놓인 둥근 사각 칸 줄. 칸당 체력 10이고 마지막 칸은 남은 비율만큼만 채워진다. 칸 수, 색 단계, 점멸로 체력을 읽는다. display_mode=body-segments일 때만 보인다(DOM에는 항상 존재)."
+    }
+  ],
+  "states": [
+    {
+      "name": "full",
+      "trigger_ko": "체력 최대(시작, 완전 회복, depleted 후 자동 리셋)",
+      "visual_ko": "메인 바가 가득 차 있고 잔상은 메인 바 뒤에 가려 보이지 않는다. 비네트는 없다."
+    },
+    {
+      "name": "damaged-trailing",
+      "trigger_ko": "hit_small·hit_big·combo 직후부터 잔상 대기 시간이 끝날 때까지",
+      "visual_ko": "메인 바는 이미 줄었고 줄어든 구간에 밝은 잔상 띠가 드러난다. 바 영역만 100ms 동안 흰색으로 살짝 밝아지고, 피해량에 비례해 바가 짧게 흔들린다(prefers-reduced-motion이면 흔들림 생략). 연타면 메인 바는 계단식으로 여러 번 줄고, 잔상 띠는 그 합계를 묶어서 보여 준다."
+    },
+    {
+      "name": "trail-catching-up",
+      "trigger_ko": "잔상 대기가 끝난 뒤. 연타 중이면 대기를 다시 채우되, 첫 피격부터 최대 1200ms가 지나면 강제로 시작",
+      "visual_ko": "잔상 바가 easing을 따라 메인 바 끝까지 줄어든다."
+    },
+    {
+      "name": "healing",
+      "trigger_ko": "heal 이벤트",
+      "visual_ko": "heal_style에 따라 다르다. preview-then-fill이면 줄무늬 미리보기가 목표 값까지 먼저 늘고 메인 바가 천천히 따라 채운다. 기준을 넘으면 비네트가 서서히 사라진다."
+    },
+    {
+      "name": "max-up",
+      "trigger_ko": "max_up 이벤트(최대 체력 +20, 현재 체력도 +20, 최대 160까지)",
+      "visual_ko": "screen-bar에서는 프레임이 오른쪽으로 길어지고 라벨의 최대값이 바뀐다. body-segments에서는 칸 2개가 줄 끝에 새로 생긴다. 상한 160에 도달하면 이벤트 버튼이 비활성화된다."
+    },
+    {
+      "name": "low-hp",
+      "trigger_ko": "체력 비율이 low_hp_threshold 이하",
+      "visual_ko": "화면 가장자리에 붉은 비네트가 나타나 pulse_bpm 속도로 맥동한다. single+warn 색 체계면 메인 바가 경고색으로 바뀐다."
+    },
+    {
+      "name": "critical",
+      "trigger_ko": "체력 비율이 low_hp_threshold의 절반 이하",
+      "visual_ko": "비네트가 더 진해지고 맥동이 1.4배 빨라진다(최대 120 BPM = 2Hz). 수치 라벨이 굵어진다."
+    },
+    {
+      "name": "four-step-blink",
+      "trigger_ko": "color_scheme=four-step이고 체력이 25% 미만(low_hp_threshold와 무관한 고정 기준)",
+      "visual_ko": "바 또는 칸이 2Hz로 점멸한다. 점멸은 공통 제한기를 거친다(초당 3회 이하). prefers-reduced-motion이면 점멸 대신 테두리를 굵게 해서 표시한다."
+    },
+    {
+      "name": "depleted",
+      "trigger_ko": "체력 0",
+      "visual_ko": "바가 비고 비네트가 최대 농도로 고정되며 맥동이 멈춘다. 1.5초 뒤 100/100으로 자동 리셋해 full이 된다(최대 체력도 100으로 되돌림)."
+    },
+    {
+      "name": "body-segments 모드",
+      "trigger_ko": "display_mode=body-segments",
+      "visual_ko": "하단 바, 잔상, 라벨, 기준 눈금이 사라진다. 캐릭터 등 윗부분의 가로 칸 줄만 남는다. 칸은 꺼질 때 trail_duration_ms 동안 페이드되고, four-step이면 색이 75/50/25% 기준으로 4단계로 바뀐다."
+    }
+  ],
+  "params": [
+    {
+      "key": "display_mode",
+      "label_ko": "표시 위치",
+      "type": "select",
+      "default": "screen-bar",
+      "options": [
+        "screen-bar",
+        "body-segments"
+      ],
+      "affects_ko": "screen-bar는 화면 하단 고정 바(non-diegetic)에 비네트(meta)를 더한다. body-segments는 캐릭터 실루엣 등 윗부분의 가로 칸 게이지(diegetic, 칸당 10)로 바꾼다. 이 모드에서는 잔상 바와 라벨이 사라지고 칸 수, 색, 점멸로만 체력을 읽는다."
+    },
+    {
+      "key": "trail_delay_ms",
+      "label_ko": "잔상 대기 시간",
+      "type": "range",
+      "default": "400",
+      "min": 0,
+      "max": 1000,
+      "step": 50,
+      "unit": "ms",
+      "affects_ko": "피격 후 잔상이 줄기 시작할 때까지의 시간. 0이면 피해량 띠가 거의 안 보인다. 길면 연타 피해가 하나의 큰 띠로 묶인다(최대 대기 1200ms 상한은 고정 규칙)."
+    },
+    {
+      "key": "trail_duration_ms",
+      "label_ko": "잔상 감소 시간",
+      "type": "range",
+      "default": "500",
+      "min": 100,
+      "max": 1500,
+      "step": 50,
+      "unit": "ms",
+      "affects_ko": "잔상이 메인 바까지 따라붙는 데 걸리는 시간. 짧으면 경쾌하고, 길면 묵직하지만 다음 피격과 겹치기 쉽다. body-segments 모드에서는 칸이 꺼지는 페이드 시간으로 쓰인다."
+    },
+    {
+      "key": "low_hp_threshold",
+      "label_ko": "저체력 기준",
+      "type": "range",
+      "default": "30",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "%",
+      "affects_ko": "비네트와 맥동이 시작되는 비율. 바 위 기준 눈금도 함께 움직인다. 높으면 경고가 잦아져 둔감해지고, 낮으면 대응할 시간이 부족하다."
+    },
+    {
+      "key": "vignette_strength",
+      "label_ko": "화면 테두리 세기",
+      "type": "range",
+      "default": "0.6",
+      "min": 0,
+      "max": 1,
+      "step": 0.05,
+      "unit": "",
+      "affects_ko": "가장자리 붉은 색의 최대 불투명도. 0이면 화면 효과가 꺼지고, 1에 가까우면 적과 탄환을 가릴 만큼 시야를 덮는다."
+    },
+    {
+      "key": "pulse_bpm",
+      "label_ko": "맥동 속도",
+      "type": "range",
+      "default": "72",
+      "min": 0,
+      "max": 120,
+      "step": 6,
+      "unit": "BPM",
+      "affects_ko": "비네트가 오르내리는 박동 속도. 0이면 고정된다. 위기 단계에서는 1.4배로 빨라지지만 120 BPM(2Hz)을 넘지 않는다. prefers-reduced-motion이면 0으로 처리한다."
+    },
+    {
+      "key": "color_scheme",
+      "label_ko": "색 체계",
+      "type": "select",
+      "default": "single+warn",
+      "options": [
+        "single+warn",
+        "four-step"
+      ],
+      "affects_ko": "single+warn은 평소 한 색이다가 저체력 기준 아래에서만 경고색으로 바뀐다. four-step은 75/50/25% 고정 기준마다 갤러리 토큰 색이 바뀌고 25% 미만이면 점멸한다(저체력 기준과 무관)."
+    },
+    {
+      "key": "heal_style",
+      "label_ko": "회복 연출",
+      "type": "select",
+      "default": "preview-then-fill",
+      "options": [
+        "preview-then-fill",
+        "instant",
+        "slow-fill"
+      ],
+      "affects_ko": "preview-then-fill은 미리보기가 먼저 늘고 메인 바가 따라온다(body-segments에서는 채워질 칸이 윤곽으로 먼저 보인다). instant는 바로 채운다. slow-fill은 미리보기 없이 천천히 채운다. 피해 잔상과의 대칭이 얼마나 깨지는지 비교한다."
+    }
+  ],
+  "presets": [
+    {
+      "id": "action-arena",
+      "name_ko": "빠른 액션 · 하단 바 + 주변시 경고",
+      "genre_ko": "탑다운 액션 / 로그라이트",
+      "values_json": "{\"display_mode\":\"screen-bar\",\"trail_delay_ms\":\"350\",\"trail_duration_ms\":\"450\",\"low_hp_threshold\":\"30\",\"vignette_strength\":\"0.6\",\"pulse_bpm\":\"72\",\"color_scheme\":\"single+warn\",\"heal_style\":\"preview-then-fill\"}",
+      "look_ko": "하단 바가 즉시 줄고 밝은 잔상이 짧게 따라온다. 30% 아래에서는 화면 테두리가 붉게 맥동해서, 전투에 집중한 채로도 위험을 알 수 있다."
+    },
+    {
+      "id": "immersive-body-gauge",
+      "name_ko": "몰입형 · 몸에 붙은 칸 게이지",
+      "genre_ko": "3인칭 서바이벌 호러",
+      "values_json": "{\"display_mode\":\"body-segments\",\"trail_delay_ms\":\"0\",\"trail_duration_ms\":\"200\",\"low_hp_threshold\":\"25\",\"vignette_strength\":\"0\",\"pulse_bpm\":\"0\",\"color_scheme\":\"four-step\",\"heal_style\":\"slow-fill\"}",
+      "look_ko": "화면 HUD가 사라지고 캐릭터 등 윗부분의 칸이 0.2초 만에 꺼진다. 색은 4단계로 바뀌고 25% 미만이면 점멸한다. 화면 효과 없이 캐릭터 자체가 상태를 보여 준다."
+    },
+    {
+      "id": "combo-readability",
+      "name_ko": "보스전 · 긴 잔상으로 콤보 피해 읽기",
+      "genre_ko": "보스 러시 / 격투",
+      "values_json": "{\"display_mode\":\"screen-bar\",\"trail_delay_ms\":\"800\",\"trail_duration_ms\":\"700\",\"low_hp_threshold\":\"20\",\"vignette_strength\":\"0.3\",\"pulse_bpm\":\"0\",\"color_scheme\":\"single+warn\",\"heal_style\":\"instant\"}",
+      "look_ko": "잔상이 오래 남는다. 메인 바는 타격마다 계단식으로 줄고, 잔상 띠가 그 합계를 묶어 보여 준다. 콤보 한 번에 얼마를 잃었는지 한눈에 보인다. 비네트는 약하고 맥동 없이 고정된다."
+    }
+  ],
+  "events": [
+    {
+      "id": "hit_small",
+      "label_ko": "피격 (-8)"
+    },
+    {
+      "id": "hit_big",
+      "label_ko": "강한 피격 (-30)"
+    },
+    {
+      "id": "combo",
+      "label_ko": "연속 타격 (-5 × 4, 120ms 간격)"
+    },
+    {
+      "id": "heal",
+      "label_ko": "회복 (+25)"
+    },
+    {
+      "id": "max_up",
+      "label_ko": "최대 체력 증가 (+20, 칸 2개 추가, 최대 160)"
+    }
+  ],
+  "timings": [
+    {
+      "event_ko": "피격 → 메인 바 감소",
+      "duration_ms": 60,
+      "easing": "linear (사실상 즉시)",
+      "note_ko": "권장값. 0~80ms 안에 끝나야 '즉시'로 느껴진다."
+    },
+    {
+      "event_ko": "피격 하이라이트(바 흰색 밝아짐)",
+      "duration_ms": 100,
+      "easing": "ease-out",
+      "note_ko": "권장값. 바 영역에만 적용하고 화면 전체 번쩍임은 쓰지 않는다."
+    },
+    {
+      "event_ko": "잔상 대기",
+      "duration_ms": 400,
+      "easing": "hold (정지)",
+      "note_ko": "권장값(trail_delay_ms 기본). 연타 시 다시 채우되 첫 피격부터 최대 1200ms 뒤에는 강제로 감소를 시작한다."
+    },
+    {
+      "event_ko": "잔상 감소",
+      "duration_ms": 500,
+      "easing": "cubic-bezier(0.65, 0, 0.35, 1) (easeInOutCubic)",
+      "note_ko": "권장값(trail_duration_ms 기본). 처음과 끝이 부드러워 '따라붙는' 느낌을 준다."
+    },
+    {
+      "event_ko": "회복 미리보기 확장",
+      "duration_ms": 120,
+      "easing": "ease-out",
+      "note_ko": "권장값. 목표 값을 먼저 보여 준다."
+    },
+    {
+      "event_ko": "회복 메인 바 채움",
+      "duration_ms": 600,
+      "easing": "cubic-bezier(0.33, 1, 0.68, 1) (easeOutCubic)",
+      "note_ko": "권장값. 미리보기 150ms 뒤 시작한다. 감소보다 느리게 해서 좋은 일과 나쁜 일을 속도로 구분한다."
+    },
+    {
+      "event_ko": "피격 흔들림",
+      "duration_ms": 250,
+      "easing": "감쇠 사인",
+      "note_ko": "권장값. 진폭은 피해량에 비례(최대 8px). prefers-reduced-motion이면 생략한다."
+    },
+    {
+      "event_ko": "비네트 등장 / 퇴장",
+      "duration_ms": 300,
+      "easing": "ease-out / ease-in",
+      "note_ko": "권장값. 퇴장을 600ms로 더 천천히 하면 '살았다'는 안도감이 남는다."
+    },
+    {
+      "event_ko": "맥동 1주기(72 BPM)",
+      "duration_ms": 833,
+      "easing": "박동형 곡선(앞 30% 상승, 뒤 70% 하강)",
+      "note_ko": "권장값. 60000/BPM. 위기 단계는 ×1.4(약 595ms), 하한 500ms(2Hz). 맥동값은 0.6~1 사이로 오르내려 완전히 사라지지 않게 한다."
+    },
+    {
+      "event_ko": "칸/바 점멸(four-step 25% 미만)",
+      "duration_ms": 500,
+      "easing": "steps(2)",
+      "note_ko": "권장값. 비교 게임은 점멸한다는 사실만 출처로 확인했고 주기는 확인하지 못했다. 초당 3회 이하 규칙을 지킨다."
+    },
+    {
+      "event_ko": "칸 추가 / 프레임 확장(max_up)",
+      "duration_ms": 250,
+      "easing": "ease-out",
+      "note_ko": "권장값. 새 칸은 0에서 커지며 짧게 밝아지고, screen-bar 프레임은 같은 시간 동안 길어진다."
+    }
+  ],
+  "hotspots": [
+    {
+      "n": 1,
+      "part_id": "fill",
+      "title_ko": "메인 바는 맞는 순간 줄어든다",
+      "body_ko": "피격과 감소 사이에 지연이 없어야 '맞았다'는 인과가 성립한다. 부드러운 연출은 잔상에 맡기고, 메인 바는 언제나 **진짜 현재 값**을 보여 준다.",
+      "principle": "즉각 피드백"
+    },
+    {
+      "n": 2,
+      "part_id": "trail",
+      "title_ko": "잔상이 '얼마나 잃었나'를 남긴다",
+      "body_ko": "현재 값만 보이면 피해량은 기억에 맡겨야 한다. 잔상 띠가 변화량을 잠깐 화면에 남겨 두면 **어떤 공격이 위험한지** 바로 배운다. 한 번의 큰 피해는 메인 바가 한 번에 뚝 줄고, 연타는 메인 바가 계단식으로 여러 번 줄며 잔상 띠가 그 합계를 묶는다. 그래서 둘을 구분할 수 있다.",
+      "principle": "가독성"
+    },
+    {
+      "n": 3,
+      "part_id": "heal",
+      "title_ko": "회복도 같은 문법으로",
+      "body_ko": "피해는 '즉시 바 + 따라오는 잔상', 회복은 '즉시 미리보기 + 따라오는 메인 바'다. 방향만 반대인 같은 구조라서 한 번 배운 읽기 방식을 그대로 쓴다.",
+      "principle": "일관성"
+    },
+    {
+      "n": 4,
+      "part_id": "vignette",
+      "title_ko": "위험은 시선 밖에서 알린다",
+      "body_ko": "전투 중 시선은 화면 중앙에 있다. 가장자리 전체가 붉게 맥동하면 구석의 바로 **시선을 옮기지 않아도** 주변시로 위험을 느낀다. 중앙은 가리지 않는다. 평소에는 0이고 위험할수록 강해져야 경고로서 힘이 있다.",
+      "principle": "시각 위계"
+    },
+    {
+      "n": 5,
+      "part_id": "body-gauge",
+      "title_ko": "몸에 두면 화면이 비고, 대신 카메라와 캐릭터 디자인이 받쳐야 한다",
+      "body_ko": "체력을 캐릭터 몸에 통합하면 HUD가 사라져 몰입이 깊어진다. 3인칭 카메라가 늘 비추는 등에 두었기에 읽히고, 색 단계 덕분에 숫자 없이도 위험도를 직관적으로 안다. 여기에 칸 수와 점멸을 더해 색이 아닌 단서도 준다. 비교 게임은 슈트 형태를 정할 때부터 게이지와 조명을 함께 고려했다. 게이지만 몸에 그려 넣으면 이 맥락을 놓친다. 카메라가 등을 비추지 않는 게임에는 그대로 통하지 않는다.",
+      "principle": "몰입"
+    }
+  ],
+  "principles": [
+    "현재 값은 즉시, 변화량은 지연해서 보여 준다(2중 바).",
+    "잔상과 회복 미리보기는 같은 구조를 방향만 반대로 쓴다.",
+    "저체력 경고는 시선이 머무는 곳이 아니라 주변시(화면 가장자리)에 둔다.",
+    "경고 강도는 위험도에 비례해 단계적으로 올리고, 평상시에는 0이어야 한다.",
+    "색 단서에는 길이·칸·점멸·숫자 같은 비색상 단서를 반드시 함께 둔다.",
+    "HUD(non-diegetic)와 캐릭터 몸(diegetic) 중 어디에 둘지는 가독성과 몰입을 맞바꾸는 선택이다. diegetic을 고르면 카메라와 캐릭터 디자인이 그 자리를 받쳐 줘야 한다.",
+    "번쩍임은 초당 3회 이하, 반복 맥동은 2Hz 이하로 제한한다. prefers-reduced-motion이면 흔들림과 맥동을 끄고 정적인 단서로 바꾼다."
+  ],
+  "mistakes": [
+    {
+      "title_ko": "메인 바 하나만 천천히 트윈",
+      "body_ko": "바 자체를 0.5초에 걸쳐 줄이면 감소가 늦게 느껴지고, 그동안 실제 체력과 화면이 어긋난다. 메인 바는 즉시, 느린 연출은 잔상 바만 맡는다."
+    },
+    {
+      "title_ko": "연타마다 잔상 대기를 무한 리셋",
+      "body_ko": "맞을 때마다 대기 타이머를 처음부터 다시 걸면 연타 중에 잔상이 영원히 줄지 않는다. 대기를 다시 채우더라도 최대 대기(예: 1.2초)를 둔다."
+    },
+    {
+      "title_ko": "비네트를 너무 강하게, 너무 빠르게",
+      "body_ko": "불투명도 1에 가까운 테두리나 빠른 번쩍임은 적과 탄환을 가린다. 눈이 피로해지고 광과민성 위험도 있다. 강도에 상한을 두고 맥동은 2Hz 이하로 한다."
+    },
+    {
+      "title_ko": "색 하나로만 위험 단계 전달",
+      "body_ko": "초록·노랑·빨강만 바꾸면 색각 이상 플레이어는 단계를 구분하기 어렵다. 기준 눈금, 수치, 점멸, 칸 수를 함께 쓴다."
+    },
+    {
+      "title_ko": "diegetic 게이지를 안 보이는 곳에 붙이기",
+      "body_ko": "몸에 붙인 게이지는 카메라가 그 부위를 늘 비출 때만 읽힌다. 1인칭이나 탑다운 카메라, 또는 이펙트가 덮는 부위에 붙이면 정작 위기 때 안 보인다. 카메라 각도별로 가려지는지 먼저 확인한다."
+    }
+  ],
+  "juice_off_ko": "잔상, 회복 미리보기, 흔들림, 피격 하이라이트, 기준 눈금, 비네트, 맥동, 색 변화를 모두 끈 상태다. 바가 한 번에 뚝 줄고 뚝 늘며, 연타 4번이 순식간에 지나가 한 번의 큰 피격과 거의 구분되지 않는다. 체력이 10% 남아도 화면은 평소와 같아서 바를 일부러 보지 않으면 위험을 모른다. body-segments 모드에서는 색 단계와 점멸도 꺼져 칸이 소리 없이 사라지기만 한다.",
+  "stage": {
+    "aspect": "16:9",
+    "needs_3d": false,
+    "scene_ko": "1920×1080 논리 해상도. 어두운 필드 배경 중앙에 새로 그린 중립적 캐릭터 실루엣(SVG, 뒷모습)이 서 있다. screen-bar 모드에서는 좌하단에 사선 바, 수치 라벨, 저체력 기준 눈금이 있고, 화면 전체를 덮는 비네트 레이어(pointer-events: none)가 있다. body-segments 모드에서는 하단 바가 숨고 실루엣 등 윗부분(어깨 아래)에 가로로 놓인 둥근 사각 칸 줄이 켜진다. 자동 데모는 피격 → 연타 → 강한 피격 → 저체력 맥동 → 회복 순서로 반복한다. 화면 밖에 있거나 정지 상태면 데모 루프를 멈춘다."
+  },
+  "unity_ugui": {
+    "hierarchy": "Canvas_HUD (Screen Space - Overlay · Canvas Scaler: Scale With Screen Size 1920×1080)\n└─ HealthBar (RectTransform · 앵커 좌하단 · HealthBarTrail.cs)\n   ├─ Background    (Image)\n   ├─ Trail         (Image · Type: Filled · Horizontal · Origin Left)\n   ├─ HealPreview   (Image · Type: Filled · Horizontal · Origin Left)\n   ├─ Fill          (Image · Type: Filled · Horizontal · Origin Left)\n   ├─ ThresholdMark (Image · 가는 세로선)\n   └─ Label         (TextMeshProUGUI)\nCanvas_Overlay (Screen Space - Overlay · Sort Order를 Canvas_HUD보다 높게)\n└─ LowHealthVignette (Image · Raycast Target 끔 + CanvasGroup)\nDemoInput (HealthBarDemo.cs · Input System 액션으로 피격/회복 테스트)\n[선택: diegetic 비교]\nPlayer\n└─ BackGaugeAnchor (상체 본 Transform의 자식 · 등 윗부분)\n   └─ Canvas_BodyGauge (World Space · 작은 스케일)\n      └─ Segments (HorizontalLayoutGroup)\n         └─ Segment × N (Image)",
+    "components_ko": [
+      "Canvas Scaler: UI Scale Mode = Scale With Screen Size, Reference Resolution 1920×1080, Screen Match Mode = Match Width Or Height, Match 0.5",
+      "Trail·HealPreview·Fill: Image Type = Filled, Fill Method = Horizontal, Fill Origin = Left. 그리는 순서는 Trail → HealPreview → Fill(아래 → 위, Hierarchy에서 아래에 있을수록 위에 그려짐)",
+      "Filled 타입은 Source Image에 스프라이트가 있어야 동작한다. Source Image가 None이면 인스펙터에 Image Type 항목이 나오지 않는다. 흰색 스프라이트나 기본 UISprite를 넣는다.",
+      "사선 바 모양을 원하면 평행사변형 스프라이트를 쓴다(선택). Filled로 잘린 끝은 수직이 된다는 점을 수강생에게 보여 준다.",
+      "LowHealthVignette: 가장자리만 불투명한 스프라이트, Raycast Target 끔, CanvasGroup.alpha로 세기를 조절한다.",
+      "HealthBarTrail.cs: TakeDamage(float), Heal(float), IncreaseMax(float) 공개 메서드. Update에서 잔상 대기·감소, 회복 채움, 맥동 위상을 처리한다.",
+      "HealthBarDemo.cs: InputAction(예: <Keyboard>/h, <Gamepad>/buttonSouth)으로 TakeDamage/Heal을 호출한다. 구 Input Manager(Input.GetKey 등)는 쓰지 않는다.",
+      "Label: TextMeshProUGUI(TMPro 네임스페이스). 위기 단계에서 fontStyle |= FontStyles.Bold로 굵게 한다."
+    ],
+    "steps_ko": [
+      "Canvas_HUD를 만들고 Canvas Scaler를 Scale With Screen Size, 1920×1080으로 맞춘다. 갤러리 무대와 기준 해상도가 같아서 좌표를 그대로 옮길 수 있다.",
+      "HealthBar 아래에 Background, Trail, HealPreview, Fill을 같은 크기로 겹친다. Source Image에 스프라이트를 넣은 뒤 세 바의 Image Type을 Filled, Horizontal, Origin Left로 바꾼다.",
+      "HealthBarTrail.cs를 HealthBar에 붙이고 세 Image, Label, 비네트 CanvasGroup을 인스펙터에서 [SerializeField]로 연결한다. 꼭 코드로 찾아야 하면 FindObjectOfType 대신 FindFirstObjectByType이나 FindAnyObjectByType을 쓰되, Update 안에서는 호출하지 않는다.",
+      "TakeDamage에서는 fill.fillAmount를 즉시 새 값으로 바꾼다. 잔상 값은 맞기 전 값으로 남기고 대기 타이머를 다시 채운다. 단, 첫 피격부터 잰 누적 대기가 1.2초를 넘지 않게 한다.",
+      "Update에서 대기 타이머가 끝나면 잔상 값을 easing 함수(또는 Mathf.MoveTowards)로 메인 값까지 줄인다. 회복은 반대로 HealPreview를 먼저 목표로 올리고 Fill을 천천히 따라 올린다.",
+      "체력 비율이 기준 아래면 비네트 alpha = 강도 × (1 - 비율/기준) × 맥동값(0.6~1)으로 계산한다. 맥동 주기는 60/BPM초, 위기 단계 ×1.4, 최소 0.5초로 묶는다.",
+      "HealthBarDemo.cs에서 InputAction을 만들어 OnEnable에서 Enable하고 OnDisable에서 Disable한다. performed 콜백에서 TakeDamage/Heal을 호출해 Play 모드에서 테스트한다.",
+      "(선택) diegetic 비교: 캐릭터 상체 본 아래 BackGaugeAnchor에 World Space Canvas를 붙인다. Segment Image를 칸 수만큼 생성해 켜고 끄며, 마지막 칸은 fillAmount로 남은 비율만 채운다. 색은 비율 75/50/25% 기준으로 바꾼다."
+    ],
+    "pitfalls_ko": [
+      "바 길이는 fillAmount(0~1)로 바꾼다. RectTransform의 sizeDelta를 바꾸면 레이아웃 재계산이 생기고, localScale을 바꾸면 둥근 모서리나 사선 스프라이트가 찌그러진다.",
+      "매 프레임 바뀌는 HUD를 메뉴·아이콘과 같은 Canvas에 두면 그 Canvas 전체가 다시 빌드된다. 동적 HUD는 별도 Canvas로 분리한다.",
+      "일시정지(Time.timeScale = 0) 때 잔상도 멈추려면 Time.deltaTime을, 계속 움직이게 하려면 Time.unscaledDeltaTime을 쓴다. 둘을 섞으면 메뉴에서 바가 어긋난다.",
+      "비네트 Image의 Raycast Target을 끄지 않으면 화면 전체 클릭이 막힌다.",
+      "DOTween 같은 외부 트윈 패키지는 선택 사항이다. 기본 코드는 Update로 작성해서 수업 환경이 외부 패키지에 의존하지 않게 한다."
+    ]
+  },
+  "unity_uitk": {
+    "structure": "UIDocument (Panel Settings: Scale Mode = Scale With Screen Size, Reference Resolution 1920×1080)\n└─ HealthBarTrail.uxml\n   ├─ #vignette (.vignette · picking-mode=\"Ignore\" · position absolute, 전체 화면)\n   └─ #health-bar (.hb · 좌하단 absolute)\n      ├─ #trail        (.hb__trail · absolute, left 0)\n      ├─ #heal-preview (.hb__heal · absolute, left 0)\n      ├─ #fill         (.hb__fill · absolute, left 0)\n      ├─ #threshold    (.hb__threshold · 가는 세로선)\n      └─ #label        (Label · .hb__label)\nHealthBarTrailUITK.cs (UIDocument가 있는 GameObject에 부착)",
+    "uss_notes_ko": [
+      "trail·heal-preview·fill은 position: absolute; left: 0; top: 0; bottom: 0으로 겹치고 width만 바꾼다. 문서 순서가 곧 그리는 순서다(뒤에 올수록 위).",
+      "UI Toolkit에는 Filled 이미지 타입이 없다. 막대 길이는 C#에서 style.width = Length.Percent(값)로 바꾼다.",
+      "USS는 radial-gradient와 box-shadow를 지원하지 않는다. Unity 6.3에는 블러·색 보정용 filter 속성이 있지만 비네트용은 아니다. 비네트는 가장자리만 불투명한 텍스처를 background-image로 쓰고, -unity-slice-left/right/top/bottom으로 9-slice를, -unity-background-image-tint-color로 색을 준다.",
+      "USS transform은 translate·scale·rotate·transform-origin만 지원하고 skew는 없다. 사선 바는 직선 바로 단순화하거나, 선택 과제로 generateVisualContent의 Painter2D로 그린다.",
+      "단순 감소는 transition-property: width; transition-duration: 0.5s; transition-timing-function: ease-in-out-cubic으로도 된다. 하지만 '대기 후 감소'처럼 단계가 있는 동작은 C#에서 값으로 제어한다.",
+      "상태는 클래스 토글로 표현한다: .hb--low, .hb--critical(라벨 굵게), .hb--blink. 색만 바꾸지 말고 굵기와 점멸도 함께 바꾼다."
+    ],
+    "steps_ko": [
+      "Panel Settings 에셋을 만들고 Scale Mode를 Scale With Screen Size, Reference Resolution 1920×1080으로 맞춘 뒤 UIDocument에 연결한다.",
+      "UXML에 위 구조를 만들고 USS를 연결한다. #vignette는 picking-mode=\"Ignore\"로 입력을 통과시킨다.",
+      "HealthBarTrailUITK.cs의 OnEnable에서 rootVisualElement.Q<VisualElement>(\"fill\") 등으로 요소를 찾아 둔다.",
+      "TakeDamage/Heal 로직은 UGUI 버전과 같다. Update에서 계산한 비율을 style.width = Length.Percent(비율 × 100)로 반영한다.",
+      "비네트는 style.opacity로 세기와 맥동을 반영한다. 위기 단계에서는 EnableInClassList(\"hb--critical\", true)로 클래스를 켠다.",
+      "테스트 입력은 UGUI 버전과 같은 InputAction을 재사용한다."
+    ],
+    "pitfalls_ko": [
+      "C#에서 매 프레임 style 값을 바꾸는 속성에 USS transition까지 걸면 둘이 충돌해 바가 늦게 따라온다. C#으로 제어하는 속성에는 transition을 걸지 않는다.",
+      "Panel Settings의 Sort Order가 다른 패널보다 낮으면 비네트가 다른 UI 아래에 깔린다.",
+      "Q<T>()로 찾은 요소가 null이면 UXML의 name과 코드 문자열이 다른 것이다. 이름은 kebab-case로 통일한다.",
+      "Unity 6.3은 Panel Settings의 Render Mode를 World Space로 두는 UI Toolkit 월드 스페이스 UI를 지원한다. 다만 diegetic 비교 모드는 자료가 많은 UGUI World Space Canvas로 먼저 만들고, UI Toolkit 버전은 심화 과제로 둔다."
+    ]
+  },
+  "inspired_by": [
+    {
+      "game_id": "hades",
+      "title": "Hades (2020, 원작 정식판)",
+      "credit": "© Supergiant Games",
+      "borrowed_axes": [
+        "레이아웃 구조"
+      ],
+      "what_learned_ko": "빠른 탑다운 액션에서 체력을 화면 하단의 non-diegetic 바로 두고, 저체력을 화면 가장자리 효과로 알리는 '바 + 화면 효과' 조합을 대표 사례로 삼았다. 다만 이 레이아웃과 잔상·비네트가 있다는 점은 이번 검증에서 출처로 확인하지 못한 기억 기반 서술(unverified)이다. 그래서 색, 장식, 모양은 전혀 빌리지 않고 배치 개념만 참고했다."
+    },
+    {
+      "game_id": "dead-space-2008",
+      "title": "Dead Space (2008 원작, 리메이크 아님)",
+      "credit": "© Electronic Arts Inc.",
+      "borrowed_axes": [
+        "레이아웃 구조",
+        "색 체계"
+      ],
+      "what_learned_ko": "체력을 화면 대신 캐릭터 슈트 등의 발광 게이지로 옮긴 diegetic 해법(레이아웃 구조)과, 75/50/25% 기준 4단계 색 전환 및 25% 미만 점멸(색 체계)을 빌렸다. 최대 체력이 늘면 칸이 추가되는 방식도 출처로 확인해 반영했다. 게이지 형태는 빌리지 않았다. 원작의 세로 척추형 대신 등 윗부분의 가로 칸 줄로 새로 만들었고, 리브 슈트 같은 고유 디자인과 원작 색값도 쓰지 않는다."
+    }
+  ],
+  "original_ko": "이 갤러리에서 새로 만든 것은 다음과 같다. 사선형 바 모양, 줄무늬 회복 미리보기, 바 위 저체력 기준 눈금, 맥박 속도 규칙(BPM 기반, 위기 ×1.4, 2Hz 상한, 맥동값 0.6~1), 연타 최대 대기 1.2초 규칙, 최대 체력 증가 시 프레임이 늘어나는 규칙(상한 160)이다. 모든 색과 글꼴도 새로 정했다. 비교 모드의 캐릭터는 원작 캐릭터·슈트와 무관한 중립 실루엣이다. 칸 게이지는 원작의 세로 척추형이 아니라 등 윗부분(어깨 아래)에 가로로 놓인 단순한 둥근 사각 칸 줄이고, 마지막 칸은 남은 비율만큼만 채운다. 척추나 리브 형태는 쓰지 않는다. 4단계 색도 원작 색(청록·초록·노랑·빨강)을 그대로 쓰지 않고 갤러리 토큰 색으로 바꾼다. 칸 수, 점멸, 라벨을 함께 써서 색 의존도 줄인다. 화면 속 수치와 문구도 새로 썼다.",
+  "references": [
+    {
+      "label": "Hades 공식 사이트 (Supergiant Games)",
+      "url": "https://www.supergiantgames.com/games/hades/",
+      "type": "official"
+    },
+    {
+      "label": "Hades - Steam 상점 (자막 제공 등 기능 표기)",
+      "url": "https://store.steampowered.com/app/1145360/Hades/",
+      "type": "T1"
+    },
+    {
+      "label": "Hades (video game) - Wikipedia (God Mode)",
+      "url": "https://en.wikipedia.org/wiki/Hades_(video_game)",
+      "type": "T2"
+    },
+    {
+      "label": "GDC Vault: Crafting Destruction - The Evolution of the Dead Space User Interface (Dino Ignacio, 2013)",
+      "url": "https://gdcvault.com/play/1017723/Crafting-Destruction-The-Evolution-of",
+      "type": "T1"
+    },
+    {
+      "label": "Dead Space (2008) - Wikipedia (등의 체력 표시, 홀로그램 UI)",
+      "url": "https://en.wikipedia.org/wiki/Dead_Space_(2008_video_game)",
+      "type": "T2"
+    },
+    {
+      "label": "Isaac Clarke - Wikipedia (등의 체력 바, 스쿠버 슈트 착안)",
+      "url": "https://en.wikipedia.org/wiki/Isaac_Clarke",
+      "type": "T2"
+    },
+    {
+      "label": "GameRant: Dead Space HUD (색 단계 기준, 칸 추가)",
+      "url": "https://gamerant.com/dead-space-hud-best-unique-creative/",
+      "type": "T2"
+    },
+    {
+      "label": "80.lv: 리브 슈트 디자인의 기술적 이유 (Ian Milham)",
+      "url": "https://80.lv/articles/the-technological-reason-behind-the-ribbed-suit-design-in-dead-space",
+      "type": "T2"
+    },
+    {
+      "label": "W3C WCAG 2.1 Understanding 2.3.1: Three Flashes or Below Threshold",
+      "url": "https://www.w3.org/WAI/WCAG21/Understanding/three-flashes-or-below-threshold.html",
+      "type": "T1"
+    },
+    {
+      "label": "Unity 6.3 Manual: USS supported properties",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/Manual/UIE-USS-SupportedProperties.html",
+      "type": "T1"
+    },
+    {
+      "label": "Unity 6.3 Manual: USS transitions (ease-in-out-cubic 등 easing 키워드)",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/Manual/UIE-Transitions.html",
+      "type": "T1"
+    },
+    {
+      "label": "Unity 6.3 Manual: USS transform (skew 미지원)",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/Manual/UIE-Transform.html",
+      "type": "T1"
+    },
+    {
+      "label": "Unity 6.3 Manual: USS filter",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/Manual/ui-systems/uss-filter.html",
+      "type": "T1"
+    },
+    {
+      "label": "Unity 6.3 Manual: World Space UI (UI Toolkit)",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/Manual/ui-systems/world-space-ui.html",
+      "type": "T1"
+    },
+    {
+      "label": "Unity 6.3 Scripting API: Object.FindFirstObjectByType",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Object.FindFirstObjectByType.html",
+      "type": "T1"
+    },
+    {
+      "label": "Game UI Database (사람이 직접 여는 참고 링크, AI 접근 금지)",
+      "url": "https://www.gameuidatabase.com/",
+      "type": "manual-only"
+    }
+  ],
+  "confidence_notes_ko": "[확인됨] Dead Space 2008 원작에서 체력은 슈트 등에, 탄약은 무기에 표시된다(Wikipedia). 큰 피해를 받으면 등의 발광 바가 줄어들고, RIG는 스쿠버 슈트에서 착안했다(Wikipedia Isaac Clarke). 척추 게이지는 75/50/25% 기준으로 4단계 색이 바뀌고 25% 미만에서 점멸하며, 최대 체력이 늘면 칸이 늘어난다(GameRant). 리브 슈트는 등 체력바와 조명 표현을 함께 고려한 디자인이다(80.lv). GDC 2013 강연은 UI가 diegetic·몰입형으로 발전한 과정을 다룬다(GDC Vault 요약). Hades의 God Mode와 자막 제공도 확인했다(Wikipedia, Steam). Unity 6.3 LTS 문서로 확인한 것: FindFirstObjectByType는 obsolete가 아니다. USS transition에 ease-in-out-cubic 키워드가 있다. USS transform에 skew는 없다. USS filter 속성이 있다. UI Toolkit World Space UI는 Panel Settings Render Mode로 지원한다. [plausible] Dead Space 쪽 시각 주장은 텍스트 출처 기반이고 화면을 직접 보지 않았다. 점멸 주기와 감소·회복 애니메이션 수치는 확인하지 못했다. [unverified] Hades의 체력 바 위치(하단), 잔상 바, 저체력 화면 테두리 효과는 출처를 찾지 못한 기억 기반 서술이다. 이번 검수에서도 웹 검색 한도가 소진돼 추가 확인을 하지 못했다. 그래서 Hades에서는 '레이아웃 구조' 개념만 빌렸다. Hades를 대표 게임으로 삼을 근거가 약하므로, 수업 전에 강사가 직접 화면을 확인하길 권한다. [권장값] 모든 timings(ms·easing), 1.2초 최대 대기, 맥동 ×1.4·2Hz 상한, 저체력 기준 30%, 최대 체력 상한 160은 원작 수치가 아닌 제안값이다. 색각 이상 플레이어에게 색 단독 표시가 불리하다는 점은 일반 접근성 원리다. 원작의 색맹 옵션 유무는 EA 기사가 404여서 확인하지 못했다. 대상 버전: Hades는 2020 정식판(Hades II 아님), Dead Space는 2008 원작(2023 리메이크 아님).",
+  "critic_changes_ko": [
+    "[과잉 모방] 비교 모드의 칸 게이지가 '등 중앙 세로 칸'이어서 원작의 척추형 모티프와 사실상 같았다. 등 윗부분(어깨 아래)의 가로 칸 줄로 형태를 바꿨다(anatomy, states, stage, Unity hierarchy).",
+    "[과잉 모방] Dead Space borrowed_axes를 ['색 체계','형태·기울기']에서 ['레이아웃 구조','색 체계']로 바꿨다. 실제로 빌린 것은 '몸(등)에 배치'와 '4단계 색·점멸'이었고, 형태는 이번에 새로 만들었다. what_learned_ko와 original_ko도 맞춰 고쳤다.",
+    "[과잉 모방] Unity 계층 이름 SpineGaugeAnchor(척추 모티프)를 BackGaugeAnchor로 바꿨다. '등 뼈대'라는 표현은 '상체 본'으로 바꿨다.",
+    "[원리 반영] hotspot 2와 combo-readability 프리셋을 고쳤다. 근거 레코드의 원리는 '한 번의 큰 피해와 여러 번의 작은 피해를 구분하기 쉽다'인데, 기존 문구는 '연타가 하나의 띠로 쌓인다'만 말해 오히려 구분이 안 되는 것처럼 읽혔다. '메인 바는 계단식으로 줄고 잔상 띠가 합계를 묶는다'로 고쳤다.",
+    "[원리 반영] hotspot 4에 근거 레코드의 '시선 이동 감소'를 넣었다. hotspot 5에는 Dead Space 레코드의 '숫자 없이 색 단계로 위험도를 직관적으로 파악'과 '슈트 형태를 조명·게이지와 함께 설계한 맥락'을 넣었다.",
+    "[구현 가능성] max_up 이벤트에 screen-bar 모드의 동작이 정의되어 있지 않았다. max-up 상태를 추가했다(프레임 확장, 현재 체력 +20, 상한 160). depleted 리셋 때 최대 체력을 100으로 되돌리는 규칙도 명시했다.",
+    "[구현 가능성] critical 상태 안에 섞여 있던 four-step 점멸(25% 고정 기준)은 저체력 기준과 별개다. 그래서 four-step-blink 상태로 분리했다.",
+    "[구현 가능성] body-segments 모드에서 칸당 10인데 -8이나 -5 같은 피해를 어떻게 보여 줄지 정해져 있지 않았다. '마지막 칸은 남은 비율만큼 채움' 규칙을 추가했다. heal_style이 이 모드에서 어떻게 보이는지도 affects_ko에 적었다.",
+    "[구현 가능성·접근성] agent-contract의 prefers-reduced-motion 규칙을 반영했다. 흔들림 생략, 맥동 0, 점멸 대신 굵은 테두리로 처리하고, 이를 states, params, timings, principles에 명시했다. 맥동값 범위(0.6~1)도 정했다.",
+    "[Unity 정확성] USS 노트에서 'USS는 filter를 지원하지 않는다'는 틀린 서술을 고쳤다. Unity 6.3에는 USS filter가 있고, 지원하지 않는 것은 radial-gradient와 box-shadow다(6.3 문서로 확인).",
+    "[Unity 정확성] USS transform에 skew가 없다는 점(6.3 문서로 확인)을 추가하고, UI Toolkit에서 사선 바를 만드는 대안(직선 바 또는 Painter2D)을 적었다. UGUI의 사선 스프라이트 + Filled 동작도 메모했다.",
+    "[Unity 정확성] UI Toolkit 월드 스페이스 지원 여부가 '확인 필요'로 남아 있었다. Unity 6.3 문서로 Panel Settings Render Mode = World Space 지원을 확인해 반영했다.",
+    "[Unity 정확성] FindFirstObjectByType가 Unity 6.3에서 obsolete가 아님을 확인했다. Update 안에서 호출하지 말라는 주의와 FindAnyObjectByType 대안을 더했다. ease-in-out-cubic이 USS easing 키워드에 있는 것도 확인했다.",
+    "[Unity 정확성] 계층의 'HorizontalLayoutGroup 대신 VerticalLayoutGroup'이라는 모호한 표기를 정리했다(가로 칸 줄이므로 HorizontalLayoutGroup). Canvas Scaler 속성명은 Screen Match Mode = Match Width Or Height로 정확히 적었다. sizeDelta와 localScale의 부작용을 나눠 설명했고, InputAction을 OnDisable에서 Disable하는 단계와 Source Image가 None일 때 Image Type 항목이 숨는 점을 추가했다.",
+    "[교육성] 학습 목표 2에 '큰 피해 대 연타 구분'을, 목표 5에 'Update에서 대기·감소 타이머 직접 작성'을 넣어 실습 결과를 측정할 수 있게 했다.",
+    "[출처] references에 Isaac Clarke Wikipedia(레코드 evidence)와 이번에 확인한 Unity 6.3 문서 5건을 추가했다. USS supported properties 링크도 6000.3 버전 경로로 고정했다."
+  ]
+}

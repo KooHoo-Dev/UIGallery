@@ -48,6 +48,31 @@ src/unity/<id>/uitk/*.uxml *.uss *.cs UI Toolkit 구현
 - 매 프레임 바뀌는 값은 `useRef` + DOM 직접 갱신 (`el.style.transform = …`). 프레임마다 `setState` 하지 않는다.
 - 값이 바뀌거나 정지 상태일 때도 한 번은 그려지게 `useLayoutEffect(() => paint())` 를 둔다.
 
+### 공통 유틸 (직접 만들지 말고 가져다 쓴다)
+
+| 파일 | 내용 | 쓰는 표본 예 |
+|---|---|---|
+| `core/hooks.ts` | `useGameLoop` · `useTrigger` · `useAutoplay` · `damp` · `clamp` · `scaled` | 전부 |
+| `core/countup.ts` | `createCountUp(from, to, ms)` → `.step(dt)` `.skip()` · `formatNumber` · 이징 함수 | 결과·보상, 데미지 합계, 퀘스트 진행 |
+| `core/placement.ts` | `placeFloating(anchor, size, bounds, 'right')` — 재고→뒤집고→고정 | 툴팁, 선택지 패널, 말풍선 |
+| `core/projection.ts` | `project()` 월드→화면+가장자리 고정+카메라 뒤 판정, `relativeBearing` | 화면 밖 표시, 데미지 숫자, 미니맵 |
+| `core/input.tsx` | 중립 입력 글리프(`ActionGlyph` `KeyCap` `PadButton` `Shoulder` `MouseGlyph` `TouchGlyph`) + `useLastInputDevice()` | 메뉴, 쿨다운, 인벤토리, 대화창, 설정 |
+| `core/silhouettes.tsx` | 실루엣 키트 `<Silhouette role="ally|enemy|neutral">` (아군=캡슐, 적=삼각, 중립=마름모) | 데미지 숫자, 조준점, 설정 미리보기 |
+| `core/flash.ts` | `requestFlash()` 번쩍임 제한기 · `prefersReducedMotion()` | 번쩍이는 효과가 있는 표본 |
+
+- 게임패드 버튼은 **위치(아래/오른쪽/왼쪽/위)** 로만 표기한다. 특정 콘솔의 기호(A/B/X/Y, ○/×/△/□)·로고 금지.
+- 파라미터 이름은 camelCase, 같은 개념은 같은 이름: `edgeMargin`(px), `fovDeg`, `accentColor`, `skewDeg`, `inputDevice`(auto|keyboard|gamepad|touch), `pulseHz`(≤ 3).
+
+### 공통 세계관 · 문구
+
+표본마다 따로 노는 설정 대신 하나의 가상 세계를 쓴다 (원작과 무관한 이 갤러리 고유 설정).
+
+- **외곽 탐사대** — 변방 행성의 궤도 정비 기지와 지표 탐사 구역
+- 인물: **하린**(탐사대장), **도윤**(정비사), **세라**(통신 담당) — 모두 아군(캡슐 실루엣)
+- 적: **잔해 드론** (삼각 실루엣)
+- 아이템·자원: 수리 키트, 냉각 셀, 회로 조각, 산소 캔, 크레딧
+- 화면 속 문구는 짧고 구체적으로: "냉각 셀 3개 회수", "북쪽 통신탑 복구"
+
 ## 4. 해설 번호 (hotspots)
 
 - meta.hotspots 의 `part` 마다 HUD 안에 `data-part="<part>"` 요소가 **항상** 있어야 한다 (숨김 상태여도 DOM 에는 존재).

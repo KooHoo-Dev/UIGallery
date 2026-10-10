@@ -5,7 +5,7 @@
     python tools/shot.py <표본id> --no-build ...        # 이미 빌드한 결과 재사용
 
 - 다른 에이전트와 겹치지 않게 _shots/build-<id>/ 에 따로 빌드한다 (dist 를 건드리지 않음).
-- 결과: _shots/<id>/<상태>.png  (Read 도구로 열어 확인)
+- 결과: _shots/<id>/<상태>-<시각>.png  (Read 도구로 열어 확인. 실행마다 새 파일)
 - 상태 문법: default | juice0 | slow | event:<이벤트id> | preset:<프리셋id> | spot:<번호> | aspect916 | mobile | home
 """
 
@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -75,10 +76,12 @@ def main() -> int:
         return 1
 
     html = (out_build / "index.html").as_uri()
+    # 매번 새 파일명 — 같은 경로를 다시 읽으면 이전 이미지가 보일 수 있다
+    stamp = time.strftime("%H%M%S")
     for st in states:
         query, (w, h) = state_to_query(st)
         url = f"{html}#/" if st == "home" else f"{html}#/s/{sid}" + (f"?{query}" if query else "")
-        png = out_dir / f"{st.replace(':', '-')}.png"
+        png = out_dir / f"{st.replace(':', '-')}-{stamp}.png"
         subprocess.run(
             [
                 CHROME,

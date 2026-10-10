@@ -1,0 +1,604 @@
+{
+  "specimen_id": "inventory-grid-tooltip",
+  "name_ko": "인벤토리 그리드 + 툴팁 비교",
+  "name_en": "Inventory Grid with Compare Tooltip",
+  "group": "E",
+  "paradigm": "non-diegetic",
+  "one_liner_ko": "칸에 담긴 아이템을 희귀도로 한눈에 가르고, 장착품과의 차이는 툴팁이 대신 계산해 준다. 툴팁은 화면 가장자리에서도 잘리지 않는다. 공간 모드로 바꾸면 배치 자체가 퍼즐이 된다.",
+  "learning_goals_ko": [
+    "균일 슬롯 그리드와 모양이 있는 공간 그리드의 차이를 말하고, 각 방식이 플레이어에게 어떤 결정을 요구하는지 설명할 수 있다.",
+    "희귀도를 색 하나에만 맡기지 않고 테두리·모양·텍스트로 이중 부호화할 수 있다.",
+    "장착품 비교 툴팁에서 절댓값 대신 차이(+/-)를 보여 줘 인지 부하를 줄일 수 있다.",
+    "툴팁이 화면 밖으로 나가면 피벗을 뒤집고 위치를 클램프하는 보정 로직을 UGUI와 UI Toolkit에서 각각 구현할 수 있다.",
+    "GridLayoutGroup·ScrollRect(UGUI), flex-wrap·ScrollView(UI Toolkit)로 스크롤되는 인벤토리를 만들고 마우스·게임패드 포커스를 모두 지원할 수 있다.",
+    "(심화) 공간 모드에서 점유 모양 회전과 배치 가능 검사(차단 칸·전용 칸·겹침)를 구현하고, 1:1 교체를 처리할 수 있다."
+  ],
+  "anatomy": [
+    {
+      "part_id": "inventory-root",
+      "name_ko": "인벤토리 화면 루트",
+      "role_ko": "장착 패널, 정렬·필터 바, 그리드, 툴팁 레이어를 담는 전체 틀. 툴팁은 스크롤 영역 밖 최상위 레이어에 둔다."
+    },
+    {
+      "part_id": "equipped-panel",
+      "name_ko": "장착 칸 패널",
+      "role_ko": "지금 장착한 아이템을 부위별로 보여 준다. 비교 툴팁이 기준으로 삼는 값은 여기서 가져온다."
+    },
+    {
+      "part_id": "sort-filter-bar",
+      "name_ko": "정렬·필터 바",
+      "role_ko": "희귀도·수치·종류 기준 정렬과 희귀도 필터 토글. 지금 적용된 기준을 항상 보이게 표시한다."
+    },
+    {
+      "part_id": "scroll-view",
+      "name_ko": "스크롤 영역",
+      "role_ko": "칸이 화면보다 많을 때 세로로 스크롤한다. 포커스가 보이는 영역 밖으로 나가면 따라 스크롤한다."
+    },
+    {
+      "part_id": "slot-grid",
+      "name_ko": "슬롯 그리드",
+      "role_ko": "균일 모드에서는 같은 크기 칸이 늘어선 격자다. 공간 모드에서는 쓸 수 없는 차단 칸과 특정 부위 전용 칸이 섞인 고정 격자가 된다."
+    },
+    {
+      "part_id": "slot",
+      "name_ko": "슬롯",
+      "role_ko": "아이템 하나를 담는 칸. 빈 칸·호버·포커스·선택·사용 불가 상태를 구분해 그린다."
+    },
+    {
+      "part_id": "rarity-frame",
+      "name_ko": "희귀도 표시",
+      "role_ko": "테두리 색과 모서리 모양(티어별 도형)으로 희귀도를 이중 부호화한다."
+    },
+    {
+      "part_id": "item-footprint",
+      "name_ko": "아이템 점유 모양",
+      "role_ko": "공간 모드 전용. 아이템이 차지하는 칸 모양(1×1, 1×3, L자 등). 회전하면 모양도 함께 돈다."
+    },
+    {
+      "part_id": "placement-preview",
+      "name_ko": "배치 미리보기",
+      "role_ko": "공간 모드에서 아이템을 든 채 움직이면 놓일 칸을 초록(가능)·빨강(불가)·노랑(교체)으로 미리 칠하고 ✓·✕·⇄ 아이콘을 함께 띄운다."
+    },
+    {
+      "part_id": "tooltip",
+      "name_ko": "아이템 툴팁",
+      "role_ko": "이름·희귀도·종류·수치·설명·조작 힌트를 보여 준다. 화면 가장자리에 닿으면 반대쪽으로 뒤집히고, 그래도 넘치면 클램프된다."
+    },
+    {
+      "part_id": "compare-block",
+      "name_ko": "비교 블록",
+      "role_ko": "장착품 대비 수치 차이를 +초록/-빨강 화살표와 숫자로 보여 준다. 나란히 놓기(side-by-side)와 한 줄 차이(inline-delta) 두 방식이 있다."
+    },
+    {
+      "part_id": "hint-bar",
+      "name_ko": "조작 힌트 바",
+      "role_ko": "장착·회전·버리기 같은 입력 힌트를 입력 장치(마우스/게임패드/터치)에 맞춰 바꿔 보여 준다."
+    }
+  ],
+  "states": [
+    {
+      "name": "idle",
+      "trigger_ko": "인벤토리를 열었고 아무것도 가리키지 않음",
+      "visual_ko": "희귀도 테두리가 있는 칸 격자. 빈 칸은 옅은 점선 테두리로 표시한다."
+    },
+    {
+      "name": "hover-focus",
+      "trigger_ko": "마우스 호버 또는 게임패드·키보드 포커스",
+      "visual_ko": "칸이 살짝 밝아지고 포커스 링이 생긴다. 툴팁 지연 타이머가 시작된다."
+    },
+    {
+      "name": "tooltip-open",
+      "trigger_ko": "호버·포커스가 지연 시간보다 오래 유지됨",
+      "visual_ko": "툴팁이 칸 옆에 페이드와 약간의 스케일로 나타난다. 기본 위치는 칸의 오른쪽 아래."
+    },
+    {
+      "name": "compare",
+      "trigger_ko": "툴팁 대상과 같은 부위에 장착품이 있음",
+      "visual_ko": "비교 블록이 붙는다. 오른 수치는 초록 ▲, 내린 수치는 빨강 ▼, 같으면 회색이다. 장착 중인 아이템에는 '장착 중' 배지가 붙고 비교는 생략한다."
+    },
+    {
+      "name": "edge-flipped",
+      "trigger_ko": "툴팁이 화면 오른쪽·아래 가장자리를 넘음",
+      "visual_ko": "툴팁이 칸의 왼쪽이나 위쪽으로 뒤집힌다. 뒤집어도 넘치면 화면 안쪽으로 클램프된다. 원래 칸은 가리지 않는다."
+    },
+    {
+      "name": "filtered-sorted",
+      "trigger_ko": "정렬 기준 변경 또는 희귀도 필터 토글(균일 모드)",
+      "visual_ko": "아이템이 새 자리로 미끄러져 이동한다. 필터에서 빠진 아이템은 흐려지거나 숨겨지고, 바에 현재 기준이 강조된다."
+    },
+    {
+      "name": "holding-item",
+      "trigger_ko": "공간 모드에서 아이템을 집음",
+      "visual_ko": "아이템이 커서·포커스를 따라 떠 있고, 아래 칸에 배치 미리보기 색과 아이콘이 칠해진다. 툴팁은 숨긴다. 고정 정보 패널은 접는다."
+    },
+    {
+      "name": "swap",
+      "trigger_ko": "공간 모드에서 든 아이템을 다른 아이템 하나가 있는 칸에 놓음(1:1)",
+      "visual_ko": "두 아이템이 자리를 바꾸고, 밀려난 아이템이 손에 들린 상태(holding-item)로 이어진다. 놓을 자리가 아이템 여럿과 겹치면 빨강 미리보기로 거부한다."
+    },
+    {
+      "name": "new-item",
+      "trigger_ko": "새 아이템 획득",
+      "visual_ko": "새 칸에 작은 점 배지와 은은한 펄스가 한 번 나온다. 툴팁을 한 번 열면 배지가 사라진다."
+    },
+    {
+      "name": "inventory-full",
+      "trigger_ko": "빈 칸(공간 모드에서는 들어갈 자리)이 없는데 획득 시도",
+      "visual_ko": "그리드 테두리가 짧게 흔들리고 '공간 부족' 토스트가 뜬다. 번쩍임은 한 번만."
+    }
+  ],
+  "params": [
+    {
+      "key": "layout_mode",
+      "label_ko": "그리드 방식",
+      "type": "select",
+      "options": [
+        "uniform",
+        "spatial"
+      ],
+      "default": "uniform",
+      "affects_ko": "uniform은 같은 크기 칸에 아이템을 하나씩 담는다. spatial은 아이템마다 점유 모양이 있고, 차단 칸과 부위 전용 칸이 섞인 고정 격자(행 6줄 고정)로 바뀌어 배치 자체가 퍼즐이 된다."
+    },
+    {
+      "key": "columns",
+      "label_ko": "열 개수",
+      "type": "range",
+      "min": 4,
+      "max": 10,
+      "step": 1,
+      "default": "6",
+      "unit": "열",
+      "affects_ko": "한 줄에 들어가는 칸 수다. 칸 크기, 스크롤 길이, 툴팁이 가장자리에 닿는 빈도가 함께 달라진다. spatial 모드에서는 격자 폭이며, 차단·전용 칸은 열 수에 맞춰 테두리에 다시 배치된다."
+    },
+    {
+      "key": "rarity_style",
+      "label_ko": "희귀도 표시",
+      "type": "select",
+      "options": [
+        "border-shape",
+        "background",
+        "corner-tag",
+        "off"
+      ],
+      "default": "border-shape",
+      "affects_ko": "border-shape는 테두리 색과 모서리 도형, background는 칸 배경 그라데이션, corner-tag는 모서리의 작은 삼각형만 쓴다. off는 표시하지 않는다. off로 바꾸면 위계가 사라지는 것을 비교해 볼 수 있다."
+    },
+    {
+      "key": "compare_mode",
+      "label_ko": "장착품 비교",
+      "type": "select",
+      "options": [
+        "off",
+        "side-by-side",
+        "inline-delta"
+      ],
+      "default": "inline-delta",
+      "affects_ko": "off는 절댓값만 보여 준다. side-by-side는 장착품 툴팁을 옆에 하나 더 띄우므로 화면을 넓게 차지한다. inline-delta는 한 툴팁 안에서 수치마다 +/- 차이를 붙인다."
+    },
+    {
+      "key": "tooltip_anchor",
+      "label_ko": "툴팁 위치 방식",
+      "type": "select",
+      "options": [
+        "slot-anchored",
+        "follow-pointer",
+        "fixed-panel"
+      ],
+      "default": "slot-anchored",
+      "affects_ko": "slot-anchored는 칸 옆에 고정되어 게임패드에 맞다. follow-pointer는 커서를 따라다닌다. fixed-panel은 화면 한쪽의 고정 정보 패널로, 그리드 일부를 가리는 트레이드오프를 보여 준다."
+    },
+    {
+      "key": "edge_correction",
+      "label_ko": "가장자리 위치 보정",
+      "type": "toggle",
+      "default": "true",
+      "affects_ko": "켜면 툴팁이 화면 밖으로 나갈 때 반대쪽으로 뒤집고 클램프한다. 끄면 오른쪽 끝 칸의 툴팁이 잘린다. tooltip_anchor가 fixed-panel이면 효과가 없으므로 비활성화한다."
+    },
+    {
+      "key": "tooltip_delay",
+      "label_ko": "툴팁 지연",
+      "type": "range",
+      "min": 0,
+      "max": 800,
+      "step": 50,
+      "default": "250",
+      "unit": "ms",
+      "affects_ko": "호버 기준 지연이다. 0이면 커서로 그리드를 훑을 때 툴팁이 깜빡이고, 너무 길면 답답하다. 게임패드·키보드 포커스에는 이 값의 절반을 쓴다."
+    },
+    {
+      "key": "sort_by",
+      "label_ko": "정렬 기준",
+      "type": "select",
+      "options": [
+        "none",
+        "rarity",
+        "power",
+        "type"
+      ],
+      "default": "rarity",
+      "affects_ko": "아이템 순서가 바뀌며 칸이 미끄러져 재배치된다. spatial 모드에서는 비활성화해 '배치는 플레이어 몫'임을 보여 준다."
+    }
+  ],
+  "presets": [
+    {
+      "id": "loot-compare",
+      "name_ko": "수집형 비교 그리드",
+      "genre_ko": "루트 슈터·액션 RPG",
+      "values_json": "{\"layout_mode\":\"uniform\",\"columns\":\"6\",\"rarity_style\":\"border-shape\",\"compare_mode\":\"inline-delta\",\"tooltip_anchor\":\"slot-anchored\",\"edge_correction\":\"true\",\"tooltip_delay\":\"200\",\"sort_by\":\"rarity\"}",
+      "look_ko": "같은 크기 칸에 희귀도 테두리가 또렷하고, 칸 옆에 붙는 툴팁이 장착품 대비 +/-를 바로 알려 준다. 희귀도 순으로 정렬되어 좋은 물건이 앞에 모인다."
+    },
+    {
+      "id": "spatial-pack",
+      "name_ko": "공간 퍼즐형 배낭",
+      "genre_ko": "생존·관리 시뮬레이션",
+      "values_json": "{\"layout_mode\":\"spatial\",\"columns\":\"8\",\"rarity_style\":\"off\",\"compare_mode\":\"off\",\"tooltip_anchor\":\"fixed-panel\",\"edge_correction\":\"true\",\"tooltip_delay\":\"0\",\"sort_by\":\"none\"}",
+      "look_ko": "8×6 격자에 차단 칸과 부위 전용 칸이 섞여 있고, 모양이 다른 아이템을 회전시켜 끼운다. 정보는 화면 한쪽 고정 패널에 뜨며, 패널이 그리드 일부를 가리는 대가를 직접 확인할 수 있다. 아이템을 들면 패널이 접힌다."
+    },
+    {
+      "id": "touch-panel",
+      "name_ko": "터치 우선 고정 패널",
+      "genre_ko": "모바일 RPG",
+      "values_json": "{\"layout_mode\":\"uniform\",\"columns\":\"4\",\"rarity_style\":\"background\",\"compare_mode\":\"side-by-side\",\"tooltip_anchor\":\"fixed-panel\",\"edge_correction\":\"true\",\"tooltip_delay\":\"0\",\"sort_by\":\"power\"}",
+      "look_ko": "호버가 없는 터치 환경을 가정해 탭 한 번으로 고정 패널이 열린다. 칸이 크고 배경색으로 희귀도를 보여 주며, 장착품과 나란히 놓고 비교한다."
+    }
+  ],
+  "events": [
+    {
+      "id": "loot-drop",
+      "label_ko": "새 아이템 획득"
+    },
+    {
+      "id": "equip-focused",
+      "label_ko": "선택한 아이템 장착"
+    },
+    {
+      "id": "cycle-sort",
+      "label_ko": "정렬 기준 바꾸기"
+    },
+    {
+      "id": "toggle-rarity-filter",
+      "label_ko": "희귀도 필터 토글"
+    },
+    {
+      "id": "focus-edge-slot",
+      "label_ko": "오른쪽 아래 끝 칸에 포커스(가장자리 보정 테스트)"
+    },
+    {
+      "id": "pick-up-item",
+      "label_ko": "아이템 집기(공간 모드)"
+    },
+    {
+      "id": "rotate-held",
+      "label_ko": "들고 있는 아이템 90도 회전(공간 모드, 들고 있지 않으면 먼저 집기)"
+    },
+    {
+      "id": "swap-drop",
+      "label_ko": "든 아이템을 다른 아이템 칸에 놓아 1:1 교체(공간 모드)"
+    },
+    {
+      "id": "fill-inventory",
+      "label_ko": "인벤토리 가득 채우기(공간 부족)"
+    }
+  ],
+  "timings": [
+    {
+      "event_ko": "툴팁 표시 지연(호버)",
+      "duration_ms": 250,
+      "easing": "none",
+      "note_ko": "권장값. 게임패드·키보드 포커스는 절반(125ms)을 쓴다. 툴팁이 이미 떠 있는 상태에서 이웃 칸으로 옮기면 지연 없이 바로 교체한다."
+    },
+    {
+      "event_ko": "툴팁 나타나기(페이드 + 스케일 0.96→1)",
+      "duration_ms": 120,
+      "easing": "ease-out",
+      "note_ko": "권장값. 위치 이동은 애니메이션하지 않으며, 가장자리 뒤집기도 즉시 적용한다."
+    },
+    {
+      "event_ko": "툴팁 사라지기",
+      "duration_ms": 80,
+      "easing": "ease-in",
+      "note_ko": "권장값. 나타날 때보다 짧게 한다."
+    },
+    {
+      "event_ko": "칸 호버·포커스 하이라이트",
+      "duration_ms": 80,
+      "easing": "ease-out",
+      "note_ko": "권장값."
+    },
+    {
+      "event_ko": "정렬·필터 재배치(FLIP 이동)",
+      "duration_ms": 250,
+      "easing": "cubic-bezier(0.2, 0, 0, 1)",
+      "note_ko": "권장값. prefers-reduced-motion이면 0ms로 즉시 배치한다."
+    },
+    {
+      "event_ko": "장착 교체(칸 ↔ 장착 패널)",
+      "duration_ms": 180,
+      "easing": "cubic-bezier(0.3, 1.3, 0.6, 1)",
+      "note_ko": "권장값. 살짝 넘쳤다 돌아오는 ease-out-back 계열이다. 오버슈트는 5% 안팎으로 작게 둔다."
+    },
+    {
+      "event_ko": "공간 모드 회전",
+      "duration_ms": 120,
+      "easing": "ease-out",
+      "note_ko": "권장값. 90도 단위로 돈다."
+    },
+    {
+      "event_ko": "공간 모드 1:1 교체",
+      "duration_ms": 150,
+      "easing": "ease-out",
+      "note_ko": "권장값. 놓은 아이템은 칸에 스냅하고, 밀려난 아이템은 손 위치로 떠오른다."
+    },
+    {
+      "event_ko": "새 아이템 펄스",
+      "duration_ms": 600,
+      "easing": "ease-in-out",
+      "note_ko": "권장값. 한 번만 재생하고 반복 루프는 쓰지 않는다. prefers-reduced-motion이면 배지만 표시한다."
+    },
+    {
+      "event_ko": "공간 부족 흔들림",
+      "duration_ms": 300,
+      "easing": "ease-out",
+      "note_ko": "권장값. 좌우 4px 이하로 3회 왕복한다. prefers-reduced-motion이면 흔들림 대신 테두리 색만 바꾼다."
+    }
+  ],
+  "hotspots": [
+    {
+      "n": 1,
+      "part_id": "rarity-frame",
+      "title_ko": "희귀도를 색과 모양으로 함께 말한다",
+      "body_ko": "칸을 열지 않아도 어떤 아이템이 귀한지 먼저 눈에 들어온다. 색만 쓰면 색각 이상인 플레이어는 구분하기 어렵기 때문에, 티어마다 모서리 도형을 달리해 같은 정보를 한 번 더 싣는다. rarity_style을 off로 바꿔 보면 위계가 사라져 모든 칸이 같은 무게로 보인다.",
+      "principle": "시각 위계"
+    },
+    {
+      "n": 2,
+      "part_id": "compare-block",
+      "title_ko": "뺄셈은 UI가 대신 한다",
+      "body_ko": "힘 312와 298을 보여 주고 비교하라고 하면 플레이어 머릿속에서 계산이 시작된다. inline-delta는 차이만 +14 ▲로 붙여 판단을 바로 내리게 한다. 같은 부위 장착품이 없거나 이미 장착한 아이템이면 비교 블록을 생략해 정보량을 줄인다.",
+      "principle": "인지 부하"
+    },
+    {
+      "n": 3,
+      "part_id": "tooltip",
+      "title_ko": "가장자리에서 뒤집히는 툴팁",
+      "body_ko": "오른쪽 끝 칸에서 툴팁이 화면 밖으로 잘리면 가장 중요한 수치가 사라진다. 툴팁 크기를 먼저 잰 뒤 넘치는 방향만 반대쪽으로 뒤집고, 그래도 넘치면 화면 안으로 클램프한다. 원래 칸을 가리지 않아야 플레이어가 무엇을 보고 있는지 놓치지 않는다.",
+      "principle": "가독성"
+    },
+    {
+      "n": 4,
+      "part_id": "slot-grid",
+      "title_ko": "칸의 모양이 규칙을 알려 준다",
+      "body_ko": "공간 모드에서는 차단 칸과 부위 전용 칸이 '여기에는 무엇만 놓을 수 있다'를 설명 없이 보여 준다. 그래서 장비 선택이 곧 배치 퍼즐이 되고, 격자 하나가 보관·능력치·업그레이드·관리 게임플레이를 함께 맡는다. 화면을 따로 늘리지 않고도 여러 겹의 결정이 생긴다.",
+      "principle": "어포던스"
+    },
+    {
+      "n": 5,
+      "part_id": "placement-preview",
+      "title_ko": "놓기 전에 결과를 보여 준다",
+      "body_ko": "아이템을 든 채 움직이면 아래 칸이 초록·빨강·노랑으로 칠해져, 놓을 수 있는지와 교체가 일어나는지를 미리 알 수 있다. 실패한 뒤에 알리지 않고 시도하는 동안 알려 주므로 시행착오가 줄어든다. 색에 더해 칸 안 아이콘(✓, ✕, ⇄)도 함께 보여 준다.",
+      "principle": "즉각 피드백"
+    },
+    {
+      "n": 6,
+      "part_id": "item-footprint",
+      "title_ko": "교체는 한 번에 끝난다",
+      "body_ko": "꽉 찬 격자에서 아이템을 바꾸려고 할 때마다 먼저 한쪽을 빈 칸으로 옮겨야 한다면 플레이어는 금방 지친다. 다른 아이템 위에 놓으면 1:1로 자리를 바꾸고 밀려난 아이템을 손에 들려 주면, 회전과 교체만으로 배치를 계속 다듬을 수 있다. 큰 아이템 하나가 작은 아이템 여럿을 덮는 경우는 처리가 훨씬 어려워서, 이 표본에서는 미리보기로 거부한다.",
+      "principle": "오류 방지"
+    }
+  ],
+  "principles": [
+    "희귀도는 색 + 모양 + 텍스트로 이중 부호화한다. 색만으로 의미를 전달하지 않는다.",
+    "비교는 차이(+/-)로 보여 준다. 절댓값 비교를 플레이어에게 떠넘기지 않는다.",
+    "툴팁은 크기를 잰 뒤 위치를 정한다. 넘치면 뒤집고, 그래도 넘치면 클램프한다.",
+    "툴팁은 지금 보고 있는 칸과 다음에 볼 이웃 칸을 가리지 않는다. 고정 패널은 조작 중인 영역과 반대편에 두거나 접는다.",
+    "툴팁은 입력을 받지 않는다(레이캐스트·피킹 끔). 그래야 호버 깜빡임 루프가 생기지 않는다.",
+    "정렬·필터 결과는 이동 애니메이션으로 이어 아이템을 잃어버리지 않게 한다.",
+    "마우스 호버, 게임패드 포커스, 터치 탭이 같은 툴팁 상태로 모이도록 입력을 추상화한다.",
+    "공간 그리드는 '무엇을 어디에 놓을 수 있는가'를 칸 모양으로 미리 보여 주고, 1:1 교체로 재배치 비용을 낮춘다."
+  ],
+  "mistakes": [
+    {
+      "title_ko": "툴팁이 화면 밖으로 잘린다",
+      "body_ko": "툴팁을 항상 칸 오른쪽 아래에 놓으면 오른쪽 끝 열과 맨 아래 줄에서 잘린다. 툴팁 크기를 레이아웃 갱신 뒤에 재고, 넘치는 축만 피벗을 뒤집은 다음 화면 경계로 클램프한다."
+    },
+    {
+      "title_ko": "희귀도를 색으로만 구분한다",
+      "body_ko": "초록과 빨강, 보라와 파랑은 색각 이상이 있으면 구분하기 어렵다. 티어별 모서리 도형이나 툴팁 안 희귀도 텍스트를 함께 쓴다."
+    },
+    {
+      "title_ko": "비교 툴팁이 절댓값만 보여 준다",
+      "body_ko": "두 숫자를 나란히 두기만 하면 플레이어가 직접 빼야 한다. 차이와 방향(▲▼)을 붙이고, '높을수록 나쁜' 수치(재사용 대기 시간 등)는 색 의미를 반대로 처리한다."
+    },
+    {
+      "title_ko": "툴팁이 커서를 받아 깜빡인다",
+      "body_ko": "툴팁이 레이캐스트를 받으면 커서가 툴팁 위에 올라간 순간 칸에서 '나감' 이벤트가 생기고, 툴팁이 닫혔다 다시 열리는 루프가 생긴다. UGUI는 CanvasGroup.blocksRaycasts를 끄고, UI Toolkit은 picking-mode를 Ignore로 둔다."
+    },
+    {
+      "title_ko": "정보 패널이 그리드를 가린다",
+      "body_ko": "고정 정보 패널이나 큰 툴팁이 재배치할 칸을 덮으면 공간 판단이 어려워진다. 실제 출시작의 디자이너도 선택한 아이템 정보가 격자 일부의 공간 정보를 가린다고 인정한 문제다. 패널을 그리드 반대편으로 옮기거나, 아이템을 든 동안에는 접는다."
+    },
+    {
+      "title_ko": "교체하려면 빈 칸부터 만들어야 한다",
+      "body_ko": "공간 그리드에서 다른 아이템 위에 놓는 것을 막아 버리면, 꽉 찬 격자에서는 아이템 하나를 바꾸는 데도 여러 번 옮겨야 한다. 1:1 교체를 지원하고, 밀려난 아이템은 손에 들린 상태로 이어 준다."
+    }
+  ],
+  "juice_off_ko": "모든 칸이 같은 회색이라 희귀도를 알 수 없다. 툴팁은 지연 없이 커서에 붙어 그리드를 훑을 때마다 깜빡이고, 오른쪽 끝 칸에서는 절반이 화면 밖으로 잘린다. 비교 정보 없이 절댓값만 나와 장착품 수치를 기억해서 빼야 한다. 정렬하면 아이템이 순간이동해 방금 보던 물건을 찾을 수 없다. 공간 모드에서는 놓아 보기 전까지 들어가는지 알 수 없고, 다른 아이템 위에는 놓을 수 없어 빈 칸부터 만들어야 한다.",
+  "stage": {
+    "aspect": "both",
+    "needs_3d": false,
+    "scene_ko": "16:9에서는 왼쪽에 장착 칸 패널(머리·몸·손·동력 등 4~5부위), 가운데에 정렬·필터 바와 스크롤되는 슬롯 그리드를 둔다. 9:16에서는 장착 패널을 위쪽 가로 띠로, 그리드를 아래 4열로 바꾸고 툴팁은 하단 고정 패널로 띄운다. 아이템 아이콘은 직접 그린 단순 SVG 도구 실루엣이다. 무대 오른쪽 아래 끝 칸에 일부러 아이템을 두어 가장자리 보정을 바로 시험하게 한다. 공간 모드는 8×6 격자이며 차단 칸과 전용 칸 위치는 표본 고유 배치를 쓴다."
+  },
+  "unity_ugui": {
+    "hierarchy": "Canvas (Screen Space - Overlay)\n├─ InventoryScreen\n│  ├─ EquippedPanel (VerticalLayoutGroup)\n│  │  └─ EquipSlot_Head / EquipSlot_Body / ... (SlotView)\n│  ├─ SortFilterBar (HorizontalLayoutGroup)\n│  │  ├─ SortButton (Button + TMP_Text)\n│  │  └─ RarityToggle_0..4 (Toggle)\n│  └─ GridScroll (ScrollRect)\n│     ├─ Viewport (RectMask2D)\n│     │  └─ Content (GridLayoutGroup + ContentSizeFitter)\n│     │     └─ Slot (프리팹 × N: Image 배경, RarityFrame, Icon, NewBadge, SlotView)\n│     └─ Scrollbar Vertical\n├─ TooltipLayer (빈 RectTransform, 전체 화면 stretch, 맨 마지막 형제)\n│  └─ Tooltip (CanvasGroup + VerticalLayoutGroup + ContentSizeFitter + TooltipView)\n│     ├─ Header (TMP 이름, 희귀도 텍스트)\n│     ├─ StatList (VerticalLayoutGroup → StatRow: 이름, 값, Delta)\n│     ├─ CompareBlock (선택)\n│     └─ HintRow\nEventSystem (EventSystem + InputSystemUIInputModule)",
+    "components_ko": [
+      "Canvas + CanvasScaler: UI Scale Mode는 Scale With Screen Size, 기준 해상도 1920×1080, Match 0.5.",
+      "EventSystem에는 InputSystemUIInputModule을 둔다(StandaloneInputModule은 쓰지 않는다). Actions Asset의 UI 맵이 Point·Navigate·Submit을 담당한다.",
+      "GridScroll(ScrollRect): Horizontal 끔, Movement Type Clamped. Viewport에는 RectMask2D를 둔다(Mask보다 가볍다).",
+      "Content: GridLayoutGroup(Cell Size 96×96, Spacing 8, Constraint = Fixed Column Count, Constraint Count = columns) + ContentSizeFitter(Vertical Fit = Preferred Size). 피벗은 위쪽(0.5, 1).",
+      "Slot 프리팹: Image(배경), RarityFrame Image(티어별 스프라이트·색), Icon Image, Selectable(Navigation Automatic). SlotView 스크립트가 IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler를 구현한다.",
+      "Tooltip: CanvasGroup(blocksRaycasts=false, interactable=false, alpha로 페이드), VerticalLayoutGroup + ContentSizeFitter(Horizontal·Vertical 모두 Preferred Size). 툴팁 안 모든 Graphic의 Raycast Target을 끈다.",
+      "TooltipView 스크립트: Show(SlotView target)에서 내용을 채우고 → LayoutRebuilder.ForceRebuildLayoutImmediate(rect)로 크기를 확정한 뒤 → 위치를 계산한다.",
+      "위치 계산: 칸의 RectTransform.GetWorldCorners로 모서리를 얻고, RectTransformUtility.WorldToScreenPoint와 ScreenPointToLocalPointInRectangle로 TooltipLayer 로컬 좌표로 바꾼다. 오른쪽에 둘 때 x + width가 레이어 rect.xMax를 넘으면 pivot.x를 1로 뒤집어 칸 왼쪽에 두고, 아래쪽은 pivot.y로 같은 처리를 한다. 마지막에 Mathf.Clamp로 경계 안에 고정한다.",
+      "InventoryModel(일반 C# 클래스): 아이템 리스트, 정렬(List.Sort + Comparison), 필터를 맡는다. 장착품 참조는 인스펙터 직렬화 필드로 연결한다. FindObjectOfType는 Unity 6에서 obsolete이므로 쓰지 않고, 꼭 찾아야 하면 FindAnyObjectByType(순서 무관, 더 빠름)이나 FindFirstObjectByType을 Start에서 한 번만 호출한다.",
+      "공간 모드: 배경 칸은 GridLayoutGroup으로 깔고, 아이템은 별도 ItemLayer 아래에 두어 anchoredPosition = 셀 좌표 × (셀 크기 + 간격)으로 직접 배치한다. 점유 모양은 Vector2Int 리스트로 들고, 회전은 각 칸을 (x, y) → (y, -x)로 바꾼 뒤 최솟값이 0이 되도록 정규화한다. 칸 상태는 enum Cell { Free, Blocked, Dedicated } 2차원 배열로 관리한다."
+    ],
+    "steps_ko": [
+      "Canvas, CanvasScaler, EventSystem(InputSystemUIInputModule)을 만든다.",
+      "ScrollRect → Viewport(RectMask2D) → Content(GridLayoutGroup + ContentSizeFitter) 구조를 만들고 Fixed Column Count로 열 수를 고정한다.",
+      "Slot 프리팹을 만들고, SlotView가 아이템 데이터(이름·희귀도·부위·수치)를 받아 RarityFrame 색과 모서리 도형을 티어별로 설정하게 한다.",
+      "InventoryModel의 리스트를 기준으로 Content 아래에 Slot을 생성하거나 풀에서 재사용한다. 정렬할 때는 SetSiblingIndex로 순서를 바꾼다. 이동 애니메이션이 필요하면 바꾸기 전후 위치를 기록해 코루틴으로 보간한다(레이아웃 그룹이 위치를 덮어쓰므로 보간 중에는 아이콘만 별도 레이어에서 움직인다).",
+      "TooltipLayer를 Canvas의 맨 마지막 자식으로 두어 스크롤 마스크 밖에서 가장 위에 그려지게 한다.",
+      "SlotView의 OnPointerEnter/OnSelect에서 코루틴으로 지연(호버는 tooltip_delay, 포커스는 그 절반) 후 TooltipView.Show를 호출하고, OnPointerExit/OnDeselect에서는 코루틴을 멈추고 Hide한다.",
+      "Show 안에서 같은 부위 장착품을 찾아 수치마다 delta를 계산한다. '낮을수록 좋은' 수치는 색을 반대로 처리하고, 장착 중인 아이템이면 비교 블록을 숨긴다.",
+      "ForceRebuildLayoutImmediate 뒤에 위치 보정(뒤집기 → 클램프)을 적용하고, CanvasGroup.alpha와 localScale을 코루틴으로 120ms 동안 올린다.",
+      "게임패드 포커스가 Viewport 밖 칸으로 가면 Content.anchoredPosition을 조정해 포커스 칸이 보이도록 자동 스크롤한다.",
+      "공간 모드가 필요하면 배치 가능 검사(점유 칸이 격자 밖·차단 칸·맞지 않는 전용 칸·다른 아이템과 겹치는지)를 만들고, 드래그 중 미리보기 색을 갱신한다. 겹치는 아이템이 정확히 하나면 교체, 둘 이상이면 거부로 판정한다. 회전 입력은 Input System 액션(예: UI 맵에 추가한 Rotate)으로 받는다."
+    ],
+    "pitfalls_ko": [
+      "툴팁 Graphic의 Raycast Target이 켜져 있으면 커서가 툴팁에 걸려 PointerExit → 닫힘 → 다시 열림 깜빡임이 생긴다.",
+      "ContentSizeFitter는 다음 레이아웃 패스에서 크기를 정하므로, 같은 프레임에 rect.size를 읽으면 0이나 이전 값이 나온다. ForceRebuildLayoutImmediate를 먼저 호출한다.",
+      "Screen Space - Camera 캔버스에서는 ScreenPointToLocalPointInRectangle에 캔버스 카메라를 넘겨야 한다. Overlay면 null을 넘긴다.",
+      "툴팁을 ScrollRect Content 아래에 두면 RectMask2D에 잘린다. 반드시 마스크 밖 레이어에 둔다.",
+      "GridLayoutGroup은 모든 칸 크기가 같다는 전제다. 모양이 다른 아이템(공간 모드)에는 맞지 않으므로 수동 배치한다.",
+      "레이아웃 그룹을 깊게 중첩하면 칸이 많을 때 리빌드 비용이 커진다. 아이템이 수백 개면 보이는 줄만 만드는 가상화를 고려한다.",
+      "ScrollRect는 게임패드 포커스를 따라 자동 스크롤하지 않으므로 직접 구현해야 한다.",
+      "구 Input Manager(Input.GetKey, Input.mousePosition)나 StandaloneInputModule을 쓰지 않는다. 포인터 위치가 필요하면 PointerEventData.position이나 Input System의 Pointer.current를 쓴다."
+    ]
+  },
+  "unity_uitk": {
+    "structure": "UIDocument (PanelSettings: Scale Mode = Scale With Screen Size, Reference Resolution 1920×1080)\n└─ InventoryScreen.uxml\n   <ui:VisualElement name=\"inventory-root\" class=\"inv-root\">\n     <ui:VisualElement name=\"equipped-panel\" class=\"equipped\"/>\n     <ui:VisualElement class=\"inv-main\">\n       <ui:VisualElement name=\"sort-filter-bar\" class=\"bar\">\n         <ui:Button name=\"sort-button\" text=\"정렬: 희귀도\"/>\n         <ui:Toggle name=\"filter-r0\" class=\"rarity-toggle\"/> ...\n       </ui:VisualElement>\n       <ui:ScrollView name=\"grid-scroll\" mode=\"Vertical\">\n         <ui:VisualElement name=\"slot-grid\" class=\"slot-grid\"/>\n       </ui:ScrollView>\n     </ui:VisualElement>\n     <ui:VisualElement name=\"tooltip-layer\" class=\"tooltip-layer\" picking-mode=\"Ignore\">\n       <ui:VisualElement name=\"tooltip\" class=\"tooltip\" picking-mode=\"Ignore\">\n         <ui:Label name=\"tt-name\" picking-mode=\"Ignore\"/> <ui:Label name=\"tt-rarity\" picking-mode=\"Ignore\"/>\n         <ui:VisualElement name=\"tt-stats\" picking-mode=\"Ignore\"/>\n         <ui:VisualElement name=\"tt-compare\" picking-mode=\"Ignore\"/>\n         <ui:Label name=\"tt-hint\" picking-mode=\"Ignore\"/>\n       </ui:VisualElement>\n     </ui:VisualElement>\n   </ui:VisualElement>\nSlot.uxml (Template): <ui:VisualElement class=\"slot\" focusable=\"true\"><ui:VisualElement class=\"slot__rarity\"/><ui:VisualElement class=\"slot__icon\"/><ui:VisualElement class=\"slot__new\"/></ui:VisualElement>",
+    "uss_notes_ko": [
+      "UI Toolkit USS에는 display: grid가 없다. .slot-grid { flex-direction: row; flex-wrap: wrap; } 에 .slot { width: 96px; height: 96px; margin: 4px; } 로 격자를 만들고, 열 수는 컨테이너 width = 열 수 × (칸 + 좌우 여백)으로 고정한다.",
+      "희귀도는 클래스로 나눈다. .slot--r0 ~ .slot--r4 에서 border-color와 .slot__rarity의 background-image(티어별 모서리 도형 VectorImage 또는 스프라이트)를 지정한다. 색 값은 USS 변수(--rarity-3 등)로 두고 var()로 참조한다.",
+      "툴팁 레이어는 .tooltip-layer { position: absolute; left: 0; top: 0; right: 0; bottom: 0; } 로 화면 전체를 덮고, .tooltip { position: absolute; } 의 left/top은 코드에서 style.left/style.top으로 지정한다.",
+      ".tooltip { opacity: 0; scale: 0.96 0.96; transition-property: opacity, scale; transition-duration: 0.12s; transition-timing-function: ease-out; } 와 .tooltip--open { opacity: 1; scale: 1 1; } 로 나타나기를 처리한다.",
+      ".slot:hover, .slot:focus 에 밝기·테두리 변화를 주고 transition-duration은 0.08s로 둔다. 포커스 링은 색만이 아니라 테두리 두께로도 구분한다.",
+      "비교 수치는 .delta--up(초록 ▲), .delta--down(빨강 ▼), .delta--same(회색) 클래스와 함께 기호 문자를 텍스트에 넣어 색 없이도 읽히게 한다."
+    ],
+    "steps_ko": [
+      "PanelSettings와 UIDocument를 만들고 InventoryScreen.uxml을 연결한다. UI Toolkit만 쓰는 화면이라면 EventSystem은 필요 없다. Player 설정의 Active Input Handling이 Input System이면 UI Toolkit이 그 액션에서 이벤트를 받는다. uGUI와 섞을 때만 EventSystem을 둔다.",
+      "InventoryController(MonoBehaviour)의 OnEnable에서 rootVisualElement.Q로 slot-grid, tooltip 등을 찾는다.",
+      "아이템 리스트를 돌며 Slot.uxml(VisualTreeAsset)을 Instantiate해 slot-grid에 Add하고, 희귀도 클래스(AddToClassList)와 userData(아이템 참조)를 지정한다.",
+      "각 칸에 PointerEnterEvent·FocusInEvent 콜백을 등록하고, schedule.Execute(() => ShowTooltip(slot)).StartingIn(지연ms)로 지연 표시를 예약한다. PointerLeaveEvent·FocusOutEvent에서는 예약을 Pause하고 툴팁을 닫는다. 포커스 지연은 호버 지연의 절반을 쓴다.",
+      "ShowTooltip에서 라벨과 비교 행을 채우고 .tooltip--open을 붙인 뒤, tooltip에 GeometryChangedEvent를 한 번 등록해 resolvedStyle.width/height가 확정되면 위치를 계산한다.",
+      "위치 계산: slot.worldBound(패널 좌표)를 tooltipLayer.WorldToLocal로 변환해 칸 오른쪽 아래를 기본 위치로 잡는다. tooltipLayer.layout을 넘으면 칸 왼쪽·위쪽으로 뒤집은 뒤 Mathf.Clamp로 고정한다.",
+      "정렬할 때는 아이템 리스트를 정렬하고 slot-grid.Sort(Comparison) 또는 재삽입으로 자식 순서를 갱신한다. 이동 애니메이션이 필요하면 바꾸기 전후 worldBound 차이를 style.translate에 넣었다가 다음 프레임에 0으로 transition한다.",
+      "게임패드 포커스가 바뀌면 ScrollView.ScrollTo(slot)로 포커스 칸이 보이게 한다.",
+      "공간 모드에서는 slot-grid를 flex-wrap 대신 position: absolute 자식으로 바꿔 셀 좌표 × 셀 크기로 배치하고, 미리보기 칸에 .cell--ok/.cell--bad/.cell--swap 클래스를 토글한다."
+    ],
+    "pitfalls_ko": [
+      "VisualElement.tooltip 속성은 Unity 문서에 Editor UI에서만 지원된다고 적혀 있어 런타임 게임 UI에서는 표시되지 않는다. 런타임 툴팁은 직접 만든다.",
+      "툴팁과 툴팁 레이어(자식 포함)의 picking-mode를 Ignore로 두지 않으면 커서를 가로채 호버 깜빡임이 생긴다. 레이어가 화면 전체를 덮으므로 Ignore를 빠뜨리면 그리드 전체가 클릭되지 않는다.",
+      "resolvedStyle 값은 레이아웃 전에는 NaN이거나 이전 값이다. 크기를 읽는 코드는 GeometryChangedEvent 안에서 실행한다.",
+      "툴팁을 ScrollView 안에 두면 overflow: hidden에 잘린다. 루트 바로 아래 레이어에 둔다.",
+      "VisualTreeAsset.Instantiate()는 템플릿을 TemplateContainer로 한 번 감싸서 돌려준다. 감싼 요소에 .slot 크기가 적용되지 않으면 격자가 틀어지므로, 안쪽 요소를 꺼내 쓰거나 CloneTree(parent)를 쓴다.",
+      "칸이 포커스를 받으려면 focusable=\"true\"가 필요하다. flex-wrap 격자에서는 방향키 이동이 기대와 다를 수 있으니 실제 패드로 확인한다.",
+      "ListView는 한 줄에 아이템 하나인 구조라 그대로는 격자가 되지 않는다. 아이템이 아주 많으면 '한 행 = 칸 N개' 단위로 ListView를 가상화한다.",
+      "USS transition은 left/top 변경에도 걸린다. 위치에는 transition을 주지 말고 opacity와 scale에만 준다. 그렇지 않으면 뒤집힐 때 툴팁이 화면을 가로질러 미끄러진다."
+    ]
+  },
+  "inspired_by": [
+    {
+      "game_id": "destiny-2",
+      "title": "Destiny 2",
+      "credit": "© Bungie, Inc.",
+      "borrowed_axes": [],
+      "what_learned_ko": "근거 레코드에 검증된 UI 요소가 없어서 구체적으로 차용한 축은 없다. '장착 칸 + 후보 그리드 + 비교 툴팁' 배치, 희귀도 색 구분, 정렬은 루트 슈터 장르에서 흔히 쓰는 관습으로만 다룬다. 이 게임의 실제 화면에 대한 서술은 모두 unverified다. 색 값·티어 이름·도형·문구는 표본에서 새로 정했다."
+    },
+    {
+      "game_id": "dredge-2023",
+      "title": "DREDGE",
+      "credit": "Black Salt Games (개발) / Team17 (퍼블리싱)",
+      "borrowed_axes": [
+        "레이아웃 구조"
+      ],
+      "what_learned_ko": "차단 칸과 장비 전용 칸이 섞인 비균질 고정 격자에서 모양이 다른 아이템을 회전·1:1 교체하는 공간 인벤토리 구조를 참고했다(공동 디자이너 Joel Mason의 GameDeveloper 딥다이브, 출시 전 개발 단계 글일 수 있음). 선택한 아이템 정보가 그리드 일부를 가린다는 디자이너 본인의 지적은 '고정 패널' 프리셋과 흔한 실수 항목으로 옮겼다. 격자 크기와 차단·전용 칸 위치, 장비 이름은 따라 하지 않았다."
+    }
+  ],
+  "original_ko": "격자는 균일 모드 기본 6열이고, 공간 모드는 8열×6행이다. 차단 칸은 네 모서리를 모두 막지 않고 일부 테두리에만 표본 고유 패턴으로 두며, 전용 칸도 '머리·동력·손' 같은 중립 부위명으로 새로 배치한다(원작의 조명·엔진·낚시 장비 명칭과 배치는 쓰지 않는다). 희귀도는 다섯 단계 '기본·개량·정예·명품·유일'로 새로 이름 짓고, 색은 표본 CSS 변수로 새로 정한다. 단계마다 모서리 도형(없음·점·삼각·마름모·별)을 붙여 색과 함께 쓴다. 아이템 아이콘은 직접 그린 단순한 SVG 도구 실루엣(렌치·랜턴·나침반·상자·톱니)을 쓰고, 물고기·총기·우주 테마 모티프는 쓰지 않는다. 수치 이름은 '힘·속도·안정·내구'로 새로 정하고, 툴팁 문구와 조작 힌트는 모두 한국어로 새로 쓴다. 글꼴은 시스템 기본 산세리프 스택을 쓰며, 원작 전용 폰트·로고·스크린샷은 쓰지 않는다. 배경은 중립적인 어두운 남회색 패널이다.",
+  "references": [
+    {
+      "label": "Deep Dive: The surprising depth of spatial inventories in DREDGE (Game Developer, Joel Mason)",
+      "url": "https://www.gamedeveloper.com/design/deep-dive-the-surprising-depth-of-spatial-inventories-in-dredge",
+      "type": "T1"
+    },
+    {
+      "label": "Apple unveils winners and finalists of the 2025 Apple Design Awards",
+      "url": "https://www.apple.com/newsroom/2025/06/apple-unveils-winners-and-finalists-of-the-2025-apple-design-awards/",
+      "type": "T1"
+    },
+    {
+      "label": "DREDGE 공식 사이트 (Black Salt Games)",
+      "url": "https://www.blacksaltgames.com/",
+      "type": "official"
+    },
+    {
+      "label": "Destiny 공식 사이트 (Bungie)",
+      "url": "https://www.bungie.net/7/en/Destiny",
+      "type": "official"
+    },
+    {
+      "label": "Destiny 2 (Wikipedia) - 출시일·퍼블리싱·Power 레벨",
+      "url": "https://en.wikipedia.org/wiki/Destiny_2",
+      "type": "T2"
+    },
+    {
+      "label": "DREDGE Accessibility Review (Can I Play That)",
+      "url": "https://caniplaythat.com/2023/05/10/dredge-accessibility-review/",
+      "type": "T2"
+    },
+    {
+      "label": "How Accessible is DREDGE? (GameGrin)",
+      "url": "https://www.gamegrin.com/articles/how-accessible-is-dredge/",
+      "type": "T2"
+    },
+    {
+      "label": "Unity UGUI 매뉴얼: Grid Layout Group",
+      "url": "https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/script-GridLayoutGroup.html",
+      "type": "docs"
+    },
+    {
+      "label": "Unity UGUI 매뉴얼: Scroll Rect",
+      "url": "https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/script-ScrollRect.html",
+      "type": "docs"
+    },
+    {
+      "label": "Unity Scripting API: RectTransformUtility.ScreenPointToLocalPointInRectangle",
+      "url": "https://docs.unity3d.com/ScriptReference/RectTransformUtility.ScreenPointToLocalPointInRectangle.html",
+      "type": "docs"
+    },
+    {
+      "label": "Unity 6.3 Scripting API: VisualElement.tooltip (Editor UI 전용)",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/UIElements.VisualElement-tooltip.html",
+      "type": "docs"
+    },
+    {
+      "label": "Unity 6.3 매뉴얼: UI Toolkit 런타임 이벤트 시스템",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/Manual/UIE-Runtime-Event-System.html",
+      "type": "docs"
+    },
+    {
+      "label": "Unity 6.3 Scripting API: Object.FindFirstObjectByType",
+      "url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Object.FindFirstObjectByType.html",
+      "type": "docs"
+    }
+  ],
+  "confidence_notes_ko": "DREDGE 관련 서술은 모두 검증된 근거 레코드에서 가져왔다. 그리드 구조·회전·핫스왑·정보 패널 가림 문제의 근거는 GameDeveloper 딥다이브(T1)이며, 이 글은 출시 전 개발 단계 글일 수 있어 최종 빌드와 같다고 단정하지 않는다. 화면을 직접 보지 않았으므로 시각 서술은 plausible이다. Destiny 2는 근거 레코드의 elements가 비어 있어 구체적으로 차용한 축이 없다. 희귀도 색 구분, 장착품 비교 툴팁, 보관함 정렬 같은 Destiny 2 UI 서술은 unverified(기억 기반)이며, 카드에서는 장르 관습으로만 다룬다. Wikipedia로 확인한 것은 출시일·퍼블리싱 이력·Power 레벨뿐이다. timings 수치는 모두 업계 통상 권장값이다. Unity 6.3 문서로 다음 세 가지를 확인했다. VisualElement.tooltip은 Editor UI 전용이다. UI Toolkit 런타임은 EventSystem 없이 자체 이벤트 시스템을 쓰고, EventSystem은 uGUI와 섞을 때만 필요하다. FindFirstObjectByType은 obsolete가 아니며, FindAnyObjectByType이 더 빠른 대안이다. gameuidatabase.com·interfaceingame.com에는 접근하지 않았다.",
+  "critic_changes_ko": [
+    "[과잉 모방] hotspot 4와 실수 5의 본문에서 게임명 'DREDGE'를 뺐다. 출처 표기는 inspired_by와 references에만 남겼다.",
+    "[과잉 모방] 공간 프리셋 id·이름을 spatial-cargo/'화물칸'에서 spatial-pack/'공간 퍼즐형 배낭'으로 바꿨다. 열 수도 원작 격자 폭과 같은 7에서 8로 바꾸고 행은 6으로 고정했다(원작 7×9와 다르게). original_ko에 격자 크기와 차단 칸 배치 방식을 구체적으로 적었다.",
+    "[과잉 모방] anatomy·params에서 '모서리 차단 칸·테두리 전용 칸'처럼 원작 배치를 그대로 묘사하던 표현을 '차단 칸·부위 전용 칸'으로 일반화했다.",
+    "[출처 정확성] DREDGE credit을 '© Team17'에서 근거 레코드대로 'Black Salt Games (개발) / Team17 (퍼블리싱)'으로 고쳤다.",
+    "[출처 정확성] Destiny 2는 근거 레코드에 검증된 요소가 없으므로 borrowed_axes를 빈 배열로 바꾸고, 장르 관습으로만 다룬다고 what_learned_ko에 밝혔다.",
+    "[원리 반영] 근거 레코드의 '핫스왑이 좌절을 막는 데 필수'와 '다대일 교체는 어려운 문제'를 반영해 hotspot 6(교체는 한 번에 끝난다, part_id item-footprint)과 실수 6을 추가했다. hotspot 4에는 '격자 하나가 여러 시스템을 겸한다'는 근거를 넣었다.",
+    "[구현 가능성] swap·holding-item 상태에 대응하는 이벤트 pick-up-item, swap-drop을 추가했다. rotate-held에는 들고 있지 않으면 먼저 집는다고 명시했다. swap 상태에 '여러 아이템과 겹치면 거부'를 넣어 다대일 경우를 정의했다.",
+    "[구현 가능성] edge_correction은 fixed-panel에서 효과가 없어 비활성화한다고 명시했다. tooltip_delay의 포커스 지연은 '절반'으로 통일했다(UGUI 단계의 120ms, timings의 100~150ms 불일치 해소).",
+    "[구현 가능성] CSS에 없는 easing 'ease-out-back'을 cubic-bezier(0.3, 1.3, 0.6, 1)로 바꿨다. 공간 모드 1:1 교체 타이밍을 추가했고, 펄스·흔들림에도 prefers-reduced-motion 대체 동작을 적었다.",
+    "[Unity 정확성] UITK 단계의 'EventSystem을 Input System UI 모듈로 설정'은 틀린 안내라 고쳤다. Unity 6.3 문서 기준으로 UI Toolkit 런타임은 EventSystem 없이 동작하고, EventSystem은 uGUI와 섞을 때만 필요하다.",
+    "[Unity 정확성] VisualElement.tooltip이 Editor UI 전용이라는 함정은 Unity 6.3 문서로 확인했으므로 '기억 기반' 단서를 지우고 문서 링크를 references에 추가했다.",
+    "[Unity 정확성] FindObjectOfType가 Unity 6에서 obsolete라는 점을 명시했다. 대안으로는 FindAnyObjectByType(우선)과 FindFirstObjectByType을 제시하고 문서로 확인했다. UGUI 위치 계산에는 월드 좌표를 스크린 좌표로 바꾸는 RectTransformUtility.WorldToScreenPoint 단계를 넣었다.",
+    "[Unity 정확성] UITK 함정에 VisualTreeAsset.Instantiate()가 TemplateContainer로 감싸 격자 크기가 틀어지는 문제와 CloneTree 대안을 추가했다. 툴팁 자식 Label에도 picking-mode=\"Ignore\"를 넣었다.",
+    "[교육성] 공간 모드의 회전·배치 검사·교체 구현을 '(심화)' 학습 목표로 따로 적어, 입문 목표(균일 그리드·툴팁)와 중급 목표를 구분했다.",
+    "[기타] 장착 부위 예시를 원작 연상 없는 '머리·몸·손·동력'으로 맞췄다. 비교 예시 수치명은 표본 수치명 '힘'으로 통일했다."
+  ]
+}

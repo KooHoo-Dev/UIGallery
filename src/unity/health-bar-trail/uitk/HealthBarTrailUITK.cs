@@ -10,6 +10,7 @@ public class HealthBarTrailUITK : MonoBehaviour
 {
     [SerializeField] float maxHealth = 100f;
     [SerializeField] float trailDelay = 0.45f;
+    [SerializeField] float maxHold = 1.2f;
     [SerializeField] float trailSpeed = 0.55f;
     [SerializeField] float healSpeed = 0.6f;
     [SerializeField, Range(0f, 1f)] float lowThreshold = 0.3f;
@@ -19,7 +20,7 @@ public class HealthBarTrailUITK : MonoBehaviour
     VisualElement fill, trail, healPreview, vignette;
     Label label;
 
-    float health = 1f, shownFill = 1f, shownTrail = 1f, holdTimer, beatPhase;
+    float health = 1f, shownFill = 1f, shownTrail = 1f, holdTimer, heldTime, beatPhase;
 
     void OnEnable()
     {
@@ -35,9 +36,10 @@ public class HealthBarTrailUITK : MonoBehaviour
     {
         float before = health;
         health = Mathf.Clamp01(health - amount / maxHealth);
+        if (shownTrail <= shownFill + 0.0001f) heldTime = 0f;
         shownFill = health;
         shownTrail = Mathf.Max(shownTrail, before);
-        holdTimer = trailDelay;
+        holdTimer = Mathf.Min(trailDelay, Mathf.Max(0f, maxHold - heldTime));   // 연타 중 총 대기 상한
     }
 
     public void Heal(float amount)
@@ -53,7 +55,7 @@ public class HealthBarTrailUITK : MonoBehaviour
         if (shownFill < health)
             shownFill = Mathf.MoveTowards(shownFill, health, healSpeed * dt);
 
-        if (holdTimer > 0f) holdTimer -= dt;
+        if (holdTimer > 0f) { holdTimer -= dt; heldTime += dt; }
         else shownTrail = Mathf.MoveTowards(shownTrail, shownFill, trailSpeed * dt);
 
         float lowness = lowThreshold > 0f ? Mathf.Clamp01(1f - shownFill / lowThreshold) : 0f;
