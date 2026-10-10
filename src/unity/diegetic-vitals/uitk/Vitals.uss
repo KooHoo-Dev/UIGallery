@@ -1,0 +1,144 @@
+/* 등판 게이지(RT 256×768 픽셀 기준) + 화면 미니 게이지.
+   USS 에는 gradient·box-shadow·filter 가 없다 — 발광은 Quad 머티리얼의 _Intensity 와 Bloom 이 맡는다. */
+
+.vitals {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    padding-top: 88px;   /* 위 88px 은 산소 표시 자리 (산소는 absolute 라 흐름을 차지하지 않는다) */
+}
+
+/* 높이 합계: 88 + 칸 영역(24 + 10 × 46) + 호(16 + 120) = 708 ≤ 768 */
+
+/* ───── 산소 (조건부) ───── */
+.o2 {
+    position: absolute;   /* 숨겨진 동안에도 칸·호 배치를 밀어내지 않게 흐름에서 뺀다 */
+    top: 8px;
+    right: 12px;
+    flex-direction: row;
+    align-items: center;
+    padding: 6px 12px;
+    background-color: rgba(4, 7, 11, 0.85);
+    border-width: 2px;
+    border-color: rgba(61, 245, 200, 0.4);
+    border-radius: 8px;
+    transition-property: opacity, scale;
+    transition-duration: 0.3s, 0.3s;
+    transition-timing-function: ease-out, ease-out;
+}
+
+.o2--hidden {
+    opacity: 0;
+    scale: 0.9 0.9;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-in, ease-in;
+}
+
+/* 물방울 + 압력계 글리프 스프라이트 (Resources/O2Glyph) */
+.o2__glyph {
+    width: 40px;
+    height: 40px;
+    margin-right: 8px;
+    background-image: resource("O2Glyph");
+    -unity-background-image-tint-color: rgb(61, 245, 200);
+}
+
+.o2__value {
+    font-size: 44px;
+    -unity-font-style: bold;
+    color: rgb(233, 246, 255);
+    padding: 0;
+    margin: 0;
+}
+
+.o2--low .o2__value {
+    color: rgb(255, 69, 69);
+}
+
+.o2--low .o2__glyph {
+    -unity-background-image-tint-color: rgb(255, 69, 69);
+}
+
+/* ───── 체력 칸 (세로) ───── */
+.spine {
+    flex-direction: column-reverse;   /* 0번 칸이 맨 아래 */
+    align-items: center;
+    margin-top: 24px;
+}
+
+.seg {
+    width: 120px;
+    height: 40px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+/* 꺼짐은 display:none 대신 opacity — 레이아웃이 흔들리지 않는다 */
+.seg--off {
+    opacity: 0.08;
+}
+
+/* ───── 동력 호 ───── */
+.arc {
+    width: 220px;
+    height: 120px;
+    margin-top: 16px;
+}
+
+/* ───── 화면 미니 게이지 ───── */
+.fallback {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.mini {
+    position: absolute;
+    left: 48px;
+    top: 500px;
+    flex-direction: row;
+    align-items: center;
+    padding: 12px 20px;
+    background-color: rgba(5, 8, 12, 0.72);
+    border-width: 2px;
+    border-color: rgba(160, 200, 230, 0.25);
+    border-radius: 8px;
+    transition-property: opacity, translate;
+    transition-duration: 0.25s, 0.25s;
+    transition-timing-function: ease-out, ease-out;
+}
+
+.mini--hidden {
+    opacity: 0;
+    translate: -24px 0;
+}
+
+.mini__cells {
+    flex-direction: row;
+}
+
+.mini__cells .seg {
+    width: 20px;
+    height: 24px;
+    margin: 0 2px;
+}
+
+.mini__energy {
+    width: 90px;
+    height: 10px;
+    margin-left: 14px;
+    border-radius: 5px;
+    background-color: rgb(11, 15, 21);
+    overflow: hidden;
+}
+
+.mini__energy-fill {
+    height: 100%;
+    width: 80%;
+    background-color: rgb(97, 160, 255);
+}

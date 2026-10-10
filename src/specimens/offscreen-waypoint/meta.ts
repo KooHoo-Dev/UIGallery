@@ -170,4 +170,8 @@ export const meta: SpecimenMeta = {
     { label: 'Unity 6.3 — Camera.WorldToScreenPoint', url: 'https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Camera.WorldToScreenPoint.html' },
     { label: 'Unity 6.3 — RuntimePanelUtils.CameraTransformWorldToPanel', url: 'https://docs.unity3d.com/6000.3/Documentation/ScriptReference/UIElements.RuntimePanelUtils.CameraTransformWorldToPanel.html' },
   ],
+  related: [
+    { id: 'circular-minimap', why: '같은 "어디로 가야 하나"를 **위에서 내려다본 지도**로 — 회전형과 북쪽 고정형, 범위 밖 아이콘' },
+    { id: 'quest-tracker-toasts', why: '목표 마커가 "어디"라면 퀘스트 목록은 "무엇을" — 둘이 같은 목표를 가리키게 맞춘다' },
+  ],
 }

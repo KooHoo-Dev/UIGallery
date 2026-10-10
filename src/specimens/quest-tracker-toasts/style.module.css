@@ -1,0 +1,787 @@
+/* 퀘스트 트래커 + 알림 큐 — 논리 해상도 1920×1080 (세로 1080×1920) 기준 px */
+
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  color: #eef3fa;
+  font-variant-numeric: tabular-nums;
+  background: #070d1a;
+
+  /* 등급색 — 회청 · 청록 · 자홍 · 호박 (색만으로 구분하지 않도록 띠 굵기·Ⅰ~Ⅳ 를 함께 쓴다) */
+  --r0: #9fb1c4;
+  --r1: #3fd6c0;
+  --r2: #e46ad6;
+  --r3: #ffb648;
+  --accent: #ffbe5a;
+  --hud-text: #eef3fa;
+  --hud-dim: rgba(220, 230, 245, 0.62);
+  --card-h: 66px;
+  --slot-h: 76px;
+  --card-w: 520px;
+}
+.root[data-paused] *,
+.root[data-paused] *::before,
+.root[data-paused] *::after {
+  animation-play-state: paused !important;
+}
+
+.world {
+  position: absolute;
+  inset: 0;
+}
+.beacon {
+  animation: beacon calc(1s / var(--ts, 1)) steps(1, end) infinite;
+}
+@keyframes beacon {
+  50% {
+    opacity: 0.25;
+  }
+}
+.worldLabel {
+  font: 700 24px 'Malgun Gothic', sans-serif;
+  fill: #ffd9a0;
+  paint-order: stroke;
+  stroke: rgba(0, 0, 0, 0.6);
+  stroke-width: 5px;
+}
+
+/* ───────── 트래커 (목록형) ───────── */
+.tracker {
+  position: absolute;
+  right: 48px;
+  top: 64px;
+  width: 560px;
+  padding: 18px 26px 14px 30px;
+  background: linear-gradient(270deg, rgba(5, 9, 18, 0.78) 0%, rgba(5, 9, 18, 0.5) 65%, rgba(5, 9, 18, 0) 100%);
+  border-right: 3px solid rgba(255, 255, 255, 0.4);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+.trackerHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--hud-dim);
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.14);
+}
+.trackerKey {
+  opacity: 0.85;
+}
+
+.quest {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+.questInner {
+  overflow: hidden;
+  min-height: 0;
+  padding: 12px 0 6px;
+}
+.quest + .quest .questInner {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.questKind {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+}
+.quest[data-kind='repeat'] .questKind {
+  color: #8fd8ff;
+}
+.questTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 30px;
+  font-weight: 800;
+  margin: 2px 0 6px;
+  border-radius: 4px;
+}
+.quest[data-kind='repeat'] .questTitle {
+  font-size: 27px;
+  font-weight: 700;
+}
+.doneTag {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0a1018;
+  background: var(--accent);
+  padding: 1px 10px 2px;
+  border-radius: 3px;
+  text-shadow: none;
+}
+.root[data-juice] .quest[data-phase='enter'] {
+  animation: questIn calc(320ms / var(--ts, 1)) ease-out both;
+}
+.root[data-juice] .quest[data-phase='enter'] .questTitle {
+  animation: titleFlash calc(900ms / var(--ts, 1)) ease-out both;
+}
+.root[data-juice] .quest[data-phase='collapse'] {
+  animation: questOut calc(250ms / var(--ts, 1)) ease-in-out forwards;
+}
+.root:not([data-juice]) .quest[data-phase='collapse'] {
+  display: none;
+}
+.quest[data-phase='done'] .objLabel,
+.quest[data-phase='collapse'] .objLabel {
+  opacity: 0.55;
+}
+@keyframes questIn {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+@keyframes questOut {
+  to {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+@keyframes titleFlash {
+  0%,
+  25% {
+    background: rgba(255, 190, 90, 0.32);
+    box-shadow: -10px 0 0 rgba(255, 190, 90, 0.32), 10px 0 0 rgba(255, 190, 90, 0.32);
+  }
+}
+
+/* 목표 행 */
+.obj {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  column-gap: 10px;
+  padding: 5px 4px 5px 2px;
+  border-radius: 4px;
+}
+.objFlash {
+  position: absolute;
+  inset: 0 -10px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(255, 190, 90, 0.42), rgba(255, 190, 90, 0.14));
+  pointer-events: none;
+  animation: rowFlash calc(600ms / var(--ts, 1)) ease-in-out forwards;
+}
+@keyframes rowFlash {
+  0%,
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.objCheck {
+  position: relative;
+  display: flex;
+  color: rgba(238, 243, 250, 0.85);
+}
+.obj[data-done] .objCheck {
+  color: var(--accent);
+}
+.objLabel {
+  position: relative;
+  font-size: 24px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.obj[data-done] .objLabel {
+  opacity: 0.55;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+.objCount {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  font-size: 22px;
+  color: var(--hud-dim);
+}
+.objNum {
+  display: inline-block;
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--hud-text);
+}
+.root[data-juice] .objNum {
+  animation: numPop calc(360ms / var(--ts, 1)) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes numPop {
+  0% {
+    transform: scale(1.35);
+    color: var(--accent);
+  }
+}
+.objMax {
+  font-size: 24px;
+  font-weight: 700;
+}
+.objDelta {
+  position: absolute;
+  right: -2px;
+  top: -24px;
+  font-style: normal;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--accent);
+  animation: deltaUp calc(900ms / var(--ts, 1)) ease-out forwards;
+}
+@keyframes deltaUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+.objBar {
+  grid-column: 2 / 4;
+  position: relative;
+  height: 6px;
+  margin-top: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.objBar > i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, #ffd48a, var(--accent));
+  border-radius: 3px;
+}
+.root[data-juice] .objBar > i {
+  transition: width calc(400ms / var(--ts, 1)) ease-out;
+}
+/* 해설 번호 자리 — 바 오른쪽 부분 (목표 문구와 수치 사이 빈 곳 위로 번호가 오게) */
+.objBarMark {
+  position: absolute;
+  left: 50%;
+  width: 40%;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+.objBarGhost {
+  grid-column: 2 / 4;
+  position: relative;
+  height: 0;
+}
+.obj[data-done] .objBar > i {
+  background: rgba(255, 190, 90, 0.55);
+}
+
+/* ───────── 트래커 (단일 목표형) ───────── */
+.focus {
+  position: absolute;
+  left: 48px;
+  top: 52px;
+  width: 470px;
+  padding: 14px 22px 12px 22px;
+  background: linear-gradient(90deg, rgba(5, 9, 18, 0.72), rgba(5, 9, 18, 0.35) 70%, rgba(5, 9, 18, 0));
+  border-left: 3px solid var(--accent);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+.root[data-juice] .focusInner[data-phase='enter'] {
+  animation: focusIn calc(400ms / var(--ts, 1)) ease-out both;
+}
+@keyframes focusIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+.focusHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.kindMain {
+  display: flex;
+}
+.focusTitle {
+  white-space: nowrap;
+}
+.focus .obj {
+  grid-template-columns: 34px 1fr auto;
+}
+.focus .objLabel {
+  font-size: 28px;
+  font-weight: 700;
+}
+.focusMore {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  font-size: 22px;
+  color: var(--hud-dim);
+}
+
+/* ───────── 토스트 스택 ───────── */
+.dock {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: var(--card-w);
+}
+.dock[data-anchor='left-up'] {
+  left: 48px;
+  bottom: 400px;
+  --from-x: -24px;
+  --from-y: 0px;
+}
+.dock[data-anchor='right-down'] {
+  right: 48px;
+  top: 120px;
+  flex-direction: column-reverse;
+  --from-x: 24px;
+  --from-y: 0px;
+}
+.dock[data-anchor='bottom-center-up'] {
+  left: calc(50% - var(--card-w) / 2);
+  bottom: 150px;
+  --from-x: 0px;
+  --from-y: 20px;
+}
+.stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.dock[data-anchor='right-down'] .stack {
+  flex-direction: column-reverse;
+}
+.ph {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: var(--card-w);
+  height: 0;
+}
+.dock[data-anchor='right-down'] .ph {
+  top: 0;
+  bottom: auto;
+}
+.phBadge {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 96px;
+  height: 0;
+}
+
+.slot {
+  height: var(--slot-h);
+  flex: none;
+  overflow-x: visible;
+  overflow-y: clip;
+  display: flex;
+  align-items: flex-start;
+}
+.dock[data-anchor='right-down'] .slot {
+  align-items: flex-end;
+}
+.root[data-juice] .slot[data-phase='in'] {
+  animation: slotIn calc(200ms / var(--ts, 1)) ease-out both;
+}
+.root[data-juice] .slot[data-phase='in'] .card {
+  animation: cardIn calc(220ms / var(--ts, 1)) cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.root[data-juice] .slot[data-phase='out'] {
+  animation: slotOut calc(180ms / var(--ts, 1)) cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+.root[data-juice] .slot[data-phase='out'][data-why='preempted'] .card {
+  animation: cardKick calc(180ms / var(--ts, 1)) cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+@keyframes slotIn {
+  from {
+    height: 0;
+  }
+}
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    translate: var(--from-x) var(--from-y);
+  }
+}
+@keyframes slotOut {
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+@keyframes cardKick {
+  to {
+    translate: calc(var(--from-x) * 2) 0;
+    opacity: 0;
+  }
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  height: var(--card-h);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px 0 0;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(8, 13, 24, 0.94), rgba(8, 13, 24, 0.86) 70%, rgba(8, 13, 24, 0.74));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --rc: var(--r0);
+  --sw: 4px;
+}
+.card[data-rarity='1'] {
+  --rc: var(--r1);
+  --sw: 6px;
+}
+.card[data-rarity='2'] {
+  --rc: var(--r2);
+  --sw: 9px;
+  background: linear-gradient(90deg, rgba(60, 16, 58, 0.9), rgba(16, 10, 28, 0.78) 60%, rgba(8, 13, 24, 0.6));
+  box-shadow: inset 0 0 0 1px rgba(228, 106, 214, 0.35);
+}
+.card[data-rarity='3'] {
+  --rc: var(--r3);
+  --sw: 12px;
+  background: linear-gradient(90deg, rgba(92, 54, 8, 0.95), rgba(40, 24, 8, 0.85) 60%, rgba(14, 12, 10, 0.7));
+  box-shadow: inset 0 0 0 2px rgba(255, 182, 72, 0.75), 0 0 26px rgba(255, 170, 60, 0.35);
+}
+.stripe {
+  align-self: stretch;
+  width: var(--sw);
+  flex: none;
+  background: var(--rc);
+  border-radius: 4px 0 0 4px;
+}
+.numeral {
+  flex: none;
+  width: 30px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--rc);
+  margin-left: -2px;
+}
+.icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 4px;
+  color: var(--rc);
+  background: rgba(255, 255, 255, 0.06);
+}
+.label {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 26px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.card[data-rarity='3'] .label {
+  color: #ffe2b0;
+}
+.rarityWord {
+  font-style: normal;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--rc);
+  letter-spacing: 0.08em;
+}
+.badge {
+  flex: none;
+  font-size: 30px;
+  font-weight: 800;
+  color: #fff;
+  min-width: 56px;
+  text-align: right;
+}
+.root[data-juice] .badge[data-bump] {
+  animation: bump calc(160ms / var(--ts, 1)) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes bump {
+  50% {
+    transform: scale(1.15);
+    color: var(--accent);
+  }
+}
+.timer {
+  position: absolute;
+  left: var(--sw);
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.timer > i {
+  position: absolute;
+  inset: 0;
+  background: var(--rc);
+  opacity: 0.85;
+  transform-origin: left center;
+}
+/* 해설 번호 자리 — 막대 오른쪽 끝 (배지가 없는 카드라 비어 있는 곳) */
+.timerMark {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 30%;
+  pointer-events: none;
+}
+.root[data-frozen] .timer > i {
+  background: repeating-linear-gradient(90deg, var(--rc) 0 10px, transparent 10px 16px);
+}
+
+/* +N 대기 — 다음 카드가 들어올 쪽 끝 (높이를 늘 차지해 스택이 출렁이지 않게) */
+.overflow {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 10px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--hud-dim);
+  visibility: hidden;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+.overflow b {
+  font-size: 28px;
+  color: #fff;
+}
+.overflow[data-show] {
+  visibility: visible;
+}
+.dock[data-anchor='right-down'] .overflow {
+  justify-content: flex-end;
+  padding: 0 10px 0 0;
+}
+.dock[data-anchor='bottom-center-up'] .overflow {
+  justify-content: center;
+}
+
+/* ───────── 우선 배너 ───────── */
+.banner {
+  position: absolute;
+  top: 70px;
+  left: calc(50% - 350px);
+  width: 700px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 18px 40px;
+  color: var(--accent);
+  background: linear-gradient(90deg, rgba(20, 12, 4, 0), rgba(20, 12, 4, 0.88) 18%, rgba(20, 12, 4, 0.88) 82%, rgba(20, 12, 4, 0));
+  border-top: 2px solid rgba(255, 190, 90, 0.7);
+  border-bottom: 2px solid rgba(255, 190, 90, 0.7);
+  animation: bannerIn calc(250ms / var(--ts, 1)) ease-out both;
+}
+.banner[data-phase='out'] {
+  animation: bannerOut calc(300ms / var(--ts, 1)) ease-in forwards;
+}
+@keyframes bannerIn {
+  from {
+    opacity: 0;
+    transform: translateY(-28px);
+  }
+}
+@keyframes bannerOut {
+  to {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+}
+.bannerEmblem {
+  display: flex;
+  flex: none;
+}
+.bannerText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.bannerEyebrow {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.3em;
+}
+.bannerTitle {
+  font-size: 42px;
+  font-weight: 800;
+  color: #fff4e0;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.bannerSub {
+  font-size: 24px;
+  color: #ffe0b0;
+}
+
+/* ───────── 큐 상태 (학습용) ───────── */
+.debug {
+  position: absolute;
+  right: 40px;
+  bottom: 34px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  max-width: 760px;
+  padding: 10px 18px;
+  font-size: 22px;
+  color: #c9d6e6;
+  background: rgba(4, 8, 14, 0.82);
+  border: 2px dashed rgba(143, 216, 255, 0.4);
+  border-radius: 4px;
+}
+.debug b {
+  font-size: 26px;
+  color: #fff;
+}
+.debugTitle {
+  font-weight: 800;
+  color: #8fd8ff;
+  letter-spacing: 0.08em;
+}
+.debugBad {
+  color: #ff9d8f;
+  font-weight: 700;
+}
+.debugTimer {
+  font-weight: 700;
+}
+.debugTimer[data-frozen] {
+  color: var(--accent);
+}
+
+/* ───────── 일시정지 ───────── */
+.pause {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 6, 12, 0.58);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pauseCard {
+  width: 600px;
+  padding: 34px 44px 30px;
+  background: rgba(8, 12, 22, 0.94);
+  border-top: 3px solid var(--accent);
+  border-radius: 4px;
+}
+.pauseTitle {
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  margin-bottom: 18px;
+}
+.pauseMenu {
+  list-style: none;
+  margin: 0 0 22px;
+  padding: 0;
+}
+.pauseMenu li {
+  font-size: 28px;
+  padding: 10px 18px;
+  color: var(--hud-dim);
+  border-left: 4px solid transparent;
+}
+.pauseMenu li[data-on] {
+  color: #fff;
+  font-weight: 700;
+  background: rgba(255, 190, 90, 0.14);
+  border-left-color: var(--accent);
+}
+.pauseNote {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 18px;
+  font-size: 22px;
+  color: #ffb3a8;
+  background: rgba(255, 110, 90, 0.1);
+  border-radius: 4px;
+}
+.pauseNote b {
+  font-size: 26px;
+}
+.pauseNote[data-frozen] {
+  color: #ffe0b0;
+  background: rgba(255, 190, 90, 0.1);
+}
+
+/* ───────── 9:16 재배치 ───────── */
+.touch {
+  position: absolute;
+  left: 0;
+  bottom: 130px;
+}
+.root[data-layout='portrait'] .tracker {
+  right: 32px;
+  top: 200px;
+  width: 620px;
+}
+.root[data-layout='portrait'] .focus {
+  left: 32px;
+  top: 200px;
+  width: 640px;
+}
+.root[data-layout='portrait'] .banner {
+  top: 28px;
+  left: 40px;
+  width: 1000px;
+}
+.root[data-layout='portrait'] .dock[data-anchor='left-up'] {
+  left: 32px;
+  bottom: 760px;
+}
+.root[data-layout='portrait'] .dock[data-anchor='right-down'] {
+  right: 32px;
+  top: 760px;
+}
+.root[data-layout='portrait'] .dock[data-anchor='bottom-center-up'] {
+  bottom: 560px;
+}
+.root[data-layout='portrait'] .debug {
+  right: 40px;
+  left: 40px;
+  bottom: 40px;
+  max-width: none;
+  justify-content: center;
+}

@@ -93,6 +93,8 @@ src/unity/<id>/uitk/*.uxml *.uss *.cs UI Toolkit 구현
 
 - meta.hotspots 의 `part` 마다 HUD 안에 `data-part="<part>"` 요소가 **항상** 있어야 한다 (숨김 상태여도 DOM 에는 존재).
 - 번호는 요소의 위쪽 가운데에 붙는다. 넓은 요소(예: 바 전체) 대신 **설명하려는 부분만 감싼 영역**에 붙인다 (기준 구현의 `trail` 영역 참고).
+- 위쪽이 막혀 있으면 hotspot 의 `pin: 'below' | 'left' | 'right' | 'inside'`, 상태에 따라 바꾸려면 요소에 `data-pin="…"`.
+- 대상이 지금 보이지 않으면(opacity 0 · visibility hidden) 번호는 자동으로 흐려진다. 숨은 요소를 가리키려고 자리 표시 요소를 따로 만들 필요는 없다.
 - 3~5개. `principle` 은 8개 원리 중 하나.
 
 ## 5. 접근성 · 안전
@@ -127,6 +129,8 @@ src/unity/<id>/uitk/*.uxml *.uss *.cs UI Toolkit 구현
 ```bash
 npx tsc --noEmit                                   # 내 파일 오류 0
 python tools/shot.py <id> default juice0 event:<이벤트> preset:<프리셋> spot:1 mobile   # 이 표본만 넣어 빌드
+node tools/live.mjs <id> --query="p.<값이름>=<값>" wait:3000 stage:a key:ArrowDown wait:500 stage:b
+# ↑ 실제 시간 캡처. shot.py 의 가상 시간에서는 게임 루프가 거의 진행되지 않으므로 연출·타이머 확인은 이쪽으로
 python tools/check.py                              # (dist 빌드 후) 전체 규칙
 ```
 

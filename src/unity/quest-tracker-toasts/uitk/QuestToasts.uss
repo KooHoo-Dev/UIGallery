@@ -1,0 +1,412 @@
+/* 퀘스트 트래커 + 토스트 큐 — Reference Resolution 1920×1080 기준 px.
+   USS 에 없는 gradient · box-shadow · filter 는 쓰지 않는다. 등급은 색 + 띠 굵기 + Ⅰ~Ⅳ 로 구분한다. */
+
+:root {
+    --hud-text: rgb(238, 243, 250);
+    --hud-dim: rgba(220, 230, 245, 0.62);
+    --hud-accent: rgb(255, 190, 90);
+    --hud-accent-dim: rgba(255, 190, 90, 0.38);
+    --panel: rgba(5, 9, 18, 0.72);
+    --card: rgba(8, 13, 24, 0.9);
+    --rarity-common: rgb(159, 177, 196);     /* 회청 */
+    --rarity-uncommon: rgb(63, 214, 192);    /* 청록 */
+    --rarity-rare: rgb(228, 106, 214);       /* 자홍 */
+    --rarity-legendary: rgb(255, 182, 72);   /* 호박 */
+}
+
+.hud {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* ───────── 트래커 ───────── */
+.tracker {
+    position: absolute;
+    right: 48px;
+    top: 64px;
+    width: 560px;
+    padding: 18px 26px 14px 30px;
+    background-color: var(--panel);
+    border-right-width: 3px;
+    border-right-color: rgba(255, 255, 255, 0.4);
+}
+.tracker__head {
+    font-size: 22px;
+    color: var(--hud-dim);
+    -unity-font-style: bold;
+    padding-bottom: 10px;
+    border-bottom-width: 2px;
+    border-bottom-color: rgba(255, 255, 255, 0.14);
+}
+.quest {
+    padding-top: 12px;
+    padding-bottom: 6px;
+    overflow: hidden;
+    opacity: 1;
+    translate: 0 0;
+    transition-property: opacity, translate;
+    transition-duration: 0.4s, 0.4s;
+    transition-timing-function: ease-out-cubic, ease-out-cubic;
+}
+/* 다음 임무가 목록 맨 위로 들어올 때 — 한 프레임 뒤 클래스를 떼면 transition 이 시작된다 */
+.quest--enter {
+    opacity: 0;
+    translate: 0 -12px;
+}
+/* 접기: C# 이 지금 높이를 px 로 고정한 뒤 한 프레임 뒤 0 으로 바꾼다 (height: auto 는 보간 불가).
+   UI Toolkit 의 height 는 padding 을 포함하므로 padding 도 함께 0 으로 */
+.quest--collapsing {
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    transition-property: height, padding-top, padding-bottom, opacity;
+    transition-duration: 0.25s, 0.25s, 0.25s, 0.25s;
+    transition-timing-function: ease-in-out, ease-in-out, ease-in-out, ease-in-out;
+}
+.quest__title-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 6px;
+}
+.quest__done-tag {
+    display: none;
+    margin-left: 12px;
+    padding: 2px 10px;
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgb(10, 14, 22);
+    background-color: var(--hud-accent);
+    border-radius: 3px;
+}
+.quest--done .quest__done-tag {
+    display: flex;
+}
+.quest__kind {
+    font-size: 22px;
+    color: var(--hud-accent);
+    -unity-font-style: bold;
+}
+.quest__title {
+    font-size: 30px;
+    color: var(--hud-text);
+    -unity-font-style: bold;
+}
+.quest--done .quest__title {
+    opacity: 0.7;
+}
+
+.objective {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 5px 4px;
+    border-radius: 4px;
+    background-color: rgba(255, 190, 90, 0);
+    /* transition 은 기본 클래스에 — 플래시 클래스를 뗄 때 천천히 돌아온다 */
+    transition-property: background-color;
+    transition-duration: 0.6s;
+    transition-timing-function: ease-in-out;
+}
+.objective--flash {
+    background-color: var(--hud-accent-dim);
+    transition-duration: 0.05s;
+}
+.objective__check {
+    width: 22px;
+    height: 22px;
+    margin-right: 12px;
+    border-width: 2px;
+    border-color: rgba(238, 243, 250, 0.85);
+    border-radius: 3px;
+}
+.objective--done .objective__check {
+    background-color: var(--hud-accent);
+    border-color: var(--hud-accent);
+}
+.objective__label {
+    flex-grow: 1;
+    font-size: 24px;
+    color: var(--hud-text);
+}
+.objective--done .objective__label {
+    opacity: 0.55;
+}
+.objective__value {
+    font-size: 28px;
+    color: var(--hud-text);
+    -unity-font-style: bold;
+}
+.objective__bar {
+    width: 100%;
+    height: 6px;
+    margin-top: 6px;
+    margin-left: 34px;
+    background-color: rgba(255, 255, 255, 0.14);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.objective__fill {
+    height: 100%;
+    width: 0;
+    background-color: var(--hud-accent);
+    transition-property: width;
+    transition-duration: 0.4s;
+    transition-timing-function: ease-out;
+}
+
+/* ───────── 토스트 스택 ───────── */
+.toast-dock {
+    position: absolute;
+    width: 520px;
+}
+/* 바닥 고정 + column: 새 카드가 아래에 붙고 기존 카드가 위로 밀린다 */
+.toast-dock--left-up {
+    left: 48px;
+    bottom: 400px;
+    flex-direction: column;
+}
+/* 위 고정 + column-reverse: 새 카드가 위에 붙고 기존 카드가 아래로 밀린다 */
+.toast-dock--right-down {
+    right: 48px;
+    top: 120px;
+    flex-direction: column-reverse;
+}
+.toast-dock--right-down .toast-stack {
+    flex-direction: column-reverse;
+}
+.toast-dock--bottom-center-up {
+    left: 700px;
+    bottom: 150px;
+    flex-direction: column;
+}
+.toast-stack {
+    flex-direction: column;
+}
+
+/* 슬롯(레이아웃 담당): 높이를 고정 px 로 둬야 transition 이 보간한다 (auto 는 보간 불가) */
+.toast {
+    height: 76px;
+    overflow: hidden;
+    opacity: 1;
+    transition-property: height, opacity;
+    transition-duration: 0.2s, 0.22s;
+    transition-timing-function: ease-out, ease-out-cubic;
+}
+.toast--enter {
+    height: 0;
+    opacity: 0;
+}
+.toast--exit {
+    height: 0;
+    opacity: 0;
+    transition-duration: 0.18s, 0.18s;
+    transition-timing-function: ease-in-cubic, ease-in-cubic;
+}
+
+/* 카드(연출 담당): 슬라이드는 translate 로 */
+.toast__card {
+    height: 66px;
+    flex-direction: row;
+    align-items: center;
+    padding-right: 18px;
+    background-color: var(--card);
+    border-radius: 4px;
+    translate: 0 0;
+    transition-property: translate;
+    transition-duration: 0.22s;
+    transition-timing-function: ease-out-cubic;
+}
+.toast--enter .toast__card {
+    translate: -24px 0;
+}
+.toast-dock--right-down .toast--enter .toast__card {
+    translate: 24px 0;
+}
+.toast-dock--bottom-center-up .toast--enter .toast__card {
+    translate: 0 20px;
+}
+/* 선점으로 밀려날 때는 들어온 쪽(화면 가장자리 바깥)으로 빠진다. 아래 가운데는 제자리에서 접힌다 */
+.toast-dock--left-up .toast--kicked .toast__card {
+    translate: -48px 0;
+    transition-duration: 0.18s;
+    transition-timing-function: ease-in-cubic;
+}
+.toast-dock--right-down .toast--kicked .toast__card {
+    translate: 48px 0;
+    transition-duration: 0.18s;
+    transition-timing-function: ease-in-cubic;
+}
+
+.toast__stripe {
+    width: 4px;
+    height: 100%;
+    background-color: var(--rarity-common);
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+.toast__numeral {
+    width: 34px;
+    font-size: 22px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: var(--rarity-common);
+}
+.toast__icon {
+    width: 46px;
+    height: 46px;
+    margin-right: 12px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.06);
+    -unity-background-image-tint-color: var(--rarity-common);
+}
+.toast__message {
+    flex-grow: 1;
+    font-size: 26px;
+    -unity-font-style: bold;
+    color: var(--hud-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.toast__count {
+    font-size: 30px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    scale: 1 1;
+    transition-property: scale;
+    transition-duration: 0.08s;
+    transition-timing-function: ease-out-back;
+}
+.toast__count--bump {
+    scale: 1.15 1.15;
+}
+.toast__count--hidden {
+    display: none;
+}
+.toast__timer {
+    position: absolute;
+    left: 12px;
+    right: 0;
+    bottom: 0;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+.toast__timer-fill {
+    height: 100%;
+    width: 100%;
+    background-color: var(--rarity-common);
+}
+
+/* 등급: 색 + 띠 굵기 (4 / 6 / 9 / 12px) */
+.toast--r1 .toast__stripe { width: 6px; background-color: var(--rarity-uncommon); }
+.toast--r2 .toast__stripe { width: 9px; background-color: var(--rarity-rare); }
+.toast--r3 .toast__stripe { width: 12px; background-color: var(--rarity-legendary); }
+.toast--r1 .toast__numeral { color: var(--rarity-uncommon); }
+.toast--r2 .toast__numeral { color: var(--rarity-rare); }
+.toast--r3 .toast__numeral { color: var(--rarity-legendary); }
+.toast--r1 .toast__timer-fill { background-color: var(--rarity-uncommon); }
+.toast--r2 .toast__timer-fill { background-color: var(--rarity-rare); }
+.toast--r3 .toast__timer-fill { background-color: var(--rarity-legendary); }
+.toast--r1 .toast__icon { -unity-background-image-tint-color: var(--rarity-uncommon); }
+.toast--r2 .toast__icon { -unity-background-image-tint-color: var(--rarity-rare); }
+.toast--r3 .toast__icon { -unity-background-image-tint-color: var(--rarity-legendary); }
+/* 전설: box-shadow 대신 두꺼운 테두리 */
+.toast--r3 .toast__card {
+    background-color: rgba(60, 36, 8, 0.94);
+    border-width: 2px;
+    border-color: var(--rarity-legendary);
+}
+.toast--r3 .toast__message {
+    color: rgb(255, 226, 176);
+}
+
+.toast-overflow {
+    height: 40px;
+    font-size: 24px;
+    -unity-font-style: bold;
+    color: var(--hud-dim);
+    -unity-text-align: middle-left;
+    padding-left: 10px;
+}
+.toast-overflow--hidden {
+    visibility: hidden;   /* display:none 이면 스택이 출렁인다 — 자리는 그대로 둔다 */
+}
+
+/* ───────── 우선 배너 ───────── */
+.banner {
+    position: absolute;
+    top: 70px;
+    left: 610px;
+    width: 700px;
+    flex-direction: row;
+    align-items: center;
+    padding: 18px 40px;
+    background-color: rgba(20, 12, 4, 0.88);
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-color: rgba(255, 190, 90, 0.7);
+    opacity: 1;
+    translate: 0 0;
+    transition-property: opacity, translate;
+    transition-duration: 0.25s, 0.25s;
+    transition-timing-function: ease-out, ease-out;
+}
+.banner--hidden {
+    opacity: 0;
+    translate: 0 -28px;
+    transition-duration: 0.3s, 0.3s;
+    transition-timing-function: ease-in, ease-in;
+}
+.banner__emblem {
+    width: 72px;
+    height: 72px;
+    margin-right: 22px;
+    border-width: 3px;
+    border-color: var(--hud-accent);
+    rotate: 45deg;
+    scale: 0.75 0.75;
+}
+.banner__eyebrow {
+    font-size: 24px;
+    letter-spacing: 6px;
+    color: var(--hud-accent);
+    -unity-font-style: bold;
+}
+.banner__title {
+    font-size: 42px;
+    color: rgb(255, 244, 224);
+    -unity-font-style: bold;
+}
+.banner__sub {
+    font-size: 24px;
+    color: rgb(255, 224, 176);
+}
+
+/* ───────── 일시정지 ───────── */
+.pause {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(3, 6, 12, 0.58);
+}
+.pause--hidden {
+    display: none;
+}
+.pause__title {
+    font-size: 48px;
+    color: var(--hud-text);
+    -unity-font-style: bold;
+    letter-spacing: 10px;
+}
+.pause__note {
+    margin-top: 18px;
+    font-size: 26px;
+    color: rgb(255, 224, 176);
+}

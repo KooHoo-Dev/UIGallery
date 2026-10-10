@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { prefersReducedMotion } from '../core/flash'
-import { applyPreset, defaultParams } from '../core/params'
+import { applyOverrides, applyPreset, defaultParams } from '../core/params'
 import { findSpecimen, PLANNED, SPECIMENS } from '../core/registry'
 import { GROUPS, INPUTS, PARADIGMS, PLATFORMS } from '../core/taxonomy'
 import type { Aspect, ParamValues, StageTrigger } from '../core/types'
@@ -42,7 +42,9 @@ function SpecimenView({
 }) {
   const m = mod.meta
   const initialPreset = m.presets.find(p => p.id === presetId)
-  const [params, setParams] = useState<ParamValues>(() => (initialPreset ? applyPreset(m.params, initialPreset) : defaultParams(m.params)))
+  const [params, setParams] = useState<ParamValues>(() =>
+    applyOverrides(m.params, initialPreset ? applyPreset(m.params, initialPreset) : defaultParams(m.params), opts.params),
+  )
   const [presetActive, setPresetActive] = useState<string | null>(initialPreset?.id ?? null)
   const [playing, setPlaying] = useState(true)
   const [juice, setJuice] = useState(opts.juice ?? true)
@@ -152,6 +154,7 @@ function SpecimenView({
             autoplay={autoplay}
             aspect={aspect}
             presenter={presenter}
+            webglOff={opts.webgl === false}
             showBadges
             hotspots={{ list: spotList, active: activeSpot, visible: showSpots, onSelect: setActiveSpot }}
           />

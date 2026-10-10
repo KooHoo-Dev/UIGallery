@@ -1,0 +1,317 @@
+/* 결과·보상 정산 — UI Toolkit. Reference Resolution 1920×1080 기준 픽셀 값.
+   USS 에는 gradient · box-shadow · filter · skew 가 없다 → 기울어진 판은 SlantedBox(Painter2D), 강조는 border 로. */
+
+.results {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(9, 15, 34);
+    color: rgb(238, 244, 255);
+}
+
+/* ── 승리 배너: 1.6배에서 1배로 (살짝 넘쳤다 돌아오는 ease-out-back) ── */
+.banner {
+    position: absolute;
+    left: 96px;
+    top: 52px;
+    width: 640px;
+    height: 300px;
+    opacity: 0;
+    scale: 1.6 1.6;
+    transform-origin: 20% 50%;
+    transition-property: scale, opacity;
+    transition-duration: 450ms, 120ms;
+    transition-timing-function: ease-out-back, linear;
+}
+.banner--shown {
+    opacity: 1;
+    scale: 1 1;
+}
+.banner__slash {
+    position: absolute;
+    left: -40px;
+    top: 34px;
+    width: 520px;
+    height: 104px;
+}
+.banner__word {
+    font-size: 132px;
+    -unity-font-style: bold;
+    color: rgb(11, 18, 38);
+    padding-left: 20px;
+}
+.banner__mission {
+    font-size: 32px;
+    -unity-font-style: bold;
+    margin-top: 12px;
+}
+
+/* ── 파티 ── */
+.party {
+    position: absolute;
+    left: 96px;
+    top: 384px;
+    width: 560px;
+}
+.member {
+    height: 150px;
+    margin-bottom: 16px;
+    padding: 18px 26px;
+    background-color: rgba(20, 44, 84, 0.92);
+    border-left-width: 6px;
+    border-left-color: rgb(54, 214, 195);
+}
+.member__head {
+    flex-direction: row;
+    justify-content: space-between;
+}
+.member__name {
+    font-size: 34px;
+    -unity-font-style: bold;
+}
+.member__level {
+    font-size: 40px;
+    -unity-font-style: bold;
+}
+.member--up .member__level {
+    color: rgb(255, 181, 71);
+}
+.member__bar {
+    height: 16px;
+    margin: 10px 0 8px 0;
+    background-color: rgba(0, 0, 0, 0.45);
+}
+.member__fill {
+    height: 100%;
+    width: 0%;
+    background-color: rgb(54, 214, 195);
+}
+.member__exp {
+    font-size: 22px;
+    color: rgb(169, 184, 212);
+}
+
+/* ── 정산 패널: 배너 뒤(450ms)에 밀려 들어온다 ── */
+.panel {
+    position: absolute;
+    left: 728px;
+    top: 112px;
+    width: 1096px;
+    height: 730px;
+    padding: 34px 72px 0 84px;
+    opacity: 0;
+    translate: 140px 0;
+    transition-property: translate, opacity;
+    transition-duration: 300ms;
+    transition-delay: 450ms;
+    transition-timing-function: ease-out-cubic;
+}
+.panel--shown {
+    opacity: 1;
+    translate: 0 0;
+}
+.panel__frame {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+.page-title {
+    font-size: 46px;
+    -unity-font-style: bold;
+    height: 92px;
+    margin-bottom: 22px;
+    border-bottom-width: 2px;
+    border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ── 보상 행: 클래스 토글만으로 등장 (오른쪽 48px → 제자리 + 페이드) ── */
+.row {
+    flex-direction: row;
+    align-items: center;
+    height: 82px;
+    margin-bottom: 14px;
+    padding: 0 32px 0 18px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left-width: 8px;
+    border-left-color: rgba(54, 214, 195, 0.55);
+    opacity: 0;
+    translate: 48px 0;
+    transition-property: translate, opacity;
+    transition-duration: 200ms;
+    transition-timing-function: ease-out-cubic;
+}
+.row--shown {
+    opacity: 1;
+    translate: 0 0;
+}
+.row--landed {
+    border-left-color: rgb(54, 214, 195);
+}
+.row__label {
+    font-size: 30px;
+    -unity-font-style: bold;
+}
+.row__sub {
+    font-size: 22px;
+    color: rgb(169, 184, 212);
+    margin-left: 16px;
+    flex-grow: 1;
+}
+.row__value {
+    font-size: 42px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-right;
+    min-width: 200px;
+}
+
+.total {
+    position: absolute;
+    left: 84px;
+    right: 72px;
+    bottom: 34px;
+    height: 116px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    background-color: rgba(0, 0, 0, 0.35);
+    border-top-width: 6px;
+    border-top-color: rgb(255, 181, 71);
+}
+.total__label {
+    font-size: 28px;
+    color: rgb(169, 184, 212);
+}
+.total__value {
+    font-size: 68px;
+    -unity-font-style: bold;
+    color: rgb(255, 181, 71);
+    -unity-text-align: middle-right;
+    transition-property: scale;
+    transition-duration: 75ms;
+}
+.total__value--pulse {
+    scale: 1.12 1.12;
+}
+.items {
+    font-size: 28px;
+    margin-top: 8px;
+    white-space: normal;
+}
+
+/* ── 등급 도장: 2배 → 1배, ease-in (가속하며 찍힘) ── */
+.rank {
+    position: absolute;
+    left: 536px;
+    top: 34px;
+    width: 196px;
+    height: 196px;
+    font-size: 110px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(255, 181, 71);
+    border-width: 6px;
+    border-color: rgb(255, 181, 71);
+    border-radius: 98px;
+    rotate: -12deg;
+    opacity: 0;
+    scale: 2 2;
+    transition-property: scale, opacity;
+    transition-duration: 350ms, 120ms;
+    transition-timing-function: ease-in, linear;   /* USS 에 quad 키워드는 없다 → ease-in */
+}
+.rank--stamped {
+    opacity: 1;
+    scale: 1 1;
+}
+
+/* ── 레벨 업 스포트라이트: 딤 200ms → 카드 확대 400ms ──
+   display 전환은 애니메이션되지 않으므로 opacity · scale 로 */
+.levelup {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(3, 6, 16, 0.9);
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 200ms;
+}
+.levelup__card {
+    width: 640px;
+    padding: 30px 40px 36px 40px;
+    align-items: center;
+    background-color: rgb(19, 48, 106);
+    border-width: 4px;
+    border-color: rgb(255, 181, 71);
+    scale: 0.6 0.6;
+    opacity: 0;
+    transition-property: scale, opacity;
+    transition-duration: 400ms, 160ms;
+    transition-delay: 200ms;
+    transition-timing-function: ease-out-back, linear;
+}
+.levelup--open {
+    opacity: 1;
+}
+.levelup--open .levelup__card {
+    scale: 1 1;
+    opacity: 1;
+}
+.levelup__badge {
+    font-size: 44px;
+    -unity-font-style: bold;
+    color: rgb(11, 18, 38);
+    background-color: rgb(255, 181, 71);
+    padding: 4px 30px;
+    margin-bottom: 20px;
+}
+.levelup__text {
+    font-size: 30px;
+    -unity-text-align: upper-center;
+    white-space: normal;
+}
+
+/* ── 진행 안내 ── */
+.hint {
+    position: absolute;
+    right: 96px;
+    bottom: 36px;
+    height: 72px;
+    padding: 0 28px;
+    font-size: 30px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    background-color: rgba(6, 12, 28, 0.85);
+    border-right-width: 8px;
+    border-right-color: rgb(255, 181, 71);
+}
+
+/* ── 스킵: 남은 transition 을 즉시 끝 상태로 (transition 은 상속되지 않으므로 대상마다 지정) ── */
+.results--instant .banner,
+.results--instant .panel,
+.results--instant .row,
+.results--instant .rank,
+.results--instant .levelup,
+.results--instant .levelup__card {
+    transition-duration: 0s;
+    transition-delay: 0s;
+}
+
+/* 게임 옵션 '모션 줄이기' — USS 에는 OS 설정을 읽는 미디어 쿼리가 없으므로 C# 에서 이 클래스를 붙인다 */
+.results--reduced .banner,
+.results--reduced .panel,
+.results--reduced .row,
+.results--reduced .rank,
+.results--reduced .levelup,
+.results--reduced .levelup__card {
+    transition-duration: 0s;
+    transition-delay: 0s;
+}

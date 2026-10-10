@@ -1,0 +1,34 @@
+<!-- 퀘스트 트래커 + 토스트 큐 + 우선 배너 — UI Toolkit 런타임 HUD (Panel Settings: Scale With Screen Size 1920×1080) -->
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="QuestToasts.uss" />
+    <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
+
+        <!-- 고정 정보: 우상단 트래커. 임무 블록과 목표 행은 C# 에서 만든다 -->
+        <ui:VisualElement name="tracker" class="tracker" picking-mode="Ignore">
+            <ui:Label text="추적 중인 임무" class="tracker__head" picking-mode="Ignore" />
+            <ui:VisualElement name="quest-list" picking-mode="Ignore" />
+        </ui:VisualElement>
+
+        <!-- 일시 정보: 토스트 스택. 쌓이는 방향은 클래스만 바꾼다 (--left-up / --right-down / --bottom-center-up) -->
+        <ui:VisualElement name="toast-dock" class="toast-dock toast-dock--left-up" picking-mode="Ignore">
+            <ui:VisualElement name="toast-stack" class="toast-stack" picking-mode="Ignore" />
+            <ui:Label name="toast-overflow" class="toast-overflow toast-overflow--hidden" text="+0 대기" picking-mode="Ignore" />
+        </ui:VisualElement>
+
+        <!-- 최상위 알림 전용 채널 -->
+        <ui:VisualElement name="priority-banner" class="banner banner--hidden" picking-mode="Ignore">
+            <ui:VisualElement class="banner__emblem" picking-mode="Ignore" />
+            <ui:VisualElement class="banner__text" picking-mode="Ignore">
+                <ui:Label name="banner-eyebrow" class="banner__eyebrow" text="임무 완료" picking-mode="Ignore" />
+                <ui:Label name="banner-title" class="banner__title" picking-mode="Ignore" />
+                <ui:Label name="banner-sub" class="banner__sub" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- 일시정지 막 (Time.timeScale = 0 일 때 표시) -->
+        <ui:VisualElement name="pause" class="pause pause--hidden" picking-mode="Ignore">
+            <ui:Label text="일시정지" class="pause__title" picking-mode="Ignore" />
+            <ui:Label name="pause-note" class="pause__note" picking-mode="Ignore" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

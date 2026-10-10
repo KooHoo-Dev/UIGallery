@@ -15,7 +15,28 @@
 | 2 근거 수집 | 완료 (일부 한계) | `research/games/*.json`. **Balatro 는 근거 조사가 되지 않았고**, Hades 의 체력 바 세부는 출처를 찾지 못함 (세션 웹 검색 한도 소진). 이 두 게임을 쓰는 표본은 확인된 범위만 'Inspired by' 에 싣는다 |
 | 3 패턴 카드 | 완료 | `research/patterns/*.json` 13장 + 전체 검토 `research/review.json` |
 | 4 파일럿 | 완료 | 체력 바 · 화면 밖 목표 표시(3D) · 설정·접근성 (구현 → 독립 리뷰 → 수정) |
-| 4 나머지 10개 | 대기 | 수업 시연 피드백 반영 후 |
+| 4 나머지 10개 | 완료 | 사용자 결정으로 승인 ②(수업 시연)를 건너뛰고 바로 진행. 계약 v1 고정, 표본별 격리 빌드(`UIG_ONLY`)로 10개 병렬 구현 → 독립 리뷰(10개 모두 '수정 필요') → 수정. 통합 후 실시간 캡처로 16:9 · 9:16 · 2D 대체 · 발표 모드 · 좁은 폭 확인 |
+| 5 공개 | 대기 | 승인 ③: 공개 리포 `KooHoo-Dev/UIGallery` 생성·push 는 사용자 확인 후. Unity 코드 실제 컴파일 확인 필요(강사) |
+
+### 공통화 백로그 (표본 구현 중 에이전트들이 보고한 후보)
+
+이번에 반영한 것: 해설 번호 크기 자동 조절 · 숨은 대상 흐리게 · 붙는 쪽 지정(`pin`/`data-pin`), 링크 옵션 `p.<값>` · `webgl=0`, 실제 시간 캡처 도구(`tools/live.mjs`), 긴 키 라벨 글자 크기 하한, 마지막 입력 장치 추적을 캡처 단계로, 무대 안 `kbd` 스타일 분리, 게임 루프 첫 프레임 음수 dt.
+
+다음 후보 (표본 안에 같은 코드가 2곳 이상 생기면 `src/core` 로 올린다):
+
+| 후보 | 지금 있는 곳 |
+|---|---|
+| 입력 소비·버퍼·잠금 유틸 + '입력 기록' 칩 | main-pause-menu, results-reward, dialogue-choices |
+| 스타일 토큰 `--ui-skew` · `--ui-accent` + 강조색 위 글자색(inkOn) | main-pause-menu, results-reward, dialogue-choices |
+| 이징 함수 통합 (easeOutQuart · easeOutExpo · popCurve …) → `core/countup.ts` | damage-numbers, results-reward, circular-minimap |
+| three 없는 각도 유틸(wrapAngle · dampAngle · 8방위 이름) → `core/angles.ts` | circular-minimap |
+| 오브젝트 풀 + 풀 상태 디버그 칩 | damage-numbers (킬 피드 추가 시 재사용) |
+| 시간 제한 막대(남은 시간 + 동결 표시) | quest-tracker-toasts → 대화 자동 진행·결과 화면 |
+| 자동 데모 '사람이 조작하면 N초 쉬기' 옵션 (`useAutoplay`) | reticle-hitmarker, quest-tracker-toasts, main-pause-menu |
+| 3D 오브젝트용 해설 대리 영역(월드 박스 → 화면 div) · 캔버스 글자 텍스처 | diegetic-vitals |
+| 정지 중 3D 다시 그리기(`bus.invalidate` 를 무대가 주입) | diegetic-vitals, offscreen-waypoint |
+| 임의 키 바인딩 글리프(`BindingGlyph`) · 방향키 묶음 글리프 | skill-cooldown-prompt, inventory-grid-tooltip |
+| 희귀도 팔레트 + 표식, 스와이프 스크롤 | inventory-grid-tooltip (상점·제작 표본 추가 시) |
 
 전체 검토(`research/review.json`)에서 나온 공통 제안 중 **공통 유틸**(카운트업, 부유 요소 배치, 투영·클램프, 입력 글리프, 실루엣 키트)과 **공통 세계관**은 반영했다 → [specimen-guide.md](specimen-guide.md). 패러다임 커버리지 보강(Meta 독립 표본, 월드 상호작용 프롬프트 등)과 장르 보강(무기 휠, 카드 손패, 킬 피드, 레이싱)은 2단계 백로그 후보.
 

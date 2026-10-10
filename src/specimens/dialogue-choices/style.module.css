@@ -1,0 +1,1052 @@
+/* ───────────────────────── 대화창 + 선택지 ─────────────────────────
+ * 논리 해상도 1920×1080 (세로 1080×1920) 픽셀.
+ * --accent : 단일 강조색 (이름표 · 포커스 · 타이머)   --ink : 강조색 위 글자색
+ * --skew   : 틀의 기울기. '스타일은 틀에만, 본문은 반듯하게' — 기울이는 것은 배경 틀(::before·frame)뿐이다
+ * --k      : 글자 크기 배율 (본문 · 선택지 · 기록)   --base : 세로 화면 기본 확대
+ * ──────────────────────────────────────────────────────────────── */
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  outline: none;
+  user-select: none;
+  color: #f2f4f7;
+  font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  background: #06090e;
+  --accent: #ff6a3d;
+  --ink: #0b0d10;
+  --skew: 6deg;
+  --nskew: calc(var(--skew) * -1);
+  --k: 1;
+  --base: 1;
+  --k2: min(var(--k), 1.25);
+  --ts: 1;
+  --paper: rgba(9, 11, 15, 0.94);
+  --muted: #9aa3ae;
+}
+.root[data-aspect='portrait'] {
+  --base: 1.3;
+}
+.root:focus-visible {
+  outline: 4px solid var(--accent);
+  outline-offset: -4px;
+}
+.root[data-paused] *,
+.root[data-paused] *::before,
+.root[data-paused] *::after {
+  animation-play-state: paused !important;
+}
+/* 썸네일은 정지 화면 — 등장 애니메이션의 첫 프레임(투명)에 멈추지 않게 끈다 */
+.root[data-thumb] *,
+.root[data-thumb] *::before,
+.root[data-thumb] *::after {
+  animation: none !important;
+}
+.root :where(button) {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+/* ───── 위치 표시 (왼쪽 위) ───── */
+.location {
+  position: absolute;
+  left: 64px;
+  top: 112px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 24px;
+  letter-spacing: 0.06em;
+  color: #c7ced8;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+.location::before {
+  content: '';
+  width: 10px;
+  height: 40px;
+  background: var(--accent);
+  transform: skewX(var(--nskew));
+}
+.location b {
+  color: #fff;
+  font-size: 26px;
+  font-weight: 800;
+}
+.root[data-aspect='portrait'] .location {
+  left: 48px;
+  top: 64px;
+  font-size: 30px;
+}
+.root[data-aspect='portrait'] .location b {
+  font-size: 32px;
+}
+
+/* ───── 읽기 조작: 자동 · 빨리감기 · 기록 (오른쪽 위) ───── */
+.controls {
+  position: absolute;
+  right: 64px;
+  top: 104px;
+  display: flex;
+  gap: 14px;
+}
+.root[data-aspect='portrait'] .controls {
+  right: 40px;
+  top: 140px;
+  gap: 16px;
+}
+.ctl {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 62px;
+  padding: 0 18px 0 22px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #e9edf2;
+  isolation: isolate;
+  white-space: nowrap;
+}
+.root[data-aspect='portrait'] .ctl {
+  height: 92px;
+  padding: 0 28px;
+  font-size: 32px;
+}
+.ctl::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(8, 10, 14, 0.84);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transform: skewX(var(--nskew));
+  transition: background calc(120ms / var(--ts)), border-color calc(120ms / var(--ts));
+}
+.ctl[data-on] {
+  color: var(--ink);
+}
+.ctl[data-on]::before {
+  background: var(--accent);
+  border-color: #fff;
+}
+.ctlIcon {
+  width: 28px;
+  height: 28px;
+  flex: none;
+}
+.root[data-aspect='portrait'] .ctlIcon {
+  width: 38px;
+  height: 38px;
+}
+.ctlIcon[data-ff] {
+  animation: ffRun calc(500ms / var(--ts)) linear infinite;
+}
+@keyframes ffRun {
+  50% {
+    transform: translateX(4px);
+  }
+}
+.ctlState {
+  font-size: 22px;
+  font-weight: 600;
+  opacity: 0.75;
+  margin-right: 4px;
+}
+.root[data-aspect='portrait'] .ctlState {
+  font-size: 28px;
+}
+/* 자동 진행 대기 — 다음 줄까지 남은 시간 */
+.ctlFill {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 7px;
+  height: 4px;
+  background: currentColor;
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+/* ───── 알림 ───── */
+.toast {
+  position: absolute;
+  left: 50%;
+  top: 204px;
+  translate: -50% 0;
+  padding: 14px 32px 14px 26px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(8, 10, 14, 0.92);
+  border-left: 8px solid var(--accent);
+  white-space: nowrap;
+  animation: toast calc(3000ms / var(--ts)) ease both;
+  pointer-events: none;
+  z-index: 5;
+}
+.root[data-aspect='portrait'] .toast {
+  top: 270px;
+  font-size: 32px;
+  white-space: normal;
+  width: 900px;
+  text-align: center;
+}
+.toast[data-tone='bad'] {
+  border-left-color: #ff4d5e;
+  background: rgba(64, 8, 14, 0.94);
+}
+.toast[data-tone='bad']::before {
+  content: '⚠ ';
+}
+@keyframes toast {
+  0% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  6%,
+  86% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ───── 아래 쌓기: [선택지] 위 [대화 패널] — 패널 높이가 늘어도 선택지가 겹치지 않는다 ───── */
+.stack {
+  position: absolute;
+  left: 200px;
+  right: 200px;
+  bottom: 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+.root[data-layout='side'] .stack {
+  left: 560px;
+  right: 130px;
+}
+.root[data-aspect='portrait'] .stack,
+.root[data-aspect='portrait'][data-layout='side'] .stack {
+  left: 40px;
+  right: 40px;
+  bottom: 110px;
+  gap: 40px;
+}
+.choiceArea {
+  align-self: flex-end;
+  width: 720px;
+}
+.root[data-aspect='portrait'] .choiceArea {
+  width: 100%;
+}
+.root[data-aspect='portrait'][data-layout='side'] .choiceArea {
+  width: 690px;
+}
+.choiceGhost {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+/* 선택지 자리 표시 — 틀만 흐리게(기울기도 틀에만), 캡션은 반듯하고 읽히게 */
+.ghostCaption {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 36px;
+  /* 왼쪽은 해설 3번 번호(▷ 자리 바로 위)가 앉을 자리라 비워 둔다 */
+  margin: 0 0 6px 96px;
+  font-size: calc(22px * var(--base));
+  font-weight: 700;
+  color: rgba(230, 236, 243, 0.78);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+.root :where(button).ghostJump {
+  padding: 2px 14px;
+  font-size: calc(22px * var(--base));
+  font-weight: 700;
+  color: #e9edf2;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  background: rgba(8, 10, 14, 0.7);
+}
+.root :where(button).ghostJump:hover {
+  border-color: var(--accent);
+}
+.ghostRow {
+  position: relative;
+  min-height: 80px;
+  isolation: isolate;
+  opacity: 0.3;
+}
+.root[data-aspect='portrait'] .ghostRow {
+  min-height: 120px;
+}
+.ghostRow .choiceFrame {
+  background: rgba(10, 12, 16, 0.6);
+  border: 2px dashed #fff;
+}
+.ghostRow .choiceMark {
+  color: #fff;
+  opacity: 1;
+  transform: none;
+}
+
+/* ───── 선택지 ───── */
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  --lock: 0;
+}
+.choice {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 80px;
+  padding: 12px 34px 12px 62px;
+  font-size: calc(30px * var(--k) * var(--base));
+  font-weight: 600;
+  line-height: 1.3;
+  color: #cfd5dd;
+  isolation: isolate;
+  animation: choiceIn calc(180ms / var(--ts)) cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i) * 50ms / var(--ts));
+  transition:
+    transform calc(100ms / var(--ts)) ease-out,
+    color calc(100ms / var(--ts)) ease-out,
+    opacity calc(150ms / var(--ts)) ease-in;
+}
+.root[data-aspect='portrait'] .choice {
+  min-height: 120px;
+}
+@keyframes choiceIn {
+  from {
+    opacity: 0;
+    translate: 70px 0;
+  }
+}
+.choiceFrame {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(10, 12, 16, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  transform: skewX(var(--nskew));
+  transition:
+    background calc(100ms / var(--ts)) ease-out,
+    border-color calc(100ms / var(--ts)) ease-out;
+}
+.choice[data-action] .choiceText {
+  color: #9aa3ae;
+}
+/* 포커스: 강조색 판 + 앞으로 밀기 + ▶ 표시 + 확정 키 — 색 하나에만 기대지 않는다 */
+.choice[data-focus] {
+  color: var(--ink);
+  font-weight: 800;
+  transform: translateX(-30px);
+}
+.choice[data-focus] .choiceFrame {
+  background: var(--accent);
+  border: 3px solid #fff;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.55);
+}
+.choice[data-focus][data-action] .choiceText {
+  color: var(--ink);
+}
+.choiceMarkSlot {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 40px;
+  height: 40px;
+  margin-top: -20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.choiceMark {
+  width: 0;
+  height: 0;
+  border-top: 13px solid transparent;
+  border-bottom: 13px solid transparent;
+  border-left: 20px solid currentColor;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition:
+    opacity calc(100ms / var(--ts)),
+    transform calc(100ms / var(--ts));
+}
+.choice[data-focus] .choiceMark {
+  opacity: 1;
+  transform: none;
+}
+.choiceText {
+  flex: 1;
+}
+.defaultTag {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 12px;
+  font-size: 22px;
+  font-weight: 700;
+  border: 2px dashed currentColor;
+  opacity: 0.85;
+}
+.confirmGlyph {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  transition: opacity calc(120ms / var(--ts));
+}
+/* 입력 잠금: 확정 키가 흐리고, 아래 막대가 남은 잠금 시간만큼 */
+.choices[data-locked] .confirmGlyph {
+  opacity: 0.35;
+}
+.lockBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -9px;
+  height: 4px;
+  background: currentColor;
+  transform-origin: left;
+  transform: scaleX(var(--lock));
+}
+.confirmGlyph[data-nudge] {
+  animation: nudge calc(240ms / var(--ts)) ease-out;
+}
+@keyframes nudge {
+  25% {
+    translate: -6px 0;
+  }
+  50% {
+    translate: 6px 0;
+  }
+  75% {
+    translate: -3px 0;
+  }
+}
+/* 확정: 고른 항목만 한 번 번쩍이고, 나머지는 먼저 사라진다 */
+.choice[data-flash] .choiceFrame {
+  animation: chosen calc(260ms / var(--ts)) ease-in both;
+}
+@keyframes chosen {
+  0% {
+    background: #fff;
+  }
+}
+.choice[data-dim] {
+  opacity: 0;
+}
+
+/* 제한시간 바 — 0 이면 숨김 */
+.timer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 36px;
+  margin: 0 0 6px 30px;
+  color: #fff;
+  visibility: hidden;
+}
+.timer[data-on] {
+  visibility: visible;
+}
+.hourglass {
+  width: 32px;
+  height: 32px;
+  flex: none;
+}
+.timerTrack {
+  position: relative;
+  flex: 1;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  transform: skewX(var(--nskew));
+  overflow: hidden;
+}
+.timerFill {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform-origin: left;
+}
+/* 30% 아래: 줄무늬 + 1Hz 맥동 (색만으로 알리지 않는다) */
+.root[data-hurry] .timerFill {
+  background: repeating-linear-gradient(-45deg, var(--accent) 0 10px, #fff 10px 15px);
+}
+.root[data-hurry] .timer {
+  animation: hurry calc(1000ms / var(--ts)) ease-in-out infinite;
+}
+@keyframes hurry {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* ───── 대화 패널 ───── */
+.panelWrap {
+  position: relative;
+  animation: panelIn calc(220ms / var(--ts)) cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.root[data-closed] .panelWrap {
+  animation: panelOut calc(160ms / var(--ts)) ease-in both;
+}
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    translate: 0 60px;
+  }
+}
+@keyframes panelOut {
+  to {
+    opacity: 0;
+    translate: 0 70px;
+  }
+}
+.panel {
+  position: relative;
+  min-height: calc(112px * var(--k) * var(--base) + 112px);
+  padding: 66px 120px 46px 96px;
+  cursor: pointer;
+  isolation: isolate;
+}
+.root[data-aspect='portrait'] .panel {
+  padding: 84px 64px 84px 60px;
+  min-height: calc(112px * var(--k) * var(--base) + 168px);
+}
+.frame {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--paper);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  transform: skewX(var(--nskew));
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+}
+.frame::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.frame::after {
+  content: '';
+  position: absolute;
+  right: 48px;
+  top: -3px;
+  width: 180px;
+  height: 9px;
+  background: var(--accent);
+}
+/* 해설용: 기울어진 오른쪽 모서리 */
+.edge {
+  position: absolute;
+  right: -20px;
+  top: 40%;
+  bottom: 0;
+  width: 80px;
+  pointer-events: none;
+}
+
+/* 이름표 — 본문보다 먼저 읽히도록 패널 위 모서리에 강조색으로 */
+.tagRow {
+  position: absolute;
+  left: 44px;
+  top: 0;
+  display: flex;
+  align-items: flex-end;
+  transform: translateY(-58%);
+}
+.root[data-aspect='portrait'] .tagRow {
+  left: 28px;
+}
+.tag {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 8px 34px 10px 30px;
+  color: var(--ink);
+  isolation: isolate;
+  white-space: nowrap;
+  animation: tagIn calc(200ms / var(--ts)) cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes tagIn {
+  from {
+    opacity: 0;
+    translate: -24px 0;
+  }
+}
+.tagFrame {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--accent);
+  transform: skewX(var(--nskew));
+  box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.6);
+}
+.tag[data-unknown] .tagFrame {
+  background: #f2f4f7;
+}
+.tag[data-unknown] {
+  color: #0b0d10;
+}
+.tag b {
+  font-size: calc(38px * var(--k2) * var(--base));
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+.tag small {
+  font-size: calc(22px * var(--base));
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+/* 얼굴 아이콘 — 틀(기울어진 상자)만 기울이고 그림은 반대로 되돌려 반듯하게 */
+.face {
+  position: relative;
+  width: 124px;
+  height: 124px;
+  margin-right: -8px;
+  overflow: hidden;
+  background: #1a1f27;
+  border: 3px solid #fff;
+  transform: skewX(var(--nskew));
+  box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.6);
+  animation: tagIn calc(200ms / var(--ts)) cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  z-index: 1;
+}
+.root[data-aspect='portrait'] .face {
+  width: 150px;
+  height: 150px;
+}
+.faceArt {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.face .faceArt {
+  transform: skewX(var(--skew)) scale(1.18);
+}
+
+/* 큰 측면 초상화 */
+.bust {
+  position: absolute;
+  left: -500px;
+  bottom: -56px;
+  width: 470px;
+  height: 610px;
+  pointer-events: none;
+  animation: bustIn calc(240ms / var(--ts)) cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.root[data-aspect='portrait'] .bust {
+  left: 0;
+  bottom: calc(100% - 40px);
+  width: 330px;
+  height: 430px;
+}
+@keyframes bustIn {
+  from {
+    opacity: 0;
+    translate: -40px 0;
+  }
+}
+.bustPlate {
+  position: absolute;
+  left: 50px;
+  right: 30px;
+  bottom: 0;
+  height: 76%;
+  background: #161b22;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  border-left: 12px solid var(--accent);
+  transform: skewX(var(--nskew));
+}
+.bustClip {
+  position: absolute;
+  inset: 0;
+}
+.bustArt {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(10px 0 0 rgba(0, 0, 0, 0.45));
+}
+
+/* 본문 — 반듯하게, 뒷부분은 자리만 차지하고 숨김 (줄바꿈 위치 고정) */
+.body {
+  margin: 0;
+  font-size: calc(36px * var(--k) * var(--base));
+  line-height: 1.55;
+  font-weight: 500;
+  color: #f4f6f8;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.hidden {
+  visibility: hidden;
+}
+
+/* ▼ 다음 표시 — 문장이 다 나왔을 때만 */
+.next {
+  position: absolute;
+  right: 60px;
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity calc(120ms / var(--ts));
+}
+.root[data-aspect='portrait'] .next {
+  right: 56px;
+  bottom: 26px;
+}
+.root[data-done] .next {
+  opacity: 1;
+}
+.nextArrow {
+  width: 0;
+  height: 0;
+  border-left: 17px solid transparent;
+  border-right: 17px solid transparent;
+  border-top: 22px solid var(--accent);
+  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.6));
+  animation: bob calc(700ms / var(--ts)) ease-in-out infinite alternate;
+}
+@keyframes bob {
+  to {
+    transform: translateY(8px);
+  }
+}
+
+.closedHint {
+  position: absolute;
+  left: 50%;
+  bottom: 110px;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 30px;
+  font-size: 26px;
+  font-weight: 700;
+  background: rgba(8, 10, 14, 0.86);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+  animation: fadeIn calc(300ms / var(--ts)) calc(200ms / var(--ts)) both;
+}
+.root[data-aspect='portrait'] .closedHint {
+  font-size: 34px;
+  bottom: 220px;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ───── 대화 기록 ───── */
+.logScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: rgba(3, 5, 8, 0.74);
+  animation: fadeIn calc(250ms / var(--ts)) ease-out both;
+}
+.log {
+  position: absolute;
+  left: 330px;
+  right: 330px;
+  top: 64px;
+  bottom: 64px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 12, 16, 0.97);
+  border: 3px solid #fff;
+  box-shadow: 14px 14px 0 rgba(0, 0, 0, 0.6);
+  animation: logIn calc(250ms / var(--ts)) cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.root[data-aspect='portrait'] .log {
+  left: 32px;
+  right: 32px;
+  top: 120px;
+  bottom: 120px;
+}
+@keyframes logIn {
+  from {
+    opacity: 0;
+    translate: 0 40px;
+  }
+}
+.log::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: -3px;
+  width: 220px;
+  height: 10px;
+  background: var(--accent);
+}
+.logHead {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 26px 40px 22px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.14);
+}
+.logHead b {
+  font-size: calc(36px * var(--base));
+  font-weight: 900;
+}
+.pauseChip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 14px;
+  font-size: calc(22px * var(--base));
+  font-weight: 700;
+  color: #c8cfd8;
+  border: 2px solid currentColor;
+}
+.pauseChip i {
+  width: 12px;
+  height: 16px;
+  border-left: 4px solid currentColor;
+  border-right: 4px solid currentColor;
+}
+.logClose {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: calc(24px * var(--base));
+  font-weight: 700;
+}
+.logList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 40px 34px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+}
+.logScene {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 26px 0 8px;
+  font-size: calc(22px * var(--base));
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.logScene::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.logEntry {
+  display: grid;
+  grid-template-columns: 68px 1fr;
+  column-gap: 22px;
+  row-gap: 4px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.logEntry[data-old] {
+  opacity: 0.62;
+}
+.logIcon {
+  position: relative;
+  grid-row: span 2;
+  width: 68px;
+  height: 68px;
+  overflow: hidden;
+  background: #1a1f27;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+}
+.logWho {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: calc(26px * var(--base));
+  font-weight: 800;
+}
+.logWho small {
+  font-size: calc(22px * var(--base));
+  font-weight: 600;
+  color: var(--muted);
+}
+.logWho em {
+  font-style: normal;
+  font-size: calc(22px * var(--base));
+  padding: 0 10px;
+  color: var(--ink);
+  background: var(--accent);
+}
+.logText {
+  font-size: calc(28px * var(--k) * var(--base));
+  line-height: 1.5;
+  color: #dfe4ea;
+  word-break: keep-all;
+}
+.logMine {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 12px 0;
+  padding: 12px 22px;
+  font-size: calc(28px * var(--k) * var(--base));
+  font-weight: 700;
+  border-left: 8px solid var(--accent);
+  background: rgba(255, 255, 255, 0.06);
+}
+.logMineLabel {
+  font-size: calc(22px * var(--base));
+  color: var(--muted);
+}
+
+/* ───────────────────────── 효과 끄기 = 흔한 실수 ─────────────────────────
+ * 패널 통째로 기울임(글자까지) · 고정 높이(큰 글자는 잘림) · 이름이 본문 속 · ▼ 없음
+ * 선택지는 똑같은 회색 버튼(포커스 표시 없음) · 타이머는 구석의 작은 숫자 · 기록은 메뉴 속 */
+.badMenu {
+  position: absolute;
+  right: 28px;
+  top: 150px;
+  padding: 4px 12px;
+  font-size: 22px;
+  color: #9a9a9a;
+  border: 1px solid #555;
+}
+.badTimer {
+  position: absolute;
+  left: 28px;
+  top: 28px;
+  font-size: 22px;
+  color: #8f8f8f;
+}
+.badStack {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.badChoices {
+  display: flex;
+  gap: 12px;
+}
+.root[data-aspect='portrait'] .badChoices {
+  flex-direction: column;
+}
+.badChoicesGhost {
+  display: flex;
+  gap: 12px;
+}
+.root[data-aspect='portrait'] .badChoicesGhost {
+  flex-direction: column;
+}
+.badGhostBtn {
+  min-width: 230px;
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  font-size: 22px;
+  color: #bdbdbd;
+  border: 1px dashed rgba(200, 200, 200, 0.5);
+  opacity: 0.6;
+}
+.badCorner {
+  position: absolute;
+  right: 0;
+  top: 45%;
+  bottom: 0;
+  width: 70px;
+  pointer-events: none;
+}
+.root :where(button).badChoice {
+  padding: 12px 26px;
+  font-size: calc(26px * var(--k));
+  color: #d0d0d0;
+  background: #555;
+  border: 1px solid #777;
+  text-align: center;
+}
+.badPanel {
+  position: relative;
+  align-self: stretch;
+  height: 190px;
+  overflow: hidden;
+  padding: 30px 64px;
+  background: rgba(46, 46, 46, 0.9);
+  /* skewDeg 가 0 이어도 '글자까지 기우는' 나쁜 예가 보이도록 최소 6도 */
+  transform: skewX(calc(-1 * max(var(--skew), 6deg)));
+  transform-origin: bottom left;
+  cursor: pointer;
+}
+.root[data-aspect='portrait'] .badPanel {
+  height: 300px;
+}
+.badPanel[data-empty] {
+  visibility: hidden;
+}
+.badBody {
+  margin: 0;
+  font-size: calc(30px * var(--k) * var(--base));
+  line-height: 1.5;
+  color: #dcdcdc;
+}
+.badNext {
+  position: absolute;
+  right: 40px;
+  bottom: 20px;
+  width: 40px;
+  height: 30px;
+}
+
+/* ───── 무대에 포커스가 없을 때 안내 (3초 뒤 흐려짐) ───── */
+.focusHint {
+  position: absolute;
+  left: 50%;
+  bottom: 1px;
+  translate: -50% 0;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 18px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #e9edf2;
+  background: rgba(8, 10, 14, 0.8);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.root:not(:focus-within) .focusHint {
+  display: flex;
+  animation: hintOut calc(600ms / var(--ts)) ease-in calc(3000ms / var(--ts)) forwards;
+}
+@keyframes hintOut {
+  to {
+    opacity: 0;
+  }
+}

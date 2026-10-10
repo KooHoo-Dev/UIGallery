@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <!-- 데미지 숫자 — UI Toolkit 버전. 숫자(.dmg)는 C# 에서 풀로 만들어 #number-layer 에 넣는다 -->
+    <Style src="DamageNumbers.uss" />
+    <ui:VisualElement name="number-layer" class="number-layer" picking-mode="Ignore" />
+    <ui:VisualElement name="total-counter" class="total-counter total-counter--hidden" picking-mode="Ignore">
+        <ui:Label name="total-caption" class="total-counter__caption" text="합계" picking-mode="Ignore" />
+        <ui:VisualElement class="total-counter__row" picking-mode="Ignore">
+            <ui:Label name="total-value" class="total-counter__value" text="0" picking-mode="Ignore" />
+            <ui:Label name="total-hits" class="total-counter__hits" text="0타" picking-mode="Ignore" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

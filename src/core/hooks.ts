@@ -15,7 +15,7 @@ export function useGameLoop(playing: boolean, timeScale: number, cb: (dt: number
     let raf = 0
     let last = performance.now()
     const tick = (now: number) => {
-      const dt = Math.min(0.1, (now - last) / 1000) * scaleRef.current
+      const dt = Math.max(0, Math.min(0.1, (now - last) / 1000)) * scaleRef.current
       last = now
       cbRef.current(dt)
       raf = requestAnimationFrame(tick)

@@ -1,0 +1,45 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Dialogue.uss" />
+    <!-- Panel Settings: Scale With Screen Size, Reference Resolution 1920×1080 -->
+    <ui:VisualElement name="dialogue-root" class="dlg-root dlg-root--hidden" picking-mode="Ignore">
+
+        <!-- 읽기 조작: 자동 · 빨리감기 · 기록 -->
+        <ui:VisualElement name="controls" class="dlg-controls">
+            <ui:Button name="btn-auto" class="dlg-ctl" text="자동 · R" focusable="false" />
+            <ui:Button name="btn-ff" class="dlg-ctl" text="빨리감기 · F" focusable="false" />
+            <ui:Button name="btn-log" class="dlg-ctl" text="기록 · L" focusable="false" />
+        </ui:VisualElement>
+
+        <!-- 아래에서 위로 쌓기: [선택지] 위 [패널] — 패널이 커져도 겹치지 않는다 -->
+        <ui:VisualElement name="stack" class="dlg-stack" picking-mode="Ignore">
+            <ui:VisualElement name="choices" class="dlg-choices dlg-choices--hidden">
+                <ui:VisualElement name="timer" class="dlg-timer">
+                    <ui:VisualElement name="timer-fill" class="dlg-timer__fill" />
+                </ui:VisualElement>
+                <!-- Button.dlg-choice 는 코드에서 만든다 (SkewFrame + Label) -->
+            </ui:VisualElement>
+
+            <ui:VisualElement name="panel" class="dlg-panel">
+                <SkewFrame class="dlg-frame" skew="6" border-width="3" />
+                <ui:VisualElement name="speaker-tag" class="dlg-speaker" picking-mode="Ignore">
+                    <ui:VisualElement name="face-icon" class="dlg-face" />
+                    <ui:VisualElement class="dlg-speaker__plate">
+                        <SkewFrame class="dlg-frame dlg-frame--accent" skew="6" border-width="0" />
+                        <ui:Label name="speaker-name" class="dlg-speaker__name" text="???" />
+                        <ui:Label name="speaker-role" class="dlg-speaker__role" text="" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Label name="body" class="dlg-body" enable-rich-text="true" />
+                <ui:Label name="next" class="dlg-next" text="▼" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="log" class="dlg-log dlg-log--hidden">
+            <ui:VisualElement class="dlg-log__head">
+                <ui:Label class="dlg-log__title" text="대화 기록" />
+                <ui:Label class="dlg-log__chip" text="대화 일시정지 중" />
+            </ui:VisualElement>
+            <ui:ScrollView name="log-scroll" mode="Vertical" class="dlg-log__scroll" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

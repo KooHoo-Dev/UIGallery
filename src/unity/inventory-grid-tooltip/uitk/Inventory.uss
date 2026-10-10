@@ -1,0 +1,247 @@
+/* Panel Settings: Scale With Screen Size, Reference Resolution 1920×1080 기준 픽셀 값.
+   USS 에는 grid·gradient·box-shadow·filter 가 없다 → flex-wrap 격자, 단색 + 테두리로 표현한다. */
+
+:root {
+    --rarity-0: #A3ACB8;
+    --rarity-1: #5FD68F;
+    --rarity-2: #4EA9FF;
+    --rarity-3: #C68BFF;
+    --rarity-4: #FFC23D;
+    --good: #5FE39A;
+    --bad: #FF7B7B;
+    --same: #A7B1C0;
+    --panel: rgba(16, 21, 30, 0.94);
+    --line: rgba(170, 200, 240, 0.14);
+    --text: #EEF2F7;
+    --muted: #94A1B4;
+    color: var(--text);
+    font-size: 24px;
+}
+
+.inv-root {
+    flex-grow: 1;
+    flex-direction: row;
+    padding: 168px 64px 64px 64px;
+    background-color: #0A0E15;
+}
+
+/* ───── 장착 칸 ───── */
+.equipped {
+    width: 556px;
+    margin-right: 48px;
+    padding: 24px;
+    background-color: var(--panel);
+    border-width: 1px;
+    border-color: var(--line);
+}
+.panel-title {
+    font-size: 34px;
+    -unity-font-style: bold;
+    margin-bottom: 16px;
+}
+.eq-slot {
+    flex-direction: row;
+    align-items: center;
+    height: 150px;
+    margin-bottom: 12px;
+    padding: 0 14px;
+    border-width: 2px;
+    border-color: rgba(0, 0, 0, 0);
+    border-radius: 8px;
+}
+.eq-slot .slot {
+    margin: 0 20px 0 0;
+}
+.eq-slot--target {
+    border-color: rgba(102, 224, 255, 0.75);
+    background-color: rgba(102, 224, 255, 0.07);
+}
+.eq-slot__name {
+    font-size: 28px;
+    -unity-font-style: bold;
+}
+
+/* ───── 정렬·필터 바 ───── */
+.inv-main {
+    flex-grow: 1;
+}
+.bar {
+    flex-direction: row;
+    height: 64px;
+    align-items: center;
+    padding: 0 18px;
+    margin-bottom: 18px;
+    background-color: var(--panel);
+    border-width: 1px;
+    border-color: var(--line);
+}
+.bar__label {
+    margin-right: 32px;
+    font-size: 26px;
+}
+
+/* ───── 격자 (열 수는 C# 에서 width 로 고정) ───── */
+.grid-scroll {
+    flex-grow: 1;
+}
+.slot-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.slot {
+    width: 175px;
+    height: 175px;
+    margin: 7px;
+    background-color: #161C27;
+    border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    transition-property: scale, border-color;
+    transition-duration: 0.08s;
+    transition-timing-function: ease-out;
+}
+.slot:hover {
+    background-color: #1D2534;
+}
+/* 포커스는 색이 아니라 두께로도 구분한다 */
+.slot:focus {
+    border-width: 5px;
+    border-color: #FFFFFF;
+    scale: 1.04 1.04;
+}
+.slot--out {
+    opacity: 0.25;
+}
+.slot__icon {
+    position: absolute;
+    left: 21%;
+    top: 19%;
+    width: 58%;
+    height: 58%;
+    -unity-background-scale-mode: scale-to-fit;
+}
+.slot__corner {
+    position: absolute;
+    right: 6px;
+    bottom: 4px;
+    font-size: 22px;
+    -unity-font-style: bold;
+}
+.slot__up {
+    position: absolute;
+    left: 8px;
+    bottom: 4px;
+    font-size: 22px;
+    color: var(--good);
+}
+.slot__new {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    padding: 0 8px;
+    font-size: 22px;
+    color: #2A0A00;
+    background-color: #FF9A5C;
+    border-radius: 12px;
+}
+.slot__delay {
+    position: absolute;
+    left: 10px;
+    bottom: -12px;
+    height: 5px;
+    width: 0;
+    background-color: #FFFFFF;
+}
+
+/* 희귀도: 칸의 .r-N 이 색 + 테두리 형태를, RarityMarkElement 가 모서리 표식 모양을 맡는다
+   (표식은 C# Painter2D 로 그리므로 VectorImage·스프라이트 에셋이 필요 없다. C# 이 둘을 항상 함께 바꾼다) */
+.mark {
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    width: 26px;
+    height: 26px;
+}
+.r-0 { border-color: rgba(163, 172, 184, 0.45); }
+.r-1 { border-color: var(--rarity-1); border-width: 3px; }
+.r-2 { border-color: var(--rarity-2); border-width: 3px; }
+.r-3 { border-color: var(--rarity-3); border-width: 6px; }
+.r-4 { border-color: var(--rarity-4); border-width: 4px; border-top-right-radius: 22px; border-bottom-left-radius: 22px; background-color: #221F15; }
+
+/* ───── 툴팁 ───── */
+.tooltip-layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+.tooltip {
+    position: absolute;
+    width: 560px;
+    padding-bottom: 18px;
+    background-color: rgba(11, 15, 23, 0.97);
+    border-width: 1px;
+    border-top-width: 4px;
+    border-color: rgba(255, 255, 255, 0.14);
+    opacity: 0;
+    scale: 0.96 0.96;
+    /* 위치(left/top)에는 transition 을 걸지 않는다 — 뒤집힐 때 화면을 가로질러 미끄러진다 */
+    transition-property: opacity, scale;
+    transition-duration: 0.12s;
+    transition-timing-function: ease-out;
+}
+.tooltip--open {
+    opacity: 1;
+    scale: 1 1;
+}
+.tt-head {
+    flex-direction: row;
+    align-items: center;
+    height: 54px;
+    padding: 0 22px;
+    background-color: rgba(255, 255, 255, 0.06);
+}
+.tt-head .mark {
+    position: relative;
+    left: 0;
+    top: 0;
+    margin-right: 10px;
+}
+.tt-rarity { -unity-font-style: bold; }
+.tt-kind { flex-grow: 1; -unity-text-align: middle-right; color: var(--muted); font-size: 22px; }
+.tt-badge { margin-left: 10px; padding: 0 10px; color: #0B0F15; background-color: #F2F5FA; -unity-font-style: bold; font-size: 22px; }
+.tt-name { margin: 14px 22px 0 22px; font-size: 32px; -unity-font-style: bold; }
+.tt-vs { margin: 2px 22px 0 22px; font-size: 22px; color: var(--muted); }
+.tt-score {
+    flex-direction: row;
+    align-items: center;
+    margin: 12px 22px 8px 22px;
+    padding: 8px 0;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-color: var(--line);
+}
+.tt-score__label { font-size: 22px; color: var(--muted); }
+.tt-score__value { flex-grow: 1; margin-left: 14px; font-size: 50px; -unity-font-style: bold; }
+.tt-compare { margin: 0 22px; }
+.tt-desc { margin: 12px 22px 0 22px; font-size: 22px; color: var(--muted); white-space: normal; }
+
+.stat {
+    flex-direction: row;
+    align-items: center;
+    height: 44px;
+}
+.stat__label { width: 108px; }
+.stat__bar { flex-grow: 1; height: 12px; margin: 0 12px; background-color: rgba(255, 255, 255, 0.09); }
+.stat__fill { position: absolute; left: 0; top: 0; bottom: 0; background-color: #DFE6EF; }
+.stat__tick { position: absolute; top: -6px; bottom: -6px; width: 3px; background-color: #FFFFFF; }
+.stat__value { width: 76px; -unity-text-align: middle-right; font-size: 30px; -unity-font-style: bold; }
+
+/* 차이: 기호(▲▼)를 텍스트에 넣고 색은 보조로 — 색 없이도 읽힌다 */
+.delta { width: 108px; margin-left: 12px; -unity-text-align: middle-center; -unity-font-style: bold; border-radius: 5px; }
+.delta--up { color: var(--good); background-color: rgba(70, 220, 130, 0.14); }
+.delta--down { color: var(--bad); background-color: rgba(255, 90, 90, 0.14); }
+.delta--same { color: var(--same); background-color: rgba(255, 255, 255, 0.06); }
+.hidden { display: none; }

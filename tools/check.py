@@ -157,7 +157,12 @@ def check_dist(titles: list[tuple[str, str]]) -> None:
 def check_links() -> None:
     urls = set()
     for f in (SRC / "specimens").rglob("meta.ts"):
-        urls.update(re.findall(r"https?://[^\s'\"`)]+", f.read_text(encoding="utf-8")))
+        for u in re.findall(r"https?://[^\s'\"`<>]+", f.read_text(encoding="utf-8")):
+            # 위키 주소처럼 괄호가 든 URL 은 살리고, 문장 끝의 닫는 괄호·구두점만 떼어 낸다
+            u = u.rstrip(".,;")
+            while u.endswith(")") and u.count("(") < u.count(")"):
+                u = u[:-1]
+            urls.add(u)
     bad = []
     for u in sorted(urls):
         req = urllib.request.Request(u, method="GET", headers={"User-Agent": "Mozilla/5.0 (UIGallery link check)"})

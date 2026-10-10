@@ -1,0 +1,40 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Inventory.uss" />
+    <!-- 인벤토리 화면 — 칸·장착 칸·비교 행은 InventoryUITK.cs 가 만든다 -->
+    <ui:VisualElement name="inventory-root" class="inv-root">
+        <ui:VisualElement name="equipped-panel" class="equipped">
+            <ui:Label text="장착 중 · 하린" class="panel-title" />
+        </ui:VisualElement>
+
+        <ui:VisualElement class="inv-main">
+            <ui:VisualElement name="sort-filter-bar" class="bar">
+                <ui:Label name="sort-label" text="정렬: 희귀도" class="bar__label" />
+                <ui:Label name="filter-label" text="필터: 전체" class="bar__label" />
+            </ui:VisualElement>
+            <ui:ScrollView name="grid-scroll" mode="Vertical" class="grid-scroll">
+                <ui:VisualElement name="slot-grid" class="slot-grid" />
+            </ui:ScrollView>
+        </ui:VisualElement>
+
+        <!-- 툴팁 레이어: 화면 전체를 덮으므로 자신과 모든 자식이 picking-mode="Ignore" 여야 한다 -->
+        <ui:VisualElement name="tooltip-layer" class="tooltip-layer" picking-mode="Ignore">
+            <ui:VisualElement name="tooltip" class="tooltip" picking-mode="Ignore">
+                <ui:VisualElement class="tt-head" picking-mode="Ignore">
+                    <RarityMarkElement name="tt-mark" class="mark" picking-mode="Ignore" />
+                    <ui:Label name="tt-rarity" class="tt-rarity" picking-mode="Ignore" />
+                    <ui:Label name="tt-kind" class="tt-kind" picking-mode="Ignore" />
+                    <ui:Label name="tt-badge" text="장착 중" class="tt-badge" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:Label name="tt-name" class="tt-name" picking-mode="Ignore" />
+                <ui:Label name="tt-vs" class="tt-vs" picking-mode="Ignore" />
+                <ui:VisualElement class="tt-score" picking-mode="Ignore">
+                    <ui:Label text="장비 점수" class="tt-score__label" picking-mode="Ignore" />
+                    <ui:Label name="tt-score" class="tt-score__value" picking-mode="Ignore" />
+                    <ui:Label name="tt-score-delta" class="delta" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement name="tt-compare" class="tt-compare" picking-mode="Ignore" />
+                <ui:Label name="tt-desc" class="tt-desc" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

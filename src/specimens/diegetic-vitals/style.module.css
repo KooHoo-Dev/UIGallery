@@ -1,0 +1,594 @@
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+  color: #e9f1fa;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  --glow: 8px;
+  --mint: #3df5c8;
+  --amber: #ffb43d;
+  --red: #ff4a4a;
+  --energy: #61a0ff;
+  --num: 'Chakra Petch', 'Malgun Gothic', sans-serif;
+}
+.root:active {
+  cursor: grabbing;
+}
+.defs {
+  position: absolute;
+}
+
+/* ───── 공통 게이지 조각 (SVG) ───── */
+.socket {
+  fill: #0b0f15;
+  stroke: rgba(150, 175, 200, 0.22);
+  stroke-width: 1.5;
+}
+.cellCore {
+  fill: currentColor;
+  color: var(--mint);
+  filter: drop-shadow(0 0 var(--glow) currentColor);
+}
+.root:not([data-juice]) .cellCore {
+  filter: none;
+}
+.cellHatch {
+  opacity: 0;
+  pointer-events: none;
+}
+.arcTrack {
+  fill: none;
+  stroke: #0b0f15;
+  stroke-linecap: butt;
+}
+.arcDash {
+  fill: none;
+  stroke: #9fc0ff;
+  stroke-dasharray: 4.2 4.13;
+  opacity: 0.28;
+  transition: opacity 0.3s;
+}
+.arcFill {
+  fill: none;
+  stroke: currentColor;
+  color: var(--energy);
+  stroke-dasharray: 80 100;
+  filter: drop-shadow(0 0 var(--glow) currentColor);
+}
+
+/* ───── 2D 대체 화면 ───── */
+.fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.fbWall {
+  fill: #0b1017;
+}
+.fbFloor {
+  fill: #131921;
+}
+.fbCeil {
+  fill: #080b10;
+}
+.fbRib {
+  fill: none;
+  stroke: #212a35;
+  stroke-linejoin: round;
+}
+.fbLamp {
+  fill: #b9d2ee;
+}
+.root[data-vac] .fbLamp[data-vac-lamp] {
+  fill: #ff7a4a;
+}
+.fbHazard {
+  fill: #a87a1c;
+  opacity: 0.8;
+}
+.fbFar {
+  fill: #1a222c;
+  stroke: #2c3846;
+  stroke-width: 6;
+  transition: fill 0.6s;
+}
+.root[data-vac] .fbFar {
+  fill: #020306;
+}
+.fbStars {
+  fill: #dfe8ff;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.root[data-vac] .fbStars {
+  opacity: 1;
+}
+.fbPlanet {
+  fill: #3a1d14;
+}
+.fbDust {
+  fill: #a9c4d6;
+  opacity: 0.45;
+  transition: opacity 1s;
+}
+.root[data-vac] .fbDust {
+  opacity: 0;
+}
+.body {
+  will-change: transform;
+}
+.bodySide[data-off] {
+  display: none;
+}
+.suit {
+  fill: #5c6673;
+  stroke: #2a313b;
+  stroke-width: 3;
+}
+.suitDark {
+  fill: #2a313b;
+}
+.pack {
+  fill: #363e49;
+  stroke: #4c5663;
+  stroke-width: 3;
+}
+.visorGlass {
+  fill: #0a1620;
+  stroke: #1f4e5e;
+  stroke-width: 4;
+}
+.visorShine {
+  fill: none;
+  stroke: rgba(120, 220, 240, 0.5);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+.panel2d .o2Svg {
+  transform-box: view-box;
+}
+.root:not([data-juice]) .fancy {
+  display: none;
+}
+.root[data-juice] .plain {
+  display: none;
+}
+.o2Socket {
+  fill: #06090d;
+  stroke: rgba(150, 175, 200, 0.2);
+  stroke-width: 1.5;
+}
+.o2Plate {
+  fill: rgba(4, 7, 11, 0.85);
+  stroke: rgba(61, 245, 200, 0.35);
+  stroke-width: 2;
+}
+.o2NumSvg {
+  fill: currentColor;
+  color: #e9f6ff;
+  font-family: var(--num);
+  font-weight: 700;
+}
+.o2Svg g {
+  color: var(--mint);
+}
+/* 효과 끄기: 조명을 받는 회색 막대 — 어두운 곳에서 묻힌다 */
+.badBar {
+  fill: #3f444b;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.root[data-mode='wrist'] .badBar {
+  transform-origin: 0% 50%;
+}
+.badO2 {
+  fill: #7d848d;
+  font-family: var(--num);
+  font-weight: 600;
+}
+
+/* ───── 3D 대리 영역 (해설 번호 위치) ───── */
+.proxy {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+
+/* ───── 바이저(헬멧 투영) ───── */
+.visor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.visorFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.visorMask {
+  fill: rgba(2, 4, 7, 0.88);
+}
+.visorRim {
+  fill: none;
+  stroke: rgba(140, 215, 255, 0.22);
+  stroke-width: 4;
+}
+.visorBracket {
+  fill: none;
+  stroke: rgba(170, 225, 255, 0.55);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.visorTicks {
+  fill: none;
+  stroke: rgba(170, 225, 255, 0.4);
+  stroke-width: 3;
+}
+.visorGlare {
+  fill: rgba(200, 235, 255, 0.07);
+}
+.visorFlash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(ellipse 60% 58% at 50% 50%, transparent 60%, rgba(255, 40, 50, 0.55) 100%);
+}
+.vHp,
+.vEn,
+.vO2Slot {
+  position: absolute;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+.vHp {
+  left: 230px;
+  bottom: 150px;
+  transform: perspective(1400px) rotateY(16deg);
+  transform-origin: 0 50%;
+}
+.vLabel {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(225, 240, 255, 0.82);
+  margin: 0 0 6px 10px;
+}
+.vIcon {
+  width: 26px;
+  height: 26px;
+  fill: rgba(225, 240, 255, 0.82);
+  align-self: center;
+}
+.vNum {
+  font-family: var(--num);
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: #e9f6ff;
+  font-variant-numeric: tabular-nums;
+}
+.vCells {
+  display: block;
+  overflow: visible;
+}
+.vEn {
+  right: 240px;
+  bottom: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: perspective(1400px) rotateY(-16deg);
+  transform-origin: 100% 50%;
+}
+.vEn svg {
+  overflow: visible;
+}
+.vEnText {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: -54px;
+  font-size: 24px;
+  font-weight: 700;
+  color: rgba(225, 240, 255, 0.82);
+}
+/* 산소 자리: 숨어 있는 동안에도 아주 옅은 점선 윤곽이 남는다 */
+.vO2Slot {
+  left: 250px;
+  top: 150px;
+  border: 1px dashed rgba(200, 225, 245, 0.14);
+  border-radius: 4px;
+}
+.vO2 {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 22px 10px 14px;
+  border-left: 3px solid var(--mint);
+  background: linear-gradient(90deg, rgba(61, 245, 200, 0.12), transparent);
+  transform-origin: 0 50%;
+  color: var(--mint);
+}
+.vO2[data-low] {
+  color: var(--red);
+  border-left-color: var(--red);
+  background: linear-gradient(90deg, rgba(255, 74, 74, 0.16), transparent);
+}
+.vO2Glyph {
+  width: 54px;
+  height: 54px;
+  overflow: visible;
+}
+.vO2 div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+.vO2 span {
+  font-size: 22px;
+  font-weight: 700;
+  color: rgba(225, 240, 255, 0.82);
+}
+.vO2 b {
+  font-family: var(--num);
+  font-size: 40px;
+  font-variant-numeric: tabular-nums;
+}
+.vO2 i {
+  font-style: normal;
+}
+
+/* 효과 끄기 바이저: 화면에 그냥 붙인 회색 막대들 */
+.flat {
+  position: absolute;
+  left: 260px;
+  top: 170px;
+  display: grid;
+  gap: 10px;
+  padding: 16px 20px;
+  background: rgba(30, 32, 36, 0.8);
+  font-size: 24px;
+  color: #b8bec6;
+}
+.flatRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.flatRow b {
+  font-family: var(--num);
+  font-size: 28px;
+  min-width: 56px;
+}
+.flatBar {
+  width: 320px;
+  height: 20px;
+  background: #2a2d31;
+}
+.flatBar div {
+  height: 100%;
+  width: 70%;
+  background: #8c9198;
+}
+
+/* ───── 각도 보조 신호 ───── */
+/* 꺼져 있어도 옅은 점선 자리는 남긴다 (--cue: 0 = 대기, 1 = 켜짐) */
+.cue {
+  --cue: 0;
+  position: absolute;
+  left: 48px;
+  top: 500px;
+  padding: 12px 20px 12px 14px;
+  background: rgba(5, 8, 12, calc(0.72 * var(--cue)));
+  border: 2px dashed rgba(160, 200, 230, calc(0.2 + 0.1 * var(--cue)));
+  border-radius: 8px;
+  pointer-events: none;
+}
+.cueInner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  opacity: var(--cue);
+  transform: translateX(calc((1 - var(--cue)) * -24px));
+}
+.cueGhost {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: rgba(200, 220, 240, 0.42);
+  white-space: nowrap;
+  opacity: calc(1 - var(--cue));
+}
+.root:not([data-juice]) .cue,
+.root[data-thumb] .cue {
+  border-color: transparent;
+}
+.root:not([data-juice]) .cueGhost,
+.root[data-thumb] .cueGhost {
+  display: none;
+}
+.cueIcon {
+  width: 30px;
+  height: 40px;
+  fill: none;
+  stroke: rgba(200, 225, 245, 0.8);
+  stroke-width: 2.4;
+}
+.cueCells {
+  overflow: visible;
+}
+.cueCells .cellCore {
+  filter: none;
+}
+.cueEn {
+  width: 90px;
+  height: 10px;
+  border-radius: 5px;
+  background: #0b0f15;
+  overflow: hidden;
+}
+.cueEn div {
+  height: 100%;
+  width: 80%;
+  background: var(--energy);
+}
+.cueO2 {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--num);
+  font-size: 28px;
+  font-weight: 700;
+}
+.cueO2[data-show] {
+  display: flex;
+}
+.cueO2 svg {
+  width: 28px;
+  height: 28px;
+  overflow: visible;
+  color: var(--mint);
+}
+
+/* ───── 수업용 디버그 인셋 ───── */
+/* 위쪽에 해설 번호 핀이 설 자리를 비워 둔다 (핀이 제목을 가리지 않게) */
+.inset {
+  position: absolute;
+  right: 40px;
+  top: 100px;
+  width: 400px;
+  padding: 14px 18px 16px;
+  background: rgba(6, 10, 16, 0.78);
+  border: 2px dashed rgba(170, 190, 215, 0.35);
+  border-radius: 10px;
+  pointer-events: none;
+}
+.root[data-thumb] .inset {
+  display: none;
+}
+.insetHead {
+  font-size: 22px;
+  font-weight: 700;
+  color: #a9b6c8;
+  margin-bottom: 8px;
+}
+.insetBody {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.insetSvg {
+  width: 150px;
+  height: 150px;
+  flex: none;
+  overflow: visible;
+}
+.zoneOk {
+  fill: rgba(61, 245, 200, 0.18);
+}
+.zoneWarn {
+  fill: rgba(255, 180, 61, 0.2);
+}
+.insetOrbit {
+  fill: none;
+  stroke: rgba(170, 190, 215, 0.3);
+  stroke-width: 2;
+  stroke-dasharray: 4 6;
+}
+.insetRay {
+  stroke: rgba(233, 241, 250, 0.55);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+.insetCamIcon {
+  fill: #e9f1fa;
+}
+.insetChar {
+  fill: #5c6673;
+  stroke: #e9f1fa;
+  stroke-width: 2;
+}
+.insetNormal {
+  fill: none;
+  stroke: var(--mint);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.insetFace {
+  fill: none;
+  stroke: #e9f1fa;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+.insetText {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  align-items: baseline;
+  font-size: 22px;
+  color: #a9b6c8;
+}
+.insetText dd {
+  margin: 0;
+}
+.insetText b {
+  font-family: var(--num);
+  font-size: 30px;
+  color: #e9f1fa;
+  font-variant-numeric: tabular-nums;
+}
+.insetText dd:last-child {
+  grid-column: 1 / -1;
+}
+.insetText .insetState {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 22px;
+  color: #04120e;
+  background: var(--mint);
+}
+.insetState[data-state='oblique'] {
+  background: var(--amber);
+  color: #1d1202;
+}
+.insetState[data-state='hidden'] {
+  background: #c7ccd4;
+  color: #12151a;
+}
+.insetState[data-state='hidden']::before {
+  content: '⊘ ';
+}
+.insetState[data-state='follow'] {
+  background: #9fc0ff;
+  color: #071226;
+}
+
+.hint {
+  position: absolute;
+  left: 50%;
+  top: 32px;
+  transform: translateX(-50%);
+  font-size: 22px;
+  color: rgba(233, 241, 250, 0.8);
+  background: rgba(5, 8, 12, 0.55);
+  padding: 6px 16px;
+  border-radius: 6px;
+  pointer-events: none;
+}

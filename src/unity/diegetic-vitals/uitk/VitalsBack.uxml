@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <!-- 등판 게이지 판. PanelSettings_RT 로 RenderTexture(256×768)에 그린 뒤 등판 Quad 에 붙인다 -->
+    <Style src="Vitals.uss" />
+    <ui:VisualElement name="vitals-root" class="vitals" picking-mode="Ignore">
+        <ui:VisualElement name="o2" class="o2 o2--hidden">
+            <ui:VisualElement class="o2__glyph" />
+            <ui:Label name="o2-value" class="o2__value" text="100" />
+        </ui:VisualElement>
+        <!-- VitalsCell 은 C# 에서 segmentCount 만큼 생성 (아래 칸부터 차례로) -->
+        <ui:VisualElement name="spine-gauge" class="spine" />
+        <!-- [UxmlElement] 커스텀 요소. 네임스페이스 안에 두면 접두어가 필요하다 -->
+        <EnergyArcElement name="energy-arc" class="arc" fill="0.8" line-width="22" />
+    </ui:VisualElement>
+</ui:UXML>

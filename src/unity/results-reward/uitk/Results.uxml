@@ -1,0 +1,38 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Results.uss" />
+    <!-- Panel Settings: Scale With Screen Size, Reference Resolution 1920×1080 -->
+    <ui:VisualElement name="root" class="results">
+        <ui:VisualElement name="banner" class="banner">
+            <!-- 호박색 띠 + 어두운 글자 (기본 채움색은 짙은 청록이라 '승리' 글자가 묻힌다 → 강조색을 지정) -->
+            <SlantedBox class="banner__slash" skew-deg="14" fill-color="#FFB547" edge-color="#36D6C3" />
+            <ui:Label class="banner__word" text="승리" />
+            <ui:Label name="mission" class="banner__mission" />
+        </ui:VisualElement>
+
+        <!-- 파티원 카드 3장은 코드로 생성 -->
+        <ui:VisualElement name="party" class="party" />
+
+        <ui:VisualElement name="panel" class="panel">
+            <SlantedBox class="panel__frame" skew-deg="6" />
+            <ui:Label name="page-title" class="page-title" />
+            <!-- .row 는 코드로 생성 → 한 프레임 뒤 .row--shown 을 붙여 transition 으로 등장 -->
+            <ui:VisualElement name="rows" class="rows" />
+            <ui:VisualElement name="total" class="total">
+                <ui:Label name="total-label" class="total__label" text="합계" />
+                <ui:Label name="total-value" class="total__value" text="0" />
+            </ui:VisualElement>
+            <ui:Label name="items" class="items" />
+        </ui:VisualElement>
+
+        <ui:Label name="rank" class="rank" />
+
+        <ui:VisualElement name="levelup" class="levelup" picking-mode="Ignore">
+            <ui:VisualElement class="levelup__card" picking-mode="Ignore">
+                <ui:Label class="levelup__badge" text="레벨 업" />
+                <ui:Label name="levelup-text" class="levelup__text" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:Label name="hint" class="hint" />
+    </ui:VisualElement>
+</ui:UXML>

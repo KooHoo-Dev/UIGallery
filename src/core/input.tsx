@@ -66,12 +66,14 @@ export function ActionGlyph({ action, device, size = 40, tone }: GlyphProps & { 
 }
 
 export function KeyCap({ label, size = 40, tone }: GlyphProps & { label: string }) {
-  const w = Math.max(size, label.length > 1 ? size * (0.42 + label.length * 0.26) : size)
+  // 긴 라벨(Enter, Shift)은 글자를 줄이지 않고 키를 넓힌다 — 글자는 키 높이의 40% 아래로 작아지지 않는다
+  const font = size * (label.length > 3 ? 0.4 : 0.44)
+  const w = Math.max(size, label.length > 1 ? size * 0.5 + label.length * font * 0.66 : size)
   return (
     <svg width={w} height={size} viewBox={`0 0 ${w} ${size}`} aria-label={`${label} 키`} role="img" style={{ verticalAlign: 'middle' }}>
       <rect x="1.5" y="1.5" width={w - 3} height={size - 3} rx={size * 0.18} fill={paper(tone)} stroke={ink(tone)} strokeWidth="2.5" />
       <rect x="1.5" y={size - 8} width={w - 3} height="6.5" rx="3" fill={ink(tone)} opacity="0.25" />
-      <text x={w / 2} y={size / 2 + size * 0.14} textAnchor="middle" fontSize={size * (label.length > 3 ? 0.34 : 0.44)} fontWeight="700" fill={ink(tone)} fontFamily="'Chakra Petch', sans-serif">
+      <text x={w / 2} y={size / 2 + size * 0.14} textAnchor="middle" fontSize={font} fontWeight="700" fill={ink(tone)} fontFamily="'Chakra Petch', sans-serif">
         {label}
       </text>
     </svg>
@@ -184,8 +186,9 @@ export function useLastInput(forced?: Device | 'auto'): { device: Device; seq: n
     const set = (device: Device) => setState(s => ({ device, seq: s.seq + 1 }))
     const onKey = () => set('keyboard')
     const onPointer = (e: PointerEvent) => set(e.pointerType === 'touch' ? 'touch' : 'mouse')
-    addEventListener('keydown', onKey)
-    addEventListener('pointerdown', onPointer)
+    // 캡처 단계에서 듣는다 — 표본이 갤러리 단축키와 겹치지 않게 stopPropagation 해도 장치 추적은 유지된다
+    addEventListener('keydown', onKey, true)
+    addEventListener('pointerdown', onPointer, true)
     let timer = 0
     if (typeof navigator.getGamepads === 'function') {
       let wasActive = false
@@ -199,8 +202,8 @@ export function useLastInput(forced?: Device | 'auto'): { device: Device; seq: n
       }, 250)
     }
     return () => {
-      removeEventListener('keydown', onKey)
-      removeEventListener('pointerdown', onPointer)
+      removeEventListener('keydown', onKey, true)
+      removeEventListener('pointerdown', onPointer, true)
       clearInterval(timer)
     }
   }, [forced])

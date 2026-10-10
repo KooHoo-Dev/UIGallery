@@ -1,0 +1,447 @@
+/* Panel Settings: Scale With Screen Size, Reference Resolution 1920×1080 기준 픽셀 값
+   USS 에는 gradient · box-shadow 가 없다 — 테두리 색 · 두께 · 틴트로만 표현한다.
+   색: 준비 = 청록 rgb(82,229,210) · 자원 = 호박색 rgb(255,182,72) · 덮개 = 중립 남색 */
+
+.hud {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ───── 에너지 바 + 궁극기 비용 눈금 ───── */
+.energy {
+    position: absolute;
+    left: 520px;
+    top: 640px;
+    width: 860px;
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 18px;
+    background-color: rgba(8, 13, 24, 0.75);
+    border-radius: 4px;
+}
+
+.energy__label {
+    font-size: 26px;
+    -unity-font-style: bold;
+    color: rgb(255, 217, 160);
+    margin-right: 16px;
+}
+
+.energy__bar {
+    flex-grow: 1;
+    height: 18px;
+    background-color: rgba(6, 10, 18, 0.8);
+    border-width: 2px;
+    border-color: rgba(255, 220, 170, 0.55);
+}
+
+.energy__fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 22%;
+    background-color: rgb(250, 170, 60);
+}
+
+.energy__cost {
+    position: absolute;
+    top: -10px;
+    bottom: -6px;
+    width: 4px;
+    margin-left: -2px;
+    left: 40%;
+    background-color: rgba(255, 255, 255, 0.55);
+}
+
+.energy__cost--hot {
+    background-color: rgb(255, 182, 72);
+}
+
+.energy__cost-label {
+    position: absolute;
+    bottom: 22px;
+    left: -60px;
+    width: 124px;
+    -unity-text-align: middle-center;
+    font-size: 22px;
+    -unity-font-style: bold;
+    color: rgb(217, 226, 234);
+    /* 밝은 배경 위에서도 읽히게 판을 깐다 */
+    background-color: rgba(8, 13, 24, 0.8);
+    border-radius: 4px;
+}
+
+.energy__cost--hot .energy__cost-label {
+    color: rgb(255, 182, 72);
+}
+
+.haste {
+    position: absolute;
+    left: 874px;
+    font-size: 22px;
+    -unity-font-style: bold;
+    color: rgb(223, 246, 255);
+    padding: 4px 12px;
+    background-color: rgba(40, 120, 200, 0.6);
+    border-width: 2px;
+    border-color: rgba(160, 220, 255, 0.8);
+    border-radius: 6px;
+}
+
+/* ───── 거부 안내 ───── */
+.toast {
+    position: absolute;
+    left: 760px;
+    top: 548px;
+    width: 400px;
+    -unity-text-align: middle-center;
+    font-size: 26px;
+    -unity-font-style: bold;
+    color: rgb(238, 243, 248);
+    padding: 10px 18px;
+    background-color: rgba(8, 13, 24, 0.85);
+    border-left-width: 6px;
+    border-left-color: rgb(232, 238, 245);
+}
+
+.toast--energy {
+    border-left-color: rgb(255, 182, 72);
+}
+
+.toast--empty {
+    border-left-color: rgb(255, 122, 104);
+}
+
+/* ───── 스킬 바: 단축바(키보드·패드) ─────
+   두 배치(단축바 · 터치 부채꼴) 모두 position: absolute + left/top 고정값으로 둔다.
+   flex 배치(auto) ↔ 값 사이는 transition 이 보간하지 못해 순간 이동한다 → 같은 속성(값 ↔ 값)끼리만 바꾼다 */
+.skill-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.slot {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border-width: 4px;
+    border-color: rgb(141, 156, 173);
+    border-top-right-radius: 26px;
+    background-color: rgb(20, 41, 64);
+    transition-property: left, top, width, height, border-top-left-radius, border-top-right-radius, border-bottom-left-radius, border-bottom-right-radius;
+    transition-duration: 0.32s;
+    transition-timing-function: ease-out;
+}
+
+/* 슬롯 왼쪽 위 모서리 = 중심 - 크기/2 (웹 갤러리와 같은 값) */
+#slot-primary { left: 510px; top: 795px; }
+#slot-dash { left: 730px; top: 795px; }
+#slot-utility { left: 950px; top: 795px; }
+#slot-ult { left: 1180px; top: 765px; }
+
+.slot--ult {
+    width: 210px;
+    height: 210px;
+}
+
+/* 여기 안쪽만 잘린다 — .slot 에 overflow: hidden 을 걸면 바깥의 점·안내·숫자까지 잘린다 */
+.slot__clip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    border-top-right-radius: 22px;
+    transition-property: scale;
+    transition-duration: 0.09s;
+}
+
+.slot__icon {
+    position: absolute;
+    left: 20%;
+    top: 20%;
+    width: 60%;
+    height: 60%;
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-background-image-tint-color: rgb(82, 229, 210);
+}
+
+#slot-primary .slot__icon { background-image: resource("Icons/skill-wave"); }
+#slot-dash .slot__icon { background-image: resource("Icons/skill-leap"); }
+#slot-utility .slot__icon { background-image: resource("Icons/skill-shield"); }
+#slot-ult .slot__icon { background-image: resource("Icons/skill-overdrive"); }
+
+.slot__sweep {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* 세로 덮개: 위에 붙은 채 높이(%)가 줄어 아래부터 드러난다 */
+.slot__vmask {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 0;
+    background-color: rgba(2, 5, 11, 0.8);
+    border-bottom-width: 3px;
+    border-bottom-color: rgb(170, 255, 244);
+    display: none;
+}
+
+.fill-vertical .slot__vmask { display: flex; }
+.fill-vertical .slot__sweep { display: none; }
+.fill-binary .slot__sweep { display: none; }
+
+/* 이분: 회색 / 사용 가능 두 상태 */
+.fill-binary .slot--cooling .slot__clip,
+.fill-binary .slot--empty .slot__clip {
+    background-color: rgb(58, 64, 74);
+}
+
+/* 준비 완료 빛줄기: 클래스를 붙이는 순간에만 transition 이 있다 → 뗄 때는 즉시 제자리 */
+.slot__glint {
+    position: absolute;
+    top: -30%;
+    bottom: -30%;
+    width: 34%;
+    left: 0;
+    rotate: 20deg;
+    translate: -150% 0;
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+.slot--glint .slot__glint {
+    translate: 420% 0;
+    transition-property: translate;
+    transition-duration: 0.35s;
+    transition-timing-function: ease-out;
+}
+
+.slot--pop .slot__clip {
+    scale: 1.08 1.08;
+}
+
+/* 상태별 모양 — 색만으로 구분하지 않는다 */
+.slot--ready {
+    border-color: rgb(82, 229, 210);
+}
+
+.slot--cooling .slot__icon,
+.slot--empty .slot__icon {
+    -unity-background-image-tint-color: rgb(219, 231, 242);
+}
+
+.slot--no-energy {
+    border-color: rgb(255, 182, 72);
+}
+
+.slot--no-energy .slot__icon {
+    -unity-background-image-tint-color: rgb(124, 132, 142);
+}
+
+/* 자원 부족 표시: 물방울 + 필요량 (덮개 없음).
+   단축바에서는 궁극기 바깥 오른쪽 — 아이콘을 가리지 않는다. 터치에서는 버튼 위쪽 바깥 */
+.slot__lock {
+    position: absolute;
+    left: 100%;
+    margin-left: 12px;
+    top: 50%;
+    translate: 0 -50%;
+    flex-direction: row;
+    align-items: center;
+    padding: 2px 12px 2px 8px;
+    background-color: rgb(34, 23, 10);
+    border-width: 2px;
+    border-color: rgb(255, 182, 72);
+    border-radius: 18px;
+    display: none;
+}
+
+.slot--no-energy .slot__lock { display: flex; }
+
+.slot__drop {
+    width: 24px;
+    height: 24px;
+    background-image: resource("Icons/drop");
+    -unity-background-image-tint-color: rgb(255, 182, 72);
+}
+
+.slot__cost {
+    font-size: 26px;
+    -unity-font-style: bold;
+    color: rgb(255, 182, 72);
+}
+
+.slot__timer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    -unity-text-align: middle-center;
+    font-size: 50px;
+    -unity-font-style: bold;
+    color: rgb(242, 246, 250);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.9);
+    transition-property: scale;
+    transition-duration: 0.12s;
+}
+
+.slot__timer--final {
+    color: rgb(255, 243, 201);
+}
+
+/* 거부: 이유 표시가 한 번 밝아진다 */
+.slot--hot-cooldown .slot__timer { scale: 1.22 1.22; color: rgb(255, 255, 255); }
+.slot--hot-energy .slot__lock { scale: 1.18 1.18; }
+.slot--hot-empty .pip { border-color: rgb(255, 122, 104); }
+
+/* 충전 점 (슬롯 아래 바깥) */
+.slot__pips {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 14px;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.pip {
+    width: 28px;
+    height: 10px;
+    margin: 0 4px;
+    border-width: 2px;
+    border-color: rgb(82, 229, 210);
+    border-radius: 3px;
+    background-color: rgb(82, 229, 210);
+}
+
+.pip--empty {
+    background-color: rgba(6, 10, 18, 0.7);
+    border-color: rgba(220, 230, 240, 0.65);
+}
+
+.slot__name {
+    position: absolute;
+    top: 100%;
+    left: -20px;
+    right: -20px;
+    margin-top: 30px;
+    -unity-text-align: upper-center;
+    font-size: 22px;
+    -unity-font-style: bold;
+    color: rgb(227, 236, 244);
+}
+
+/* 버튼 안내 — 모서리 바깥 (잘리지 않음) */
+.slot__prompt {
+    position: absolute;
+    left: -20px;
+    top: -20px;
+}
+
+.prompt-key {
+    min-width: 46px;
+    height: 46px;
+    padding: 0 8px;
+    -unity-text-align: middle-center;
+    font-size: 22px;
+    -unity-font-style: bold;
+    color: rgb(244, 247, 251);
+    background-color: rgba(10, 14, 22, 0.8);
+    border-width: 2px;
+    border-color: rgb(244, 247, 251);
+    border-radius: 8px;
+}
+
+/* 위치형 중립 패드 기호 — 마름모 네 점 중 해당 위치만 채운 스프라이트 */
+.prompt-pad {
+    width: 46px;
+    height: 46px;
+    display: none;
+}
+
+.prompt-pad--left { background-image: resource("Glyphs/pad-left"); }
+.prompt-pad--right { background-image: resource("Glyphs/pad-right"); }
+.prompt-pad--top { background-image: resource("Glyphs/pad-top"); }
+.prompt-pad--shoulder { background-image: resource("Glyphs/pad-shoulder-r"); }
+
+.device-gamepad .prompt-key { display: none; }
+.device-gamepad .prompt-pad { display: flex; }
+.device-touch .slot__prompt { display: none; }
+
+/* ───── 터치: 우하단 부채꼴 (태블릿 가로 기준) ─────
+   모서리(1920, 1080)에서 기본 · 도약 · 보호막은 610 안쪽(엄지가 편한 곳), 궁극기만 약 730(손을 뻗어야 닿는 곳).
+   단축바와 같은 left/top 속성의 값만 바뀌므로 0.32초 동안 보간되며 옮겨 간다 */
+.device-touch .slot__name { display: none; }
+
+.device-touch #slot-primary { left: 1630px; top: 800px; width: 200px; height: 200px; border-radius: 100px; }
+.device-touch #slot-dash { left: 1400px; top: 830px; width: 140px; height: 140px; border-radius: 70px; }
+.device-touch #slot-utility { left: 1476px; top: 646px; width: 140px; height: 140px; border-radius: 70px; }
+.device-touch #slot-ult { left: 1565px; top: 330px; width: 150px; height: 150px; border-radius: 75px; }
+/* 원형 클립 — 테두리 4px 만큼 작은 반지름 */
+.device-touch #slot-primary .slot__clip { border-radius: 96px; }
+.device-touch #slot-dash .slot__clip,
+.device-touch #slot-utility .slot__clip { border-radius: 66px; }
+.device-touch #slot-ult .slot__clip { border-radius: 71px; }
+
+/* 숫자는 버튼 바깥 왼쪽 위 사선 — 엄지(오른쪽 아래)의 반대편이라 누르는 동안에도 가리지 않는다 */
+.device-touch .slot__timer {
+    left: auto;
+    top: auto;
+    right: 78%;
+    bottom: 78%;
+    height: 48px;
+    padding: 0 14px;
+    font-size: 34px;
+    background-color: rgba(8, 13, 24, 0.8);
+    border-width: 2px;
+    border-color: rgba(220, 232, 244, 0.22);
+    border-radius: 24px;
+}
+
+/* 충전 점은 버튼 위쪽 바깥 */
+.device-touch .slot__pips {
+    top: auto;
+    bottom: 100%;
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.device-touch .slot__lock {
+    left: 50%;
+    margin-left: 0;
+    top: auto;
+    bottom: 100%;
+    margin-bottom: 10px;
+    translate: -50% 0;
+}
+
+.device-touch .energy {
+    left: 520px;
+    top: 990px;
+    width: 640px;
+}
+
+.device-touch .haste {
+    left: 0;
+    top: -64px;
+}

@@ -1,0 +1,32 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Reticle.uss" />
+    <!-- 화면 전체를 덮는 루트 — 클릭을 가로채지 않게 모든 요소에 picking-mode="Ignore" -->
+    <ui:VisualElement name="hud-root" class="hud-root" picking-mode="Ignore">
+        <ui:VisualElement name="reticle" class="reticle" picking-mode="Ignore">
+            <ui:VisualElement name="dot" class="reticle__dot" picking-mode="Ignore" />
+            <ui:VisualElement name="arm-top" class="reticle__arm reticle__arm--v" picking-mode="Ignore" />
+            <ui:VisualElement name="arm-bottom" class="reticle__arm reticle__arm--v" picking-mode="Ignore" />
+            <ui:VisualElement name="arm-left" class="reticle__arm reticle__arm--h" picking-mode="Ignore" />
+            <ui:VisualElement name="arm-right" class="reticle__arm reticle__arm--h" picking-mode="Ignore" />
+            <ui:VisualElement name="hitmarker" class="hm" picking-mode="Ignore">
+                <!-- 등장 튐 · 사라짐은 hm-lines 의 scale / opacity 만 바꾼다 -->
+                <ui:VisualElement name="hm-lines" class="hm__lines" picking-mode="Ignore">
+                    <!-- 회전한 0×0 팔 안에서 선을 gap 만큼 밀어 중심을 비운다 -->
+                    <ui:VisualElement class="hm__arm hm__arm--tl" picking-mode="Ignore">
+                        <ui:VisualElement class="hm__line" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="hm__arm hm__arm--tr" picking-mode="Ignore">
+                        <ui:VisualElement class="hm__line" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="hm__arm hm__arm--bl" picking-mode="Ignore">
+                        <ui:VisualElement class="hm__line" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="hm__arm hm__arm--br" picking-mode="Ignore">
+                        <ui:VisualElement class="hm__line" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="kill-ring" class="hm__ring" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

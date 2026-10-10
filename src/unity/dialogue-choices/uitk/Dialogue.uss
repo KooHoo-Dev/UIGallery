@@ -1,0 +1,363 @@
+/* 대화창 + 선택지 — UI Toolkit (Panel Settings: Scale With Screen Size 1920×1080 기준 픽셀)
+   USS 에는 skew · gradient · box-shadow · em/rem 이 없다.
+   사선 틀은 SkewFrame(Painter2D), 글자 배율은 C# 에서 fontSize 를 직접 곱한다. */
+
+.dlg-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    /* 한글 글리프가 있는 FontAsset 을 Panel Settings 의 Text Settings(또는 -unity-font-definition)로 지정한다 */
+    transition-property: translate, opacity;
+    transition-duration: 0.22s;
+    transition-timing-function: ease-out-cubic;
+}
+
+.dlg-root--hidden {
+    translate: 0 60px;
+    opacity: 0;
+    transition-duration: 0.16s;
+    transition-timing-function: ease-in;
+}
+
+/* ───── 읽기 조작 ───── */
+.dlg-controls {
+    position: absolute;
+    right: 64px;
+    top: 70px;
+    flex-direction: row;
+}
+
+.dlg-ctl {
+    height: 62px;
+    margin: 0 0 0 14px;
+    padding: 0 22px;
+    font-size: 24px;
+    -unity-font-style: bold;
+    color: rgb(233, 237, 242);
+    background-color: rgba(8, 10, 14, 0.84);
+    border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.3);
+    border-radius: 0;
+}
+
+.dlg-ctl--on {
+    background-color: rgb(255, 106, 61);
+    border-color: rgb(255, 255, 255);
+    color: rgb(11, 13, 16);
+}
+
+/* 기본 런타임 테마의 .unity-button:hover / :focus / :active (선택자 2단계)가 위 규칙(1단계)을 이긴다
+   → 의사 상태까지 적어 의도한 모양을 명시한다 */
+.dlg-ctl:hover,
+.dlg-ctl:focus,
+.dlg-ctl:active {
+    background-color: rgba(20, 24, 30, 0.9);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.dlg-ctl--on:hover,
+.dlg-ctl--on:focus,
+.dlg-ctl--on:active {
+    background-color: rgb(255, 106, 61);
+    border-color: rgb(255, 255, 255);
+}
+
+/* ───── 쌓기 ───── */
+.dlg-stack {
+    position: absolute;
+    left: 200px;
+    right: 200px;
+    bottom: 56px;
+    flex-direction: column;
+}
+
+/* ───── 선택지 ───── */
+.dlg-choices {
+    align-self: flex-end;
+    width: 720px;
+    margin-bottom: 34px;
+}
+
+.dlg-choices--hidden {
+    display: none;
+}
+
+.dlg-timer {
+    height: 14px;
+    margin: 0 0 12px 30px;
+    background-color: rgba(255, 255, 255, 0.16);
+    border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.5);
+    overflow: hidden;
+}
+
+.dlg-timer__fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: rgb(255, 106, 61);
+    transform-origin: left;
+}
+
+/* 30% 아래: 색만이 아니라 깜박임(1Hz, C# 에서 클래스 토글)으로도 알린다 */
+.dlg-timer--hurry {
+    opacity: 0.55;
+}
+
+.dlg-choice {
+    min-height: 80px;
+    margin: 0 0 14px 0;
+    padding: 12px 34px 12px 62px;
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    border-radius: 0;
+    transition-property: translate, opacity;
+    transition-duration: 0.1s, 0.18s;
+    transition-timing-function: ease-out;
+}
+
+.dlg-choice--enter {
+    translate: 70px 0;
+    opacity: 0;
+}
+
+.dlg-choice .dlg-frame {
+    --frame-fill: rgba(10, 12, 16, 0.9);
+    --frame-border: rgba(255, 255, 255, 0.22);
+}
+
+.dlg-choice__label {
+    font-size: 30px;
+    color: rgb(207, 213, 221);
+    white-space: normal;
+}
+
+.dlg-choice__mark {
+    position: absolute;
+    left: 22px;
+    font-size: 26px;
+    color: rgb(11, 13, 16);
+    opacity: 0;
+}
+
+/* 기본 테마의 .unity-button:hover / :focus / :active 회색 배경·테두리를 지운다 — 사선 틀(.dlg-frame)만 보이게 */
+.dlg-choice:hover,
+.dlg-choice:focus,
+.dlg-choice:active {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+}
+
+/* :hover 도 같은 모양 — 마우스·패드·키보드 경험을 일치시킨다 (마우스를 올리면 C# 에서 Focus() 도 한다) */
+.dlg-choice:focus,
+.dlg-choice:hover {
+    translate: -30px 0;
+}
+
+.dlg-choice:focus .dlg-frame,
+.dlg-choice:hover .dlg-frame {
+    --frame-fill: rgb(255, 106, 61);
+    --frame-border: rgb(255, 255, 255);
+}
+
+.dlg-choice:focus .dlg-choice__label,
+.dlg-choice:hover .dlg-choice__label {
+    color: rgb(11, 13, 16);
+    -unity-font-style: bold;
+}
+
+.dlg-choice:focus .dlg-choice__mark {
+    opacity: 1;
+}
+
+/* 입력 잠금 중: 확정 안내가 흐리다 */
+.dlg-choices--locked .dlg-choice__key {
+    opacity: 0.35;
+}
+
+.dlg-choice__key {
+    margin-left: auto;
+    padding: 2px 10px;
+    font-size: 22px;
+    border-width: 2px;
+    border-color: rgb(11, 13, 16);
+    color: rgb(11, 13, 16);
+    display: none;
+}
+
+.dlg-choice:focus .dlg-choice__key {
+    display: flex;
+}
+
+.dlg-choice--dim {
+    opacity: 0;
+}
+
+/* ───── 패널 ───── */
+.dlg-frame {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.dlg-frame--accent {
+    --frame-fill: rgb(255, 106, 61);
+}
+
+.dlg-panel {
+    min-height: 224px;
+    padding: 66px 120px 46px 96px;
+}
+
+.dlg-speaker {
+    position: absolute;
+    left: 44px;
+    top: -64px;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.dlg-face {
+    width: 124px;
+    height: 124px;
+    margin-right: -8px;
+    background-color: rgb(26, 31, 39);
+    border-width: 3px;
+    border-color: rgb(255, 255, 255);
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.dlg-face--hidden {
+    display: none;
+}
+
+.dlg-speaker__plate {
+    flex-direction: row;
+    align-items: flex-end;
+    padding: 8px 34px 10px 30px;
+}
+
+.dlg-speaker__name {
+    font-size: 38px;
+    -unity-font-style: bold;
+    color: rgb(11, 13, 16);
+}
+
+.dlg-speaker__role {
+    margin-left: 14px;
+    margin-bottom: 4px;
+    font-size: 22px;
+    color: rgba(11, 13, 16, 0.75);
+}
+
+.dlg-body {
+    font-size: 36px;
+    color: rgb(244, 246, 248);
+    white-space: normal;
+}
+
+/* ▼ — USS 전환은 무한 반복이 없어서 C# 이 350ms 마다 --down 을 토글한다 (왕복 700ms) */
+.dlg-next {
+    position: absolute;
+    right: 60px;
+    bottom: 18px;
+    font-size: 30px;
+    color: rgb(255, 106, 61);
+    opacity: 0;
+    transition-property: translate, opacity;
+    transition-duration: 0.35s, 0.12s;
+    transition-timing-function: ease-in-out;
+}
+
+.dlg-next--show {
+    opacity: 1;
+}
+
+.dlg-next--down {
+    translate: 0 8px;
+}
+
+/* ───── 기록 ───── */
+.dlg-log {
+    position: absolute;
+    left: 330px;
+    right: 330px;
+    top: 64px;
+    bottom: 64px;
+    background-color: rgba(10, 12, 16, 0.97);
+    border-width: 3px;
+    border-color: rgb(255, 255, 255);
+    transition-property: translate, opacity;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-out;
+}
+
+.dlg-log--hidden {
+    translate: 0 40px;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.dlg-log__head {
+    flex-direction: row;
+    align-items: center;
+    padding: 26px 40px 22px 40px;
+    border-bottom-width: 2px;
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+.dlg-log__title {
+    font-size: 36px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+}
+
+.dlg-log__chip {
+    margin-left: 22px;
+    padding: 4px 14px;
+    font-size: 22px;
+    color: rgb(200, 207, 216);
+    border-width: 2px;
+    border-color: rgb(200, 207, 216);
+}
+
+.dlg-log__scroll {
+    flex-grow: 1;
+    padding: 6px 40px 34px 40px;
+}
+
+.dlg-log__who {
+    margin-top: 16px;
+    font-size: 26px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+}
+
+.dlg-log__text {
+    font-size: 28px;
+    color: rgb(223, 228, 234);
+    white-space: normal;
+    padding-bottom: 14px;
+    border-bottom-width: 1px;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dlg-log__mine {
+    margin: 12px 0;
+    padding: 12px 22px;
+    font-size: 28px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    background-color: rgba(255, 255, 255, 0.06);
+    border-left-width: 8px;
+    border-color: rgb(255, 106, 61);
+    white-space: normal;
+}

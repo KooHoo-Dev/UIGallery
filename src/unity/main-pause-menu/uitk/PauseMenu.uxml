@@ -1,0 +1,93 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="PauseMenu.uss" />
+    <!-- 루트 클래스: .hidden(닫힘) · .device-gamepad(마지막 입력이 게임패드) -->
+    <ui:VisualElement name="pause-root" class="pause-root hidden">
+        <ui:VisualElement name="backdrop" class="backdrop" picking-mode="Ignore" />
+        <ui:Label name="breadcrumb" class="breadcrumb" text="일시정지" />
+        <ui:VisualElement name="emblem" class="emblem" picking-mode="Ignore" />
+
+        <!-- 스택 바닥 (루트) -->
+        <ui:VisualElement name="panel-root" class="menu-panel menu-panel--left">
+            <ui:VisualElement class="panel-edge" picking-mode="Ignore" />
+            <ui:Label class="panel-title" text="일시정지" />
+            <ui:Button name="item-resume" class="menu-item" text="이어하기" />
+            <ui:Button name="item-equip" class="menu-item" text="장비" />
+            <ui:Button name="item-records" class="menu-item" text="기록" />
+            <ui:Button name="item-settings" class="menu-item" text="설정" />
+            <ui:Button name="item-title" class="menu-item" text="타이틀로" />
+        </ui:VisualElement>
+
+        <!-- 하위 패널 (Q/E 로 옆 카테고리 교체) -->
+        <ui:VisualElement name="panel-equip" class="menu-panel menu-panel--offscreen">
+            <ui:VisualElement class="panel-edge" picking-mode="Ignore" />
+            <ui:Label class="panel-title" text="장비" />
+            <ui:Button class="menu-item" text="주 무기 · 절단 레이저" />
+            <ui:Button class="menu-item" text="보조 장비 · 수리 드론" />
+            <ui:Button class="menu-item" text="탐사 슈트 · 냉각형" />
+            <ui:Button class="menu-item" text="소모품 · 수리 키트 ×3" />
+        </ui:VisualElement>
+        <ui:VisualElement name="panel-records" class="menu-panel menu-panel--offscreen">
+            <ui:VisualElement class="panel-edge" picking-mode="Ignore" />
+            <ui:Label class="panel-title" text="기록" />
+            <ui:Button class="menu-item" text="탐사 일지 · 12건" />
+            <ui:Button class="menu-item" text="개체 도감 · 6종" />
+            <ui:Button name="item-comms" class="menu-item" text="통신 기록 · 잠김" enabled="false" />
+            <ui:Button class="menu-item" text="지역 지도 · 구역 B-3" />
+        </ui:VisualElement>
+        <ui:VisualElement name="panel-settings" class="menu-panel menu-panel--offscreen">
+            <ui:VisualElement class="panel-edge" picking-mode="Ignore" />
+            <ui:Label class="panel-title" text="설정" />
+            <ui:Button class="menu-item" text="화면" />
+            <ui:Button class="menu-item" text="사운드" />
+            <ui:Button class="menu-item" text="조작" />
+            <ui:Button class="menu-item" text="접근성" />
+        </ui:VisualElement>
+
+        <!-- 확인 창: 기본 포커스는 취소 -->
+        <ui:VisualElement name="dialog" class="dialog-scrim hidden">
+            <ui:VisualElement class="dialog">
+                <ui:Label class="dialog-title" text="타이틀로 돌아갈까요?" />
+                <ui:Label class="dialog-body" text="마지막 저장 이후의 진행(4분)은 사라집니다." />
+                <ui:VisualElement class="dialog-buttons">
+                    <ui:Button name="dlg-cancel" class="menu-item dialog-button" text="취소" />
+                    <ui:Button name="dlg-ok" class="menu-item dialog-button dialog-button--danger" text="타이틀로" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- 하단 안내: 장치별 글자는 .key-only / .pad-only 로 갈린다 -->
+        <ui:VisualElement name="hint-bar" class="hint-bar">
+            <ui:VisualElement class="hint">
+                <ui:Label class="glyph key-only" text="↑↓" />
+                <ui:Label class="glyph pad-only" text="십자" />
+                <ui:Label class="hint-text" text="이동" />
+            </ui:VisualElement>
+            <ui:VisualElement class="hint">
+                <ui:Label class="glyph key-only" text="Enter" />
+                <ui:Label class="glyph pad-only" text="아래 버튼" />
+                <ui:Label class="hint-text" text="확인" />
+            </ui:VisualElement>
+            <ui:VisualElement class="hint">
+                <ui:Label class="glyph key-only" text="Esc" />
+                <ui:Label class="glyph pad-only" text="오른쪽 버튼" />
+                <ui:Label name="hint-back" class="hint-text" text="게임으로" />
+            </ui:VisualElement>
+            <ui:VisualElement name="hint-page" class="hint hidden">
+                <ui:Label class="glyph key-only" text="Q  E" />
+                <ui:Label class="glyph pad-only" text="L  R" />
+                <ui:Label class="hint-text" text="옆 카테고리" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+
+    <!-- 짧은 타이틀 화면 (메인 메뉴) -->
+    <ui:VisualElement name="title-root" class="title-root hidden">
+        <ui:Label class="logo-kicker" text="변방 행성 지표 탐사 기록" />
+        <ui:Label class="logo" text="외곽 탐사대" />
+        <ui:VisualElement class="menu-panel menu-panel--title">
+            <ui:Button name="title-continue" class="menu-item" text="이어하기" />
+            <ui:Button name="title-new" class="menu-item" text="새 탐사" />
+            <ui:Button name="title-quit" class="menu-item" text="나가기" enabled="false" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

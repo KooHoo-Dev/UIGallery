@@ -1,0 +1,298 @@
+/* 메인 · 일시정지 메뉴 — Panel Settings: Scale With Screen Size, Reference Resolution 1920×1080.
+   USS 에는 skew · gradient · box-shadow · filter 가 없다 → 사선은 회전시킨 장식 막대(.panel-edge)로만 표현하고,
+   패널 상태는 클래스 교체 + translate · opacity 트랜지션으로 바꾼다. */
+
+.pause-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    --accent: rgb(198, 255, 61);
+    --panel: rgba(8, 12, 30, 0.94);
+    --ink: rgb(243, 246, 255);
+    --muted: rgb(143, 153, 188);
+    --on-accent: rgb(10, 15, 31);
+}
+
+.hidden {
+    display: none;
+}
+
+.backdrop {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(3, 6, 16, 0.6);
+}
+
+.breadcrumb {
+    position: absolute;
+    left: 100px;
+    top: 74px;
+    font-size: 36px;
+    -unity-font-style: bold;
+    color: var(--ink);
+}
+
+.emblem {
+    position: absolute;
+    right: 84px;
+    top: 34px;
+    width: 150px;
+    height: 150px;
+    background-color: var(--accent);
+    rotate: 45deg;
+    scale: 0.6 0.6;
+    transition-property: rotate, scale;
+    transition-duration: 0.36s;
+    transition-timing-function: ease-out-back;
+}
+
+/* 열릴 때 C# 이 한 프레임 뒤 붙인다 → 회전하다 멈춘다 */
+.emblem--settled {
+    rotate: 0deg;
+    scale: 1 1;
+}
+
+/* ───── 패널 (스택 한 칸) ───── */
+.menu-panel {
+    position: absolute;
+    top: 210px;
+    left: 0;
+    width: 580px;
+    padding: 24px 34px 30px 42px;
+    background-color: var(--panel);
+    border-left-width: 7px;
+    border-left-color: var(--accent);
+    transition-property: translate, opacity;
+    transition-duration: 0.22s;
+    transition-timing-function: ease-out-cubic;
+}
+
+/* 공간 지도: 깊이 1 은 루트가 왼쪽, 깊이 2 이상은 부모 = 왼쪽 · 맨 위 = 오른쪽, 그 아래는 왼쪽 끝 세로 띠 */
+.menu-panel--left {
+    translate: 100px 0;
+}
+.menu-panel--right {
+    translate: 760px 0;
+}
+.menu-panel--parent {
+    opacity: 0.55;
+    border-left-color: var(--muted);
+}
+.menu-panel--spine {
+    translate: -496px 0;
+    opacity: 0.6;
+}
+.menu-panel--offscreen {
+    translate: 940px 0;
+    opacity: 0;
+}
+.menu-panel--offscreen-left {
+    translate: 580px 0;
+    opacity: 0;
+}
+/* 뒤로(pop)는 더 짧고 ease-in */
+.pause-root--popping .menu-panel {
+    transition-duration: 0.154s;
+    transition-timing-function: ease-in-cubic;
+}
+/* 모션 줄이기 · 컷 전환 */
+.pause-root--cut .menu-panel {
+    transition-duration: 0s;
+}
+
+.menu-panel--title {
+    top: 460px;
+    translate: 100px 0;
+    background-color: rgba(6, 9, 22, 0.62);
+}
+
+/* 사선 장식 — 회전만 가능하므로 얇은 막대를 기울여 둔다 (글자는 기울이지 않는다) */
+.panel-edge {
+    position: absolute;
+    left: -14px;
+    top: -10px;
+    width: 6px;
+    height: 110%;
+    background-color: var(--accent);
+    rotate: 6deg;
+}
+
+.panel-title {
+    font-size: 30px;
+    -unity-font-style: bold;
+    color: var(--muted);
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom-width: 2px;
+    border-bottom-color: rgba(255, 255, 255, 0.16);
+}
+
+.menu-item {
+    height: 84px;
+    margin: 0;
+    padding-left: 26px;
+    font-size: 40px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    color: var(--ink);
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    border-radius: 0;
+    transition-property: background-color, color;
+    transition-duration: 0.09s;
+}
+
+/* :hover 만 쓰면 패드 사용자는 아무것도 못 본다 → 포커스(:focus)가 주인공 */
+.menu-item:focus {
+    background-color: var(--accent);
+    color: var(--on-accent);
+}
+
+/* 부모 칸의 '들어온 항목' — 채우지 않은 외곽선 (채워진 포커스는 하나뿐) */
+.menu-item--trail {
+    border-width: 3px;
+    border-color: var(--accent);
+}
+
+.menu-item:disabled {
+    opacity: 0.36;
+}
+
+/* ───── 확인 창 ───── */
+.dialog-scrim {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.dialog {
+    width: 880px;
+    padding: 42px 52px 36px;
+    background-color: var(--panel);
+    border-left-width: 9px;
+    border-left-color: var(--accent);
+}
+
+.dialog-title {
+    font-size: 44px;
+    -unity-font-style: bold;
+    color: var(--ink);
+}
+
+.dialog-body {
+    font-size: 26px;
+    color: var(--muted);
+    margin-top: 12px;
+}
+
+.dialog-buttons {
+    flex-direction: row;
+    margin-top: 30px;
+}
+
+.dialog-button {
+    flex-grow: 1;
+    height: 90px;
+    margin-right: 22px;
+    -unity-text-align: middle-center;
+    border-width: 3px;
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+.dialog-button--danger {
+    color: rgb(255, 154, 138);
+    margin-right: 0;
+}
+
+/* ───── 하단 안내 ───── */
+.hint-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 96px;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 100px;
+    background-color: rgba(0, 0, 0, 0.55);
+    border-top-width: 2px;
+    border-top-color: rgba(255, 255, 255, 0.14);
+}
+
+.hint {
+    flex-direction: row;
+    align-items: center;
+    margin-right: 40px;
+}
+
+/* 글리프 자리 폭 고정 — 장치가 바뀌어도 문구가 옆으로 튀지 않는다 */
+.glyph {
+    min-width: 120px;
+    height: 44px;
+    margin-right: 12px;
+    font-size: 22px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: var(--ink);
+    border-width: 2px;
+    border-color: var(--ink);
+    border-radius: 8px;
+}
+
+.hint-text {
+    font-size: 26px;
+    -unity-font-style: bold;
+    color: var(--ink);
+}
+
+.pad-only {
+    display: none;
+}
+.device-gamepad .pad-only {
+    display: flex;
+}
+.device-gamepad .key-only {
+    display: none;
+}
+
+/* ───── 타이틀 화면 ───── */
+.title-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(8, 10, 22);
+    --accent: rgb(198, 255, 61);
+    --ink: rgb(243, 246, 255);
+    --on-accent: rgb(10, 15, 31);
+}
+
+.logo-kicker {
+    position: absolute;
+    left: 100px;
+    top: 110px;
+    font-size: 28px;
+    -unity-font-style: bold;
+    color: var(--accent);
+    letter-spacing: 8px;
+}
+
+.logo {
+    position: absolute;
+    left: 96px;
+    top: 150px;
+    font-size: 136px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+}

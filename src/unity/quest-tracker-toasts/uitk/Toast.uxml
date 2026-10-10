@@ -1,0 +1,15 @@
+<!-- 토스트 카드 템플릿. Instantiate() 는 TemplateContainer 로 한 번 감싸서 돌려주므로 C# 에서 Q("toast") 로 실제 카드를 꺼낸다 -->
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="toast" class="toast toast--enter" picking-mode="Ignore">
+        <ui:VisualElement name="card" class="toast__card" picking-mode="Ignore">
+            <ui:VisualElement name="stripe" class="toast__stripe" picking-mode="Ignore" />
+            <ui:Label name="numeral" class="toast__numeral" text="Ⅰ" picking-mode="Ignore" />
+            <ui:VisualElement name="icon" class="toast__icon" picking-mode="Ignore" />
+            <ui:Label name="message" class="toast__message" picking-mode="Ignore" />
+            <ui:Label name="count" class="toast__count" picking-mode="Ignore" />
+            <ui:VisualElement class="toast__timer" picking-mode="Ignore">
+                <ui:VisualElement name="timer-fill" class="toast__timer-fill" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

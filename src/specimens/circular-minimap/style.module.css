@@ -1,0 +1,457 @@
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  outline: none;
+  user-select: none;
+  font-family: 'Chakra Petch', 'Malgun Gothic', sans-serif;
+  color: #f2f5f8;
+  --amber: #ffb52e;
+  --coral: #ff6a5c;
+  --plate: rgba(8, 12, 18, 0.78);
+}
+
+.world {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* 대기 원근감: 위쪽(먼 곳)을 살짝 흐리게, 가장자리를 어둡게 */
+.haze {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(16, 26, 34, 0.55) 0%, rgba(16, 26, 34, 0.18) 26%, rgba(16, 26, 34, 0) 42%),
+    radial-gradient(ellipse 85% 80% at 50% 60%, transparent 60%, rgba(4, 8, 6, 0.45) 100%);
+}
+
+/* ───── 미니맵 묶음 (중심 기준 좌표) ───── */
+.group {
+  position: absolute;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+}
+.root[data-orient='none'] .group {
+  visibility: hidden;
+}
+.mm {
+  position: absolute;
+  left: calc(var(--R) * -1);
+  top: calc(var(--R) * -1);
+  width: calc(var(--R) * 2);
+  height: calc(var(--R) * 2);
+}
+.shadow {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+/* 원형 마스크 — Unity 의 Mask(스텐실) / UITK 의 border-radius + overflow:hidden 에 해당 */
+.mask {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: ns-resize;
+}
+.pivot {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: var(--bg);
+}
+.cone,
+.ring {
+  /* 미니맵과 같은 D×D 크기 · viewBox 원점 = 원 중심 */
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.cone {
+  opacity: 0;
+}
+.cone[data-on] {
+  opacity: 1;
+}
+
+/* ───── 아이콘 ───── */
+.icons {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+}
+.icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  will-change: transform;
+}
+.shape {
+  position: absolute;
+  left: 0;
+  top: 0;
+  translate: -50% -50%;
+  overflow: visible;
+}
+.root[data-flat] .icon .shape,
+.root:not([data-juice]) .icon .shape {
+  translate: -50% -94%;
+}
+/* 주요 목표: 범위 밖으로 나가면 원 안 아이콘은 짧게(150ms) 사라지고 가장자리 표시로 바뀐다 */
+.icon[data-tier='primary'] .shape {
+  transition:
+    opacity calc(var(--clampMs) / var(--ts, 1)) ease-out,
+    scale calc(var(--clampMs) / var(--ts, 1)) ease-out;
+}
+.icon[data-clamped='true'] .shape {
+  opacity: 0;
+  scale: 0.7;
+}
+.icon[data-tier='minor'] .shape {
+  opacity: 0.88;
+}
+
+.wave {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 128px;
+  height: 128px;
+  translate: -50% -50%;
+  transform-origin: center;
+  border-radius: 50%;
+  border: 5px solid var(--coral);
+  box-sizing: border-box;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ───── 가장자리 표시 (마스크 바깥 레이어 → 잘리지 않는다) ───── */
+.edge {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+}
+/* 효과 끄기: 가장자리 표시를 숨기되 자리는 남긴다 (display:none 이면 해설 번호가 무대 모서리로 튄다) */
+.root:not([data-juice]) .edge {
+  visibility: hidden;
+}
+.edgeMark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  transition: opacity calc(var(--clampMs) / var(--ts, 1)) ease-out;
+}
+.edgeMark[data-on='true'] {
+  opacity: 1;
+}
+.hit {
+  position: absolute;
+  left: -22px;
+  top: -22px;
+  width: 44px;
+  height: 44px;
+  pointer-events: none;
+}
+.wedgeWrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+}
+.wedge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  translate: -30% -50%;
+  overflow: visible;
+}
+.dist {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  padding: 1px 10px 2px;
+  border-radius: 6px;
+  background: var(--plate);
+  border-bottom: 3px solid var(--amber);
+  text-shadow: 0 1px 2px #000;
+}
+.root[data-flat] .dist {
+  border-bottom-color: #e8edf2;
+}
+
+.player {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  will-change: transform;
+}
+.player svg {
+  position: absolute;
+  left: -22px;
+  top: -22px;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.7));
+}
+
+/* N — 테두리를 따라 움직이지만 글자는 늘 바로 선다 */
+.north {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  will-change: transform;
+}
+.north span {
+  position: absolute;
+  left: -21px;
+  top: -21px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  font-weight: 800;
+  color: #ffffff;
+  background: #0b1117;
+  border: 3px solid #e8eef2;
+  box-sizing: border-box;
+}
+.root:not([data-juice]) .north {
+  visibility: hidden;
+}
+
+/* ───── 축척 버튼 (링 오른쪽 아래) ───── */
+.zoom {
+  position: absolute;
+  left: calc(var(--R) * 2 + 30px);
+  top: calc(var(--R) * 1.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.zoomBtn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid rgba(232, 238, 242, 0.55);
+  background: var(--plate);
+  color: #f2f5f8;
+  font: 700 30px/1 'Chakra Petch', 'Malgun Gothic', sans-serif;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 0 0 3px;
+}
+.zoomBtn:hover {
+  border-color: #fff;
+}
+.zoomVal {
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 3px #000;
+}
+
+/* ───── 방향 방식 설정 (링 아래) ───── */
+.orient {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--R) * 2 + 28px);
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 6px 5px 8px;
+  border-radius: 999px;
+  background: var(--plate);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  white-space: nowrap;
+}
+.orient svg {
+  margin-right: 4px;
+}
+.seg {
+  font: 600 22px/1 'Malgun Gothic', sans-serif;
+  color: rgba(242, 245, 248, 0.7);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+}
+.seg[data-on] {
+  background: #e8eef2;
+  color: #0b1117;
+  font-weight: 800;
+}
+
+/* ───── 목표·방위 정보 ───── */
+.info {
+  position: absolute;
+  left: calc(var(--R) * -1 - 6px);
+  top: calc(var(--R) + 96px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  white-space: nowrap;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.85);
+}
+.root[data-portrait] .info {
+  left: 0;
+  translate: -50% 0;
+  align-items: center;
+}
+.objRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 700 24px/1.2 'Malgun Gothic', sans-serif;
+}
+.objRow svg {
+  filter: drop-shadow(0 1px 2px #000);
+}
+.headRow {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-left: 40px;
+}
+.root[data-portrait] .headRow {
+  padding-left: 0;
+}
+.headKey {
+  font: 600 22px/1 'Malgun Gothic', sans-serif;
+  color: rgba(242, 245, 248, 0.7);
+}
+.headVal {
+  font-size: 28px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ───── 미니맵 없음 안내 ───── */
+/* 왼쪽 아래 — 숨은 미니맵 자리(해설 번호가 남는 곳)와 위쪽 알림을 피한다 */
+.noneNote {
+  position: absolute;
+  left: 72px;
+  bottom: 40px;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 18px 12px 16px;
+  border-left: 5px solid var(--amber);
+  background: rgba(8, 12, 18, 0.62);
+  border-radius: 4px;
+  font-family: 'Malgun Gothic', sans-serif;
+}
+.noneNote b {
+  font-size: 26px;
+}
+.noneNote span {
+  font-size: 22px;
+  color: rgba(242, 245, 248, 0.82);
+}
+.noneNote[data-portrait] {
+  left: 50%;
+  bottom: 150px;
+  translate: -50% 0;
+  scale: 1.3;
+  transform-origin: bottom center;
+}
+.root[data-orient='none'] .noneNote {
+  display: flex;
+}
+
+/* ───── 알림 ───── */
+.toast {
+  position: absolute;
+  left: 50%;
+  translate: 0 -12px;
+  transform: translateX(-50%);
+  font: 700 28px/1.2 'Malgun Gothic', sans-serif;
+  color: #fff;
+  background: rgba(8, 12, 18, 0.8);
+  border-left: 6px solid #e8eef2;
+  padding: 10px 24px;
+  border-radius: 4px;
+  opacity: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: translate 0.25s ease-out;
+}
+.toast[data-tone='danger'] {
+  border-left-color: var(--coral);
+}
+.toast[data-tone='done'],
+.toast[data-tone='info'] {
+  border-left-color: var(--amber);
+}
+.root[data-portrait] .toast {
+  font-size: 34px;
+  max-width: 1000px;
+  white-space: normal;
+  text-align: center;
+}
+
+.hints {
+  position: absolute;
+  right: 36px;
+  bottom: 30px;
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  font: 600 22px/1 'Malgun Gothic', sans-serif;
+  color: rgba(242, 245, 248, 0.9);
+  background: rgba(8, 12, 18, 0.55);
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+.hints span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.root[data-portrait] .hints {
+  right: auto;
+  left: 50%;
+  translate: -50% 0;
+  bottom: 48px;
+  scale: 1.25;
+  transform-origin: bottom center;
+}
+.root:focus-visible {
+  box-shadow: inset 0 0 0 4px rgba(90, 209, 255, 0.6);
+}

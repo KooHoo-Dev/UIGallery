@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <!-- 화면용(PanelSettings_Screen). 등판이 가려졌을 때만 왼쪽 가장자리에 나타나는 미니 게이지 -->
+    <Style src="Vitals.uss" />
+    <ui:VisualElement name="fallback-root" class="fallback" picking-mode="Ignore">
+        <ui:VisualElement name="mini-gauge" class="mini mini--hidden">
+            <ui:VisualElement name="mini-cells" class="mini__cells" />
+            <ui:VisualElement class="mini__energy">
+                <ui:VisualElement name="mini-energy-fill" class="mini__energy-fill" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

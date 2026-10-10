@@ -12,6 +12,24 @@
 | 웹에서 보기 | GitHub Pages 주소 (공개 후 기재) |
 | 인터넷 없는 강의실에서 보기 | 사이트 상단 **오프라인용 HTML 받기** 또는 Releases 의 `UIGallery-vX.html` 을 받아 더블클릭 |
 | 수업 중 시연 | 표본 화면에서 `P` 발표 모드, `Space` 재생, `1~9` 이벤트, `J` 효과 끄기(나쁜 예), `S` 슬로모션, `←/→` 해설 |
+| 특정 장면을 링크로 | 주소 뒤에 옵션을 붙입니다 (아래 표) |
+
+### 링크 옵션
+
+`#/s/<표본>?` 뒤에 `&` 로 이어 붙입니다. 예: `#/s/health-bar-trail?juice=0&event=combo&present=1`
+
+| 옵션 | 뜻 |
+|---|---|
+| `preset=<id>` | 프리셋 적용 |
+| `p.<값이름>=<값>` | 조절 값 하나를 지정 (예: `p.fovDeg=120`, `p.showDistance=0`) |
+| `juice=0` | 효과 끄기(나쁜 예)로 열기 |
+| `event=<id>` | 열리자마자 이벤트 한 번 |
+| `speed=0.25` | 슬로모션 (0.25 · 0.5 · 1) |
+| `spot=<번호>` / `spots=0` | 해설 번호 펼치기 / 숨기기 |
+| `auto=0` | 자동 데모 끄기 |
+| `aspect=9:16` | 세로 화면 (지원 표본만) |
+| `webgl=0` | 3D 표본을 2D 대체 화면으로 (저사양 PC) |
+| `present=1` | 발표 모드로 열기 |
 
 ## 강사가 직접 고칠 수 있는 것 (Node 설치 불필요)
 
@@ -31,6 +49,8 @@ npm run dev          # http://localhost:5173
 npm run build        # dist/index.html 한 개 생성
 python tools/check.py           # 오프라인 실행·용량·파일명 검사
 python tools/check.py --links   # + 출처 링크 생존 확인
+python tools/shot.py <id> default juice0 event:<id>   # 빠른 스크린샷 (가상 시간)
+node tools/live.mjs <id> wait:3000 stage:a            # 실제 시간으로 흘려 보며 캡처 (연출 확인용)
 ```
 
 ### 표본 추가하기

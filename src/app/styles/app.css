@@ -55,6 +55,15 @@ kbd {
   color: var(--text-2);
   background: var(--panel-2);
 }
+/* 무대 HUD 안의 kbd 는 표본이 직접 꾸민다 (앱 크롬의 밝은 키 스타일이 어두운 HUD 에 새지 않게) */
+:where(.stage-hud) kbd {
+  font: inherit;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: none;
+  border-radius: 0;
+}
 :focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
@@ -646,13 +655,13 @@ a.card:hover {
 .hotspot-pin {
   position: absolute;
   pointer-events: auto;
-  width: 28px;
-  height: 28px;
+  width: var(--pin, 28px);
+  height: var(--pin, 28px);
   border-radius: 50%;
   border: 2px solid #fff;
   background: rgba(10, 14, 22, 0.85);
   color: #fff;
-  font: 700 0.8rem var(--font-display);
+  font: 700 calc(var(--pin, 28px) * 0.46) var(--font-display);
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -667,6 +676,15 @@ a.card:hover {
   border-color: var(--focus);
   color: #1a1400;
   transform: scale(1.15);
+}
+/* 대상이 지금 숨어 있으면 (예: 미니맵을 끈 모드) 번호를 흐리게 — 눌러서 해설은 볼 수 있다 */
+.hotspot-pin[data-hidden]:not([data-active]) {
+  opacity: 0.4;
+  border-style: dashed;
+  box-shadow: none;
+}
+.hotspot-frame[data-hidden] {
+  border-color: color-mix(in srgb, var(--focus) 55%, transparent);
 }
 .hotspot-frame {
   position: absolute;

@@ -1,0 +1,28 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="CircularMinimap.uss" />
+    <!-- 원형 미니맵: 마스크 안(지도·원뿔·원 안 아이콘) / 마스크 바깥(링·화살표·가장자리 표시·N) -->
+    <ui:VisualElement name="minimap-root" class="minimap" picking-mode="Ignore">
+        <ui:VisualElement name="mask" class="minimap__mask" picking-mode="Ignore">
+            <ui:VisualElement name="map-pivot" class="minimap__pivot" picking-mode="Ignore">
+                <ui:VisualElement name="map-image" class="minimap__map" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement name="view-cone" class="minimap__cone" picking-mode="Ignore" />
+            <!-- 회전하지 않는 아이콘 레이어 — 아이콘은 C# 에서 위계 순서대로 만든다 -->
+            <ui:VisualElement name="icons-in" class="minimap__icons" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ring" class="minimap__ring" picking-mode="Ignore" />
+        <ui:VisualElement name="ring-inner" class="minimap__ring-inner" picking-mode="Ignore" />
+        <ui:VisualElement name="player" class="minimap__player" picking-mode="Ignore" />
+        <!-- 마스크 바깥: 범위 밖 목표 표시가 잘리지 않는다 -->
+        <ui:VisualElement name="icons-edge" class="minimap__edge" picking-mode="Ignore">
+            <ui:VisualElement name="edge-primary" class="edge" picking-mode="Ignore">
+                <ui:VisualElement name="edge-wedge" class="edge__wedge" picking-mode="Ignore" />
+                <ui:VisualElement class="edge__ring" picking-mode="Ignore">
+                    <ui:VisualElement class="edge__dot" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:Label name="edge-dist" class="edge__dist" text="0 m" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label name="north" class="minimap__north" text="N" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

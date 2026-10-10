@@ -182,5 +182,9 @@ Canvas_Overlay (Sort Order 높게)
     { label: 'W3C — WCAG 2.3.1 번쩍임 기준 (초당 3회 이하)', url: 'https://www.w3.org/WAI/WCAG22/Understanding/three-flashes-or-below-threshold' },
     { label: 'Unity 6.3 — Image.fillAmount', url: 'https://docs.unity3d.com/Packages/com.unity.ugui@2.0/api/UnityEngine.UI.Image.html' },
   ],
+  related: [
+    { id: 'diegetic-vitals', why: '같은 체력 정보를 화면 바 대신 **캐릭터 몸**에 붙이면? 몰입과 가독성의 교환 관계' },
+    { id: 'damage-numbers', why: '바가 "얼마나 남았나"라면 숫자는 "방금 얼마나 들어갔나" — 같은 피격의 다른 채널' },
+  ],
   flashes: true,
 }

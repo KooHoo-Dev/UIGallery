@@ -18,6 +18,21 @@ export function applyPreset(defs: ParamDef[], preset: Preset): ParamValues {
   return base
 }
 
-export const num = (p: ParamValues, k: string, fallback = 0) => (typeof p[k] === 'number' ? (p[k] as number) : fallback)
+/** 링크로 받은 문자열 값(#/s/<id>?p.fovDeg=120)을 정의에 맞게 바꿔 덮어쓴다 (잘못된 키·값은 무시) */
+export function applyOverrides(defs: ParamDef[], base: ParamValues, raw: Record<string, string> | undefined): ParamValues {
+  if (!raw) return base
+  const out = { ...base }
+  for (const d of defs) {
+    const v = raw[d.key]
+    if (v === undefined) continue
+    if (d.type === 'range' && v.trim() !== '' && Number.isFinite(Number(v))) out[d.key] = Math.min(d.max, Math.max(d.min, Number(v)))
+    else if (d.type === 'select' && d.options.some(o => o.value === v)) out[d.key] = v
+    else if (d.type === 'toggle' && ['1', '0', 'true', 'false'].includes(v)) out[d.key] = v === '1' || v === 'true'
+    else if (d.type === 'color' && /^#[0-9a-f]{3,8}$/i.test(v)) out[d.key] = v
+  }
+  return out
+}
+
+export const num =(p: ParamValues, k: string, fallback = 0) => (typeof p[k] === 'number' ? (p[k] as number) : fallback)
 export const str = (p: ParamValues, k: string, fallback = '') => (typeof p[k] === 'string' ? (p[k] as string) : fallback)
 export const bool = (p: ParamValues, k: string, fallback = false) => (typeof p[k] === 'boolean' ? (p[k] as boolean) : fallback)

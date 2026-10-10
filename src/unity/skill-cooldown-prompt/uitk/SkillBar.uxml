@@ -1,0 +1,105 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="SkillBar.uss" />
+    <!-- 루트 클래스 하나(device-keyboard / device-gamepad / device-touch)로 모든 슬롯의 안내와 배치가 함께 바뀐다 -->
+    <ui:VisualElement name="hud" class="hud device-keyboard" picking-mode="Ignore">
+        <ui:Label name="toast" class="toast hidden" text="" picking-mode="Ignore" />
+
+        <ui:VisualElement name="energy" class="energy" picking-mode="Ignore">
+            <ui:Label name="energy-label" class="energy__label" text="에너지 22" />
+            <ui:VisualElement class="energy__bar">
+                <ui:VisualElement name="energy-fill" class="energy__fill" />
+                <ui:VisualElement name="cost-marker" class="energy__cost">
+                    <ui:Label name="cost-label" class="energy__cost-label" text="폭주 40" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="haste-chip" class="haste hidden" text="쿨다운 가속 · 총 시간 ×0.6" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="skill-bar" class="skill-bar" picking-mode="Ignore">
+            <!-- 슬롯 구조는 4개 모두 같다. 잘리는 것은 .slot__clip 안쪽뿐 -->
+            <ui:VisualElement name="slot-primary" class="slot">
+                <ui:VisualElement class="slot__clip">
+                    <ui:VisualElement class="slot__icon" picking-mode="Ignore" />
+                    <RadialCooldown class="slot__sweep" picking-mode="Ignore" />
+                    <ui:VisualElement class="slot__vmask" picking-mode="Ignore" />
+                    <ui:VisualElement class="slot__glint" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="slot__lock" picking-mode="Ignore">
+                    <ui:VisualElement class="slot__drop" />
+                    <ui:Label class="slot__cost" text="0" />
+                </ui:VisualElement>
+                <ui:Label class="slot__timer" text="" picking-mode="Ignore" />
+                <ui:VisualElement class="slot__pips" picking-mode="Ignore" />
+                <ui:VisualElement class="slot__prompt" picking-mode="Ignore">
+                    <ui:Label class="prompt-key" text="Q" />
+                    <ui:VisualElement class="prompt-pad prompt-pad--left" />
+                </ui:VisualElement>
+                <ui:Label class="slot__name" text="파동" picking-mode="Ignore" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="slot-dash" class="slot">
+                <ui:VisualElement class="slot__clip">
+                    <ui:VisualElement class="slot__icon" picking-mode="Ignore" />
+                    <RadialCooldown class="slot__sweep" picking-mode="Ignore" />
+                    <ui:VisualElement class="slot__vmask" picking-mode="Ignore" />
+                    <ui:VisualElement class="slot__glint" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="slot__lock" picking-mode="Ignore">
+                    <ui:VisualElement class="slot__drop" />
+                    <ui:Label class="slot__cost" text="0" />
+                </ui:VisualElement>
+                <ui:Label class="slot__timer" text="" picking-mode="Ignore" />
+                <ui:VisualElement class="slot__pips" picking-mode="Ignore">
+                    <ui:VisualElement class="pip" />
+                    <ui:VisualElement class="pip" />
+                    <ui:VisualElement class="pip" />
+                </ui:VisualElement>
+                <ui:VisualElement class="slot__prompt" picking-mode="Ignore">
+                    <ui:Label class="prompt-key" text="Shift" />
+                    <ui:VisualElement class="prompt-pad prompt-pad--right" />
+                </ui:VisualElement>
+                <ui:Label class="slot__name" text="도약" picking-mode="Ignore" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="slot-utility" class="slot">
+                <ui:VisualElement class="slot__clip">
+                    <ui:VisualElement class="slot__icon" picking-mode="Ignore" />
+                    <RadialCooldown class="slot__sweep" picking-mode="Ignore" />
+                    <ui:VisualElement class="slot__vmask" picking-mode="Ignore" />
+                    <ui:VisualElement class="slot__glint" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="slot__lock" picking-mode="Ignore">
+                    <ui:VisualElement class="slot__drop" />
+                    <ui:Label class="slot__cost" text="0" />
+                </ui:VisualElement>
+                <ui:Label class="slot__timer" text="" picking-mode="Ignore" />
+                <ui:VisualElement class="slot__pips" picking-mode="Ignore" />
+                <ui:VisualElement class="slot__prompt" picking-mode="Ignore">
+                    <ui:Label class="prompt-key" text="E" />
+                    <ui:VisualElement class="prompt-pad prompt-pad--top" />
+                </ui:VisualElement>
+                <ui:Label class="slot__name" text="보호막" picking-mode="Ignore" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="slot-ult" class="slot slot--ult">
+                <ui:VisualElement class="slot__clip">
+                    <ui:VisualElement class="slot__icon" picking-mode="Ignore" />
+                    <RadialCooldown class="slot__sweep" picking-mode="Ignore" />
+                    <ui:VisualElement class="slot__vmask" picking-mode="Ignore" />
+                    <ui:VisualElement class="slot__glint" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="slot__lock" picking-mode="Ignore">
+                    <ui:VisualElement class="slot__drop" />
+                    <ui:Label class="slot__cost" text="40" />
+                </ui:VisualElement>
+                <ui:Label class="slot__timer" text="" picking-mode="Ignore" />
+                <ui:VisualElement class="slot__pips" picking-mode="Ignore" />
+                <ui:VisualElement class="slot__prompt" picking-mode="Ignore">
+                    <ui:Label class="prompt-key" text="R" />
+                    <ui:VisualElement class="prompt-pad prompt-pad--shoulder" />
+                </ui:VisualElement>
+                <ui:Label class="slot__name" text="폭주" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

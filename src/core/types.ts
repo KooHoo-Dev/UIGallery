@@ -50,7 +50,10 @@ export interface Hotspot {
   title: string
   body: string
   principle: Principle
+  /** 번호를 붙일 쪽 (기본 top). 상태에 따라 바꾸려면 요소에 data-pin="below|left|right|inside" */
+  pin?: PinSide
 }
+export type PinSide = 'top' | 'below' | 'left' | 'right' | 'inside'
 
 export interface Mistake {
   title: string
