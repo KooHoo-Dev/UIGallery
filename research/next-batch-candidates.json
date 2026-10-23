@@ -1,0 +1,1433 @@
+[
+ {
+  "lens": "acclaimed",
+  "lens_summary_ko": "2022~2026년에 UI로 호평받은 게임(Metaphor: ReFantazio, Final Fantasy XVI, Baldur's Gate 3, Balatro, Alan Wake 2, Hi-Fi Rush, Helldivers 2, Star Wars Jedi: Survivor, Fortnite·Spider-Man 2의 접근성 기능)을 보면, 칭찬받은 요소는 체력 바나 미니맵 같은 기본 HUD가 아닙니다. 대부분 시스템을 읽기 쉽게 보여 주는 UI입니다: 턴 순서 타임라인, 맥락 용어집과 키워드 툴팁, 단계별 점수 계산 연출, 수사 보드가 그렇습니다. 입력 UI(방대한 목록 빠른 선택, 방향키 커맨드 입력, 박자 표시)도 많이 칭찬받았고, 시각 단서로 소리나 박자를 대신하는 접근성 기능도 상을 받거나 기본값으로 바뀌는 추세입니다. 근거가 가장 단단한 후보는 원리가 글로 공개된 것들입니다: GMTK가 Unity로 Zelda UI를 다시 만든 글, Remedy의 Game Developer 인터뷰, GDC 2023·2024 강연 소개(FF16 ATL, Jedi Survivor), Hi-Fi Rush 접근성 보도가 있습니다. 대부분 2D UI만으로 재현할 수 있어 용량 비용이 낮고, PC와 모바일 양쪽에 맞출 수 있습니다. 다만 BG3·Hades II는 개발사 설계 자료를 찾지 못해 커뮤니티 근거만 있고, NDC의 UI 세션 목록도 검색으로 확인하지 못했습니다. WebSearch는 17회를 써서 지시한 15회 한도를 2회 넘겼습니다.",
+  "candidates": [
+   {
+    "id": "turn-order-timeline",
+    "name_ko": "턴 순서 타임라인(행동 순서 바)",
+    "group": "A",
+    "paradigm": "non-diegetic",
+    "what_ko": "턴제 전투에서 아군·적 초상 아이콘을 행동 순서대로 한 줄에 늘어놓은 바. 속도 버프나 지연 디버프가 걸리면 아이콘이 미끄러지듯 자리를 바꾸고, 다음 턴 미리보기와 끼어들기(궁극기 등)를 표시한다. 행동값(AV) 숫자는 켜고 끌 수 있다.",
+    "why_ko": "Honkai: Star Rail, Baldur's Gate 3, Metaphor 같은 최근 히트작의 핵심 UI다. 커뮤니티 분석에서는 '계획 도구'로 평가받는 동시에, 행동값이 숨겨져 있고 설명이 없다는 점은 비판받았다. 칭찬과 비판이 함께 있어서 가르치기 좋다. 기존 13개에는 턴제나 전략 전투 UI가 하나도 없고, 수강생 팀 프로젝트(모바일 수집형 RPG)에서 자주 만드는 UI다. 2D만으로 충분해 용량 부담이 거의 없다.",
+    "teaching_points_ko": [
+     "행동값 = 기준값/속도 공식으로 정렬하고, 버프가 걸리면 리스트 재정렬과 위치 보간(Lerp/DOTween)으로 애니메이션",
+     "데이터(전투 큐)와 뷰(아이콘 리스트)를 분리하는 MVC/옵저버 구조",
+     "UGUI: HorizontalLayoutGroup 대신 수동 배치로 재정렬 애니메이션 구현 / UITK: ListView 또는 absolute 배치 + transition",
+     "숨긴 수치를 설정으로 노출하는 '학습 곡선 대 정보 밀도' 설계 토론"
+    ],
+    "example_games": [
+     "Honkai: Star Rail",
+     "Baldur's Gate 3",
+     "Metaphor: ReFantazio",
+     "Final Fantasy X"
+    ],
+    "sources": [
+     "https://www.icy-veins.com/honkai-star-rail/combat-basics",
+     "https://primagames.com/gaming/honkai-star-rail-turn-based-combat-system-guide",
+     "https://afkgaming.com/gaming/honkai-star-rail/turn-based-combat-in-honkai-star-rail-how-does-it-work"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "radial-quick-select",
+    "name_ko": "빠른 선택 휠 + 대량 목록 탐색",
+    "group": "G",
+    "paradigm": "non-diegetic",
+    "what_ko": "아날로그 스틱이나 마우스 방향으로 고르는 방사형 선택 휠(8~16칸, 시간 느려짐 포함). 아이템이 100개 넘게 많아지면 쓸 수 있는 대안 비교 모드를 붙인다: 누를수록 빨라지는 가속 스크롤, XMB식 그룹 열, 탭이 있는 그리드, 즐겨찾기 링을 전환해 볼 수 있다.",
+    "why_ko": "Tears of the Kingdom과 Echoes of Wisdom의 긴 가로 목록은 UX 비평에서 반복해서 문제로 지적됐다. GMTK는 이를 Unity로 직접 재구현해 가속 스크롤, XMB, 탭 그리드, 방사형, 즐겨찾기 링, 나선 메뉴를 비교했다. 원리가 글로 상세히 공개됐고 Unity로 만든 사례라서, 이 갤러리의 '재구현' 콘셉트에 가장 잘 맞는다. 기존 백로그의 '무기 휠'이 실제로 만들 가치가 있다는 근거이기도 하다.",
+    "teaching_points_ko": [
+     "스틱 벡터 → Atan2 각도 → 섹터 인덱스, 데드존과 히스테리시스",
+     "입력 유지 시간에 따른 가속 곡선(AnimationCurve)과 위치 표시기",
+     "Input System으로 게임패드와 마우스를 동시에 지원, 휠을 여는 동안 Time.timeScale 낮추기",
+     "UGUI: Image fillAmount로 부채꼴 그리기 / UITK: Painter2D(generateVisualContent)로 섹터 그리기",
+     "'즐겨찾기가 재발견이라는 의도를 해친다'는 설계 의도 대 편의 트레이드오프 토론"
+    ],
+    "example_games": [
+     "The Legend of Zelda: Tears of the Kingdom",
+     "The Legend of Zelda: Echoes of Wisdom",
+     "Red Dead Redemption 2",
+     "Ratchet & Clank: Rift Apart"
+    ],
+    "sources": [
+     "https://gmtk.substack.com/p/can-i-fix-zeldas-ui-using-unity",
+     "https://uxdesign.cc/tears-of-the-kingdom-how-nintendo-improved-and-ignored-ui-issues-843f094b14b2",
+     "https://thefilibusterblog.com/revamping-the-zelda-series-ui-insights-after-tears-of-the-kingdom-and-echoes-of-wisdom/"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "sound-visualizer-ring",
+    "name_ko": "소리 시각화(방향성 사운드 표시)",
+    "group": "G",
+    "paradigm": "non-diegetic",
+    "what_ko": "화면 중앙 주변 링에 소리가 나는 방향을 호(arc)로 표시한다. 색과 아이콘으로 종류를 구분하고(발소리 흰색, 총성·폭발 빨강, 보물 금색), 거리에 따라 투명도와 두께를 바꾼다. 비유어 자막(효과음 캡션)도 함께 시연한다.",
+    "why_ko": "Fortnite의 Visualize Sound Effects는 옵트인 접근성 옵션에서 모든 플레이어 기본값으로 바뀌었다고 보도됐고, Spider-Man 2는 비대사 사운드 캡션을 별도로 설정할 수 있다. 청각장애인뿐 아니라 헤드폰 없이 하는 모바일 유저에게도 유용하다. 기존 settings-accessibility는 메뉴 설정이고 이 후보는 플레이 중 HUD라서 겹치지 않는다. offscreen-waypoint의 방향 계산을 재활용할 수 있어 연계 수업에도 좋다. 감지 거리를 길게 잡으면 공정성 논쟁이 생긴다는 점도 토론 거리다.",
+    "teaching_points_ko": [
+     "월드 음원 위치 → 카메라 기준 로컬 방향 → 링 각도 변환(Vector3.SignedAngle)",
+     "사운드 이벤트 버스: AudioSource 재생 시 시각화 이벤트를 함께 발행(ScriptableObject 이벤트 채널)",
+     "같은 방향 이벤트 합치기, 수명과 페이드, 우선순위",
+     "UGUI: 링 위 오브젝트 풀 / UITK: Painter2D Arc",
+     "감지 범위와 공정성(경쟁 게임 밸런스), 접근성 기본값 정책"
+    ],
+    "example_games": [
+     "Fortnite",
+     "Marvel's Spider-Man 2",
+     "The Last of Us Part II"
+    ],
+    "sources": [
+     "https://caniplaythat.com/?p=14083",
+     "https://www.gamespot.com/articles/how-to-use-visualize-audio-effects-in-fortnite/1100-6498314/",
+     "https://support.insomniac.games/hc/en-us/articles/46730041467027-What-Accessibility-options-does-Marvel-s-Spider-Man-2-feature"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "beat-sync-indicator",
+    "name_ko": "박자 표시기·리듬 어시스트",
+    "group": "C",
+    "paradigm": "non-diegetic",
+    "what_ko": "음악 박자에 맞춰 화면 하단에서 노트가 중앙으로 흐르는 바, 또는 동료 캐릭터나 UI 요소가 박자에 맞춰 맥동하는 표시. 입력하면 Perfect/Good/Miss를 판정하고, 박자를 놓쳐도 실패시키지 않고 다음 박자에 맞춰 주는 관대한 판정 모드를 지원한다.",
+    "why_ko": "Hi-Fi Rush는 리듬 시각화 옵션(상시 박자 바, 808 고양이 맥동)과 '박자를 놓쳐도 입력은 통한다'는 설계로 접근성 면에서 호평받았다(Kotaku, Tacoma Ledger, Family Gaming Database에 34개 기능 기록). 리듬과 타이밍 피드백은 액션 게임의 패링, QTE, 리듬 미니게임에 두루 쓰여 팀 프로젝트에서 재사용성이 높다. 오디오 동기화라는 실무 기술도 함께 배운다.",
+    "teaching_points_ko": [
+     "AudioSettings.dspTime 기반 박자 계산(Time.time을 쓰면 안 되는 이유)",
+     "판정 창(ms)과 입력 지연 보정 캘리브레이션 UI",
+     "박자 이벤트를 UI 맥동, 카메라, 환경 애니메이션에 방송",
+     "UGUI: 노트 풀 + RectTransform 이동 / UITK: USS 트랜지션 대신 스크립트로 위치 계산",
+     "접근성: 시각 리듬 보조를 켜고 끌 수 있게, 실패 없는 판정 옵션"
+    ],
+    "example_games": [
+     "Hi-Fi Rush",
+     "Crypt of the NecroDancer",
+     "Metal: Hellsinger"
+    ],
+    "sources": [
+     "https://kotaku.com/hi-fi-rush-game-pass-rhythm-game-visual-options-1850053933",
+     "https://thetacomaledger.com/2023/02/27/the-ingenious-accessibility-of-hi-fi-rush/",
+     "https://www.familygamingdatabase.com/accessibility/Hi-Fi+Rush",
+     "https://support.krafton.com/hc/en-us/articles/52371575035801-Hi-Fi-RUSH-Accessibility-Settings"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "score-cascade-tally",
+    "name_ko": "단계별 점수 계산 연출(칩×배율 캐스케이드)",
+    "group": "C",
+    "paradigm": "non-diegetic",
+    "what_ko": "플레이 결과를 한 번에 보여 주지 않고, 효과가 하나씩 순서대로 발동하며 기본값 + 가산, × 배율로 계산되는 과정을 보여 준다. 각 단계마다 카드나 아이템 흔들림, 슬롯머신식 롤링 숫자, 화면 흔들림, 파티클, 상승 음정 사운드가 붙는다. 미리보기를 숨겨 긴장감을 만드는 설계도 함께 다룬다.",
+    "why_ko": "Balatro는 2024년 최대 인디 히트작이고, GMTK는 '점수 미리보기를 숨긴 설계'를 별도로 분석했다. 피드백을 겹겹이 쌓는 '주스' 연출은 디자인 분석 글에서 원리 단위로 정리됐다. damage-numbers는 개별 숫자 팝업이고 results-reward는 정산 화면이라서, '인과가 드러나는 계산 연출'은 비어 있는 자리다. 로그라이크, 덱빌딩, 퍼즐 팀 프로젝트에 바로 쓸 수 있고 포트폴리오에서도 눈에 띈다.",
+    "teaching_points_ko": [
+     "코루틴이나 async로 효과 큐를 순차 재생, 배속과 스킵 처리(결과는 미리 확정)",
+     "롤링 숫자(자릿수별 스크롤) 대 단순 카운트업 비교",
+     "주스 레이어 분리: 스케일 펀치, 셰이크, 파티클, 피치를 올리는 사운드",
+     "UGUI: TextMeshPro + DOTween 시퀀스 / UITK: Label + 스케줄러(schedule.Execute)",
+     "정보 숨김 대 투명성: 미리보기를 숨기면 '분위기 게임', 보여 주면 '스프레드시트 게임'이 되는 설계 토론"
+    ],
+    "example_games": [
+     "Balatro",
+     "Peggle",
+     "Vampire Survivors"
+    ],
+    "sources": [
+     "https://gmtk.substack.com/p/balatros-cursed-design-problem",
+     "https://blakecrosley.com/ko/guides/design/balatro"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "context-lore-glossary",
+    "name_ko": "맥락 용어집·키워드 툴팁(중첩 툴팁)",
+    "group": "F",
+    "paradigm": "meta",
+    "what_ko": "일시정지하거나 버튼을 길게 누르면 지금 장면에 등장한 인물, 용어, 장소 항목만 골라서 보여 주는 맥락 용어집. 대사나 스킬 설명 속 키워드에 커서를 올리면 설명 툴팁이 뜨고, 그 툴팁 안의 키워드에 다시 올리면 하위 툴팁이 뜨는 중첩 툴팁을 함께 시연한다(고정·잠금 포함).",
+    "why_ko": "Final Fantasy XVI의 Active Time Lore는 GDC 강연으로 설계가 공개됐고, 'RPG 필수 기능'(Prime Video X-Ray 비유)으로 널리 호평받았다. BG3도 전투 로그와 판정에 마우스를 올리면 계산 근거를 보여 주는 툴팁이 칭찬받았다. 세계관 용어가 많은 RPG나 카드 게임을 만드는 수강생에게 '정보를 언제 보여 줄지'를 가르칠 수 있다. dialogue-choices나 inventory-grid-tooltip과는 목적(맥락 검색, 재귀 툴팁)이 달라 별도 표본으로 가치가 있지만, 툴팁 부분은 inventory-grid-tooltip의 확장으로 구현할 수도 있다.",
+    "teaching_points_ko": [
+     "장면과 대사 노드에 태그를 달아 현재 맥락 항목만 질의하는 데이터 설계(ScriptableObject DB)",
+     "TMP 링크 태그(<link>)로 키워드 히트 테스트 → 툴팁 스택(재귀)",
+     "툴팁 잠금(일정 시간 유지하면 고정), 화면 가장자리 위치 보정",
+     "UITK: 툴팁 VisualElement 스택 + PointerEnter/Leave 이벤트 / UGUI: TMP_TextUtilities.FindIntersectingLink",
+     "정보 과부하 대 진입 장벽: 선택형 정보 제공 원칙"
+    ],
+    "example_games": [
+     "Final Fantasy XVI",
+     "Baldur's Gate 3",
+     "Slay the Spire",
+     "Path of Exile 2"
+    ],
+    "sources": [
+     "https://gdcvault.com/play/1034185/Designing-Active-Time-Lore-for",
+     "https://www.truetrophies.com/n23011/final-fantasy-xvi-active-time-lore",
+     "https://primagames.com/tips/how-to-use-active-time-lore-in-final-fantasy-xvi",
+     "https://steamcommunity.com/app/1086940/discussions/0/4032473436330492524"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "investigation-board",
+    "name_ko": "수사 보드(단서 연결 보드)",
+    "group": "F",
+    "paradigm": "spatial",
+    "what_ko": "코르크 보드 위에 단서 카드(메모, 사진)를 끌어다 놓고 빈칸에 맞추면 붉은 실로 연결되며 추리가 완성되는 보드. 마우스와 게임패드가 함께 쓰는 가상 커서, 보드 패닝·줌, 단서에 마우스를 올리면 나오는 해설을 포함한다.",
+    "why_ko": "Alan Wake 2의 Mind Place와 Case Board는 GamesRadar와 VGC 프리뷰에서 극찬받았다. Remedy는 Game Developer 인터뷰에서 공용 커서, 카메라 패닝 볼륨, 디에제틱 UI를 시도했다가 일부를 되돌린 과정, 플레이테스터가 압도된 문제를 직접 설명했다. 원리가 글로 공개되어 있다. 드래그 앤 드롭, 가상 커서, 선 연결은 추리, 퍼즐, 크래프팅 UI에도 그대로 쓰이는 범용 기술이다.",
+    "teaching_points_ko": [
+     "UGUI: IBeginDragHandler/IDropHandler, 슬롯 스냅 / UITK: PointerManipulator 커스텀 드래그",
+     "게임패드용 가상 커서(Input System의 VirtualMouseInput)",
+     "UI 선 연결: UI LineRenderer 대체(Image 회전·늘이기) 또는 UITK Painter2D 곡선",
+     "줌·패닝 가능한 캔버스(ScrollRect 대 Transform scale)",
+     "자유도 대 진행 막힘: 힌트와 정답 검증 설계"
+    ],
+    "example_games": [
+     "Alan Wake 2",
+     "The Case of the Golden Idol",
+     "Shadows of Doubt"
+    ],
+    "sources": [
+     "https://www.gamedeveloper.com/design/true-detective-meets-hearthstone-the-unlikely-inspirations-behind-alan-wake-ii-s-metaphyiscal-mind-place",
+     "https://videogameschronicle.com/features/alan-wake-2-interview-true-detective-was-definitely-on-our-mind",
+     "https://www.gamesradar.com/alan-wake-2-mind-place"
+    ],
+    "cost": "medium",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "directional-combo-input",
+    "name_ko": "방향 커맨드 입력 HUD(스트라타젬식)",
+    "group": "G",
+    "paradigm": "non-diegetic",
+    "what_ko": "버튼을 누르고 있는 동안 커맨드 목록이 열리고, 방향키 시퀀스(예: ↓↓↑→)를 입력하면 일치하는 후보만 남으며 입력한 화살표가 하나씩 불이 들어온다. 완성되면 발동하고, 틀리면 흔들림과 함께 초기화된다. 모바일에서는 스와이프 입력으로 대체한다.",
+    "why_ko": "Helldivers 2(2024 대표 히트작)는 의도적으로 '손이 바쁜' 커맨드 입력을 통해 긴장과 협동의 재미를 만든 대표 사례다. 커뮤니티에서는 Hold/Press 토글이나 리매핑 요구 같은 사용성 논쟁도 활발해서, 설계와 접근성을 함께 토론할 수 있다. 접두사 필터링, 입력 버퍼, 피드백은 격투 게임 커맨드나 마법 주문 입력에도 그대로 쓰인다. 2D만으로 구현할 수 있어 비용이 낮다.",
+    "teaching_points_ko": [
+     "입력 시퀀스 버퍼와 접두사 매칭(트라이 또는 단순 필터)",
+     "Input System 액션맵 전환(커맨드 모드 중 이동 입력 차단 여부)",
+     "단계별 피드백: 맞은 화살표 하이라이트, 오입력 셰이크, 완료 펄스",
+     "Hold 대 Press(토글) 옵션 같은 운동 접근성 설정, 모바일 스와이프 대체 입력",
+     "UGUI/UITK 공통: 데이터(커맨드 정의 SO)와 HUD 위젯 분리"
+    ],
+    "example_games": [
+     "Helldivers 2",
+     "Helldivers",
+     "Magicka"
+    ],
+    "sources": [
+     "https://www.shacknews.com/article/138705/all-stratagems-codes-helldivers-2",
+     "https://steamcommunity.com/app/553850/discussions/0/4295944344104408657",
+     "https://boardgamers2409.itch.io/plague-wardens/devlog/805643/interactive-stratagem-popout-menu-ryan-brown"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 3
+   },
+   {
+    "id": "stylized-menu-transitions",
+    "name_ko": "스타일 메뉴 전환(개성 있는 메뉴 모션)",
+    "group": "D",
+    "paradigm": "screen",
+    "what_ko": "메뉴마다 고유한 레이아웃과 진입·퇴장 모션(사선 커팅, 스태거 등장, 텍스트 흔들림, 배경 와이프)을 넣되, 가독성을 지키는 규칙(대비, 정렬 기준선, 모션 줄이기 옵션)을 파라미터로 조절해 보여 주는 표본.",
+    "why_ko": "Metaphor: ReFantazio(2024)의 메뉴는 요코 타로가 극찬했다. 하시노 디렉터는 메뉴마다 별도 프로그램으로 만든다고 밝혔고, Persona 5의 각진 메뉴는 처음에 읽기 어려워 반복 개선했다고 설명했다. GDC 2025에서도 Atlus UI 패널로 다뤄졌다. 기존 main-pause-menu는 구조와 흐름 중심이라, 모션과 아트 디렉션 층을 더하는 확장으로 적합하다. 포트폴리오 영상에서 가장 눈에 띄는 유형이다.",
+    "teaching_points_ko": [
+     "UGUI: Animator 대신 DOTween 시퀀스와 스태거 / UITK: USS transition + 클래스 토글 연출",
+     "Mask/RectMask2D와 회전 컨테이너로 사선 레이아웃 만들기",
+     "'스타일 대 가독성' 체크리스트: 대비비, 읽기 순서, 모션 줄이기 옵션",
+     "입력 즉시성: 애니메이션 중에도 입력을 받는 구조(전환 스킵)"
+    ],
+    "example_games": [
+     "Metaphor: ReFantazio",
+     "Persona 5",
+     "Hi-Fi Rush"
+    ],
+    "sources": [
+     "https://kotaku.com/-metaphor-refantazio-persona-5-menu-ui-hashino-1851667088",
+     "https://automaton-media.com/en/news/yoko-taro-plays-new-atlus-rpg-metaphor-refantazio-its-so-stylish-i-almost-wet-myself/",
+     "https://www.gamebusiness.jp/article/2025/03/21/23978.html",
+     "https://80.lv/articles/persona-director-says-making-stylish-ui-is-really-annoying/"
+    ],
+    "cost": "medium",
+    "extends_existing": "main-pause-menu",
+    "strength": 3
+   },
+   {
+    "id": "customization-workbench",
+    "name_ko": "커스터마이즈 작업대(파츠 조합 + 미리보기)",
+    "group": "E",
+    "paradigm": "spatial",
+    "what_ko": "무기나 캐릭터를 손잡이·몸체·색상 같은 파츠 슬롯으로 나누고, 슬롯을 고르면 카메라가 해당 부위로 이동하며 실시간 미리보기가 바뀌는 작업대. 조합 수가 폭발해도 탐색할 수 있도록 카테고리 → 파츠 → 색상의 계층 탐색과 되돌리기·랜덤 기능을 제공한다.",
+    "why_ko": "GDC 2024에서 Respawn의 'Customizing a Billion Lightsabers'(10번 반복한 인터페이스, 플레이어 리서치 기반)와 'Designing Immersive UI for Jedi: Survivor'(디에제틱 스킬·커스터마이즈 UI)가 발표됐다. 캐릭터 커스터마이즈는 수강생 포트폴리오에서 인기 있는 주제다. 다만 3D 미리보기가 필요해 용량 비용이 있으니, 기본 도형(프리미티브)으로 만든 막대·검 형태로 축소해 구현하길 권한다.",
+    "teaching_points_ko": [
+     "슬롯-파츠 데이터 구조(ScriptableObject)와 조합 상태 직렬화",
+     "슬롯 포커스에 따른 카메라 전환(Cinemachine) 또는 RenderTexture 미리보기 패널",
+     "계층 탐색 UX: 브레드크럼, 되돌리기 스택, 비교(현재 대 이전)",
+     "UGUI: RawImage + RenderTexture / UITK: 배경 이미지로 RenderTexture 표시"
+    ],
+    "example_games": [
+     "Star Wars Jedi: Survivor",
+     "Armored Core VI",
+     "Monster Hunter Wilds"
+    ],
+    "sources": [
+     "https://www.gdcvault.com/play/1034223/Customizing-a-Billion-Lightsabers-STAR",
+     "https://schedule.gdconf.com/session/ux-summit-designing-immersive-ui-for-star-wars-jedi-survivor/901582",
+     "https://gdcvault.com/play/1034481/UX-Summit-Designing-Immersive-UI"
+    ],
+    "cost": "high",
+    "extends_existing": "",
+    "strength": 2
+   }
+  ]
+ },
+ {
+  "lens": "taxonomy",
+  "lens_summary_ko": "분류 체계 세 가지를 기존 13개와 대조했습니다. Game Accessibility Guidelines의 전체 목록, XAG 101~123 목록, Fagerholt·Lorentzon의 디제시스(이야기 안에 속하는가) × 공간성(게임 세계 안에 있는가) 4분면입니다. 대조해 보면 A·B 그룹(HUD·길찾기)은 이미 촘촘합니다. 반면 G 입력·접근성은 settings-accessibility 하나뿐이라 가장 크게 비어 있습니다. 두 지침 모두 기본·중급 항목으로 꼽는 자막·캡션(XAG 104), 화면 낭독·포커스 표시(XAG 106/113), 입력 재설정(XAG 107, GAG 기본), 소리 정보의 시각화(GAG 청각 중급), 크기·위치를 바꿀 수 있는 UI(GAG 중급)가 빠져 있습니다. Unity 6.3에 데스크톱 화면 낭독 지원이 들어왔고 Input System에는 리바인딩 API가 있어서, 이 부분은 지금 가르치기 좋은 시점입니다. D 그룹에는 파괴적 행동 확인 모달(XAG 115), 로딩, 튜토리얼 강조가 없습니다. E 그룹에는 성장 축(스킬트리)이 없습니다. 모바일 비중이 반이므로 터치 조작 배치 편집기도 꼭 넣을 만한 갭입니다. 후보는 모두 2D·저용량이라 3MB 예산 안에서 소화할 수 있습니다. 순위에서 밀렸지만 상점·재화 구매와 세이브 슬롯(썸네일 포함, GAG 중급)도 후속 후보입니다.",
+  "candidates": [
+   {
+    "id": "subtitles-captions",
+    "name_ko": "자막·클로즈드 캡션",
+    "group": "F",
+    "paradigm": "non-diegetic",
+    "what_ko": "대사 자막과 효과음 캡션(예: [폭발음 ←])을 한 상자에 보여 주는 표본입니다. 화자 이름과 색 구분, 글자 크기·배경 상자·불투명도 조절, 한 줄 글자 수와 최대 2줄 제한, 읽기 속도에 맞춘 표시 시간, 화자가 바뀔 때만 이름을 다시 붙이는 규칙을 다룹니다.",
+    "why_ko": "GAG에서 청각 기본 항목(선명한 자막, 중요한 대사 자막)과 중급 항목(자막 커스터마이즈, 화자 표시, 배경음 캡션)이 가장 많이 몰린 영역이고, XAG 104가 따로 있습니다. 그런데 기존 13개에는 자막 표본이 없습니다. dialogue-choices는 대화창이라 성격이 다릅니다. 한국 팀 프로젝트의 컷신·내레이션에 바로 쓸 수 있고, 포트폴리오에서 접근성을 고려했다는 신호가 됩니다.",
+    "teaching_points_ko": [
+     "자막과 캡션의 차이: 캡션은 효과음·음악·방향까지 글로 옮긴다",
+     "글자 수 기반 표시 시간 계산과 줄바꿈 규칙(한국어 글자 폭)",
+     "화자 라벨 규칙: 화자가 바뀌거나 오래 쉰 뒤에만 다시 붙인다",
+     "UGUI: TextMeshPro와 배경 Image의 ContentSizeFitter / UITK: USS 변수로 크기·배경 불투명도를 실시간 반영",
+     "타임라인·오디오 이벤트에서 자막 큐를 띄우는 데이터 구조(ScriptableObject 또는 TSV)"
+    ],
+    "example_games": [
+     "Assassin's Creed Origins",
+     "The Last of Us Part II",
+     "Marvel's Spider-Man"
+    ],
+    "sources": [
+     "https://gameaccessibilityguidelines.com/full-list/",
+     "https://devdocs.xbox.com/gaming/accessibility/xbox-accessibility-guidelines/104",
+     "https://cmf-fmc.ca/now-next/articles/subtitles-in-video-games-the-best-practices/",
+     "https://80.lv/articles/10-golden-rules-on-subtitles-for-games",
+     "https://www.gameanalytics.com/blog/adding-subtitles-to-your-mobile-game-dos-and-donts"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "input-rebinding",
+    "name_ko": "입력 재설정(키 리바인딩)",
+    "group": "G",
+    "paradigm": "screen",
+    "what_ko": "조작 설정 화면입니다. 행동 목록을 두고 '키를 누르세요' 대기 상태, 다른 행동과 겹칠 때 충돌 경고와 맞바꾸기, 기본값 복원을 보여 줍니다. 키보드·Xbox·PS 패드 중 마지막에 쓴 장치에 맞춰 버튼 아이콘(글리프)을 바꾸고, 재설정 결과를 저장·불러옵니다.",
+    "why_ko": "GAG 운동 기본 항목(조작 재설정)이자 XAG 107의 핵심이고, Xbox 접근성 기능 태그 20개에도 들어갑니다. PC·패드를 함께 지원하는 팀 프로젝트라면 거의 반드시 필요하지만 수강생이 가장 자주 빼먹는 화면입니다. settings-accessibility의 조작 탭으로 붙일 수도 있지만, 상태 기계와 저장 로직이 충분히 깊어서 단독 표본으로 낼 가치가 있습니다.",
+    "teaching_points_ko": [
+     "Input System의 PerformInteractiveRebinding, WithControlsExcluding(\"Mouse\"), 작업 객체 Dispose",
+     "SaveBindingOverridesAsJson / LoadBindingOverridesFromJson으로 PlayerPrefs에 저장",
+     "충돌 감지 후 맞바꾸기와 기본값 복원 UX",
+     "GetBindingDisplayString과 장치별 글리프 매핑, 마지막 사용 장치 감지",
+     "리바인딩 중 UI 입력이 두 번 들어가는 문제(알려진 버그) 피하기",
+     "UGUI·UITK 공통: 목록 행 템플릿(UITK ListView) 재사용"
+    ],
+    "example_games": [
+     "The Last of Us Part II",
+     "Celeste",
+     "Forza Horizon 5"
+    ],
+    "sources": [
+     "https://gameaccessibilityguidelines.com/full-list/",
+     "https://learn.microsoft.com/en-us/gaming/accessibility/guidelines",
+     "https://docs.unity.cn/Packages/com.unity.inputsystem@1.8/api/UnityEngine.InputSystem.InputActionRebindingExtensions.html",
+     "https://discussions.unity.com/t/ui-buttons-are-triggered-multiple-times-when-rebinding-controls/1547237",
+     "https://news.xbox.com/en-us/2021/10/01/xbox-announces-accessibility-updates/"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "touch-controls-layout",
+    "name_ko": "터치 조작·HUD 배치 편집",
+    "group": "G",
+    "paradigm": "non-diegetic",
+    "what_ko": "모바일 가상 조이스틱 표본입니다. 고정·플로팅·다이내믹 방식을 바꿔 가며 비교하고 데드존·반경을 조절합니다. 여기에 플레이어가 버튼을 끌어 옮기고 크기·투명도를 바꿔 저장하는 HUD 배치 편집 모드를 붙입니다.",
+    "why_ko": "팀 프로젝트의 절반이 모바일이라고 가정하면 가장 실용적인 갭입니다. GAG 중급 항목(크기 조절 UI, 위치 재배치 UI)과 XAG 107의 터치 입력 하위 지침이 그대로 대응합니다. 기존 백로그의 가상 조이스틱과 겹치지만, 배치 편집까지 더하면 접근성 표본이 됩니다.",
+    "teaching_points_ko": [
+     "플로팅·고정 조이스틱의 차이와 사용성 비교(소규모 연구 근거)",
+     "Input System의 On-Screen Stick·Button과 EnhancedTouch 멀티터치",
+     "Canvas Scaler·Safe Area(노치) 대응, 앵커 기반 저장 좌표",
+     "배치 편집 모드: 드래그·핀치 크기 조절과 JSON 저장",
+     "UITK: 포인터 이벤트와 PanelSettings 스케일 모드"
+    ],
+    "example_games": [
+     "PUBG Mobile",
+     "Call of Duty: Mobile",
+     "Genshin Impact"
+    ],
+    "sources": [
+     "https://gameaccessibilityguidelines.com/full-list/",
+     "https://learn.microsoft.com/ar-sa/xbox/accessibility/xag-version-history",
+     "https://repository.upi.edu/101077"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "focus-narration",
+    "name_ko": "UI 포커스 표시·화면 낭독",
+    "group": "G",
+    "paradigm": "screen",
+    "what_ko": "패드·키보드로 메뉴를 이동할 때 포커스 테두리가 늘 보이고, 화면 밖 항목으로 가면 스크롤이 따라오는 동작을 보여 줍니다. 포커스가 바뀌거나 값이 바뀔 때 화면 낭독기가 읽을 문장(이름, 역할, 값, 힌트)을 낭독 로그로 보여 주고, 원하면 브라우저 음성으로 읽어 줍니다.",
+    "why_ko": "XAG 106(화면 낭독), 112(UI 탐색), 113(포커스 처리)이 모두 이 영역이고, GAG 시각 고급 항목(메뉴 화면 낭독)도 같습니다. Unity 6.3에 Windows·macOS 화면 낭독 지원이 들어와 모바일 TalkBack·VoiceOver와 같은 API로 가르칠 수 있게 되었습니다. 기존 main-pause-menu가 탐색을 일부 보여 주겠지만, 포커스·낭독을 중심으로 다루는 표본은 없습니다.",
+    "teaching_points_ko": [
+     "UGUI: EventSystem, Selectable의 Navigation(Explicit, Automatic), 첫 선택 지정과 ScrollRect 자동 스크롤",
+     "UITK: focusable·tabIndex, :focus USS 의사 클래스, NavigationMoveEvent",
+     "Unity Accessibility 모듈: AssistiveSupport, AccessibilityHierarchy, AccessibilityNode(label, value, hint, role)와 Hierarchy Viewer",
+     "낭독 시점: 맥락 변경, 포커스 변경, 값 변경, 실시간 알림",
+     "대비 기준(비활성 요소 3:1)과 포커스 표시 디자인"
+    ],
+    "example_games": [
+     "The Last of Us Part II",
+     "Forza Horizon 5",
+     "Hearthstone"
+    ],
+    "sources": [
+     "https://devdocs.xbox.com/gaming/accessibility/xbox-accessibility-guidelines/106",
+     "https://dotnet.territoriali.olinfo.it/en-us/gaming/accessibility/xbox-accessibility-guidelines/113",
+     "https://discussions.unity.com/t/native-desktop-screen-reader-support-now-available-in-unity-6-3/1681788",
+     "https://docs.unity3d.com/Manual/accessibility/module-intro.html",
+     "https://docs.unity.com/en-us/engine/6000.3/script-reference/unityengine/accessibility/accessibilitynode"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "sound-visualizer",
+    "name_ko": "소리 방향 시각화",
+    "group": "C",
+    "paradigm": "non-diegetic",
+    "what_ko": "발소리·총성·상자 같은 중요한 소리가 어느 방향에서 났는지 화면 중앙의 링에 아이콘과 호(弧)로 보여 줍니다. 거리에 따라 크기·불투명도가 바뀌고 일정 시간 뒤 사라지며, 소리 종류별 아이콘과 우선순위가 있습니다.",
+    "why_ko": "GAG 청각 중급 '소리 정보의 시각 단서'와 기본 '소리로만 전달하는 핵심 정보 금지', XAG 103(시각·청각 단서의 추가 채널)에 대응합니다. 기존 표본은 시각 정보 위주라 청각 대체 채널이 비어 있습니다. offscreen-waypoint와 방향 계산이 비슷하지만 대상이 소리 이벤트 큐라서 C 그룹 신규 표본으로 분리했습니다.",
+    "teaching_points_ko": [
+     "카메라 기준 상대 각도 계산(Vector3.SignedAngle)과 링 위 배치",
+     "소리 이벤트 버스와 수명·우선순위 큐, 같은 소리 합치기",
+     "색만으로 구분하지 않기: 아이콘 모양과 색을 함께 쓴다",
+     "UGUI: Image.fillAmount 호와 회전 / UITK: Painter2D Arc로 호 그리기"
+    ],
+    "example_games": [
+     "Fortnite",
+     "Apex Legends",
+     "Call of Duty: Modern Warfare II"
+    ],
+    "sources": [
+     "https://gameaccessibilityguidelines.com/full-list/",
+     "https://learn.microsoft.com/en-us/gaming/accessibility/guidelines"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "confirm-modal-stack",
+    "name_ko": "확인 모달·뒤로 가기 스택",
+    "group": "D",
+    "paradigm": "screen",
+    "what_ko": "삭제·판매·초기화 같은 파괴적 행동에 쓰는 확인 모달입니다. 기본 포커스를 안전한 쪽에 두고, 길게 눌러 확정하는 방식과 되돌리기 토스트를 함께 보여 줍니다. 모달이 여러 겹 열렸을 때 ESC·안드로이드 뒤로 가기로 하나씩 닫는 화면 스택과 오류 메시지 문구 규칙도 다룹니다.",
+    "why_ko": "XAG 115(오류 메시지와 파괴적 행동)에 직접 대응하고, 실수로 아이템을 팔거나 세이브를 지우는 문제는 수강생 프로젝트에서 실제로 자주 생깁니다. main-pause-menu가 단일 메뉴 흐름이라면, 이 표본은 모든 메뉴에 깔리는 기반 구조(UI 스택)를 가르칩니다.",
+    "teaching_points_ko": [
+     "UI 스택 매니저: Push/Pop, 입력 차단, 포커스 복원",
+     "기본 포커스는 '취소', 확정은 길게 누르기(진행 링)",
+     "되돌리기 토스트와 확인창, 각각 언제 쓰는가",
+     "UGUI: CanvasGroup.blocksRaycasts와 정렬 순서 / UITK: 오버레이 VisualElement와 pickingMode",
+     "오류 문구: 원인과 해결 방법을 함께, 코드는 숨긴다"
+    ],
+    "example_games": [
+     "Destiny 2",
+     "Overwatch 2",
+     "Monster Hunter: World"
+    ],
+    "sources": [
+     "https://learn.microsoft.com/en-us/gaming/accessibility/guidelines",
+     "https://devdocs.xbox.com/build/game-principles/accessibility/xbox-accessibility-guidelines"
+    ],
+    "cost": "low",
+    "extends_existing": "main-pause-menu",
+    "strength": 4
+   },
+   {
+    "id": "radial-wheel",
+    "name_ko": "방사형 선택 휠",
+    "group": "G",
+    "paradigm": "non-diegetic",
+    "what_ko": "버튼을 누르고 있는 동안 무기·감정 표현·도구 휠이 열리고, 스틱·마우스·터치의 방향 각도로 칸을 고릅니다. 데드존, 칸 개수와 간격, 열린 동안의 시간 감속, 놓으면 확정 또는 탭해서 확정 방식을 조절할 수 있습니다.",
+    "why_ko": "백로그의 무기 휠을 검증해 보니 패드 입력 UI의 대표 패턴이고, 모든 칸이 중심에서 같은 거리에 있다는 원리가 글로 잘 설명되어 있습니다. 기존 13개에는 아날로그 방향 선택 UI가 없습니다. GAG의 '꾹 누르기 피하기' 항목과 연결해 토글 방식 옵션도 함께 가르칠 수 있습니다.",
+    "teaching_points_ko": [
+     "Atan2로 각도를 칸 인덱스로 바꾸기, 데드존과 경계 히스테리시스",
+     "Time.timeScale 감속과 UI는 unscaledDeltaTime으로 처리",
+     "누르고 있기와 토글 방식 옵션(접근성)",
+     "UGUI: Image Radial fill로 칸 만들기 / UITK: Painter2D로 부채꼴 그리기"
+    ],
+    "example_games": [
+     "Grand Theft Auto V",
+     "Red Dead Redemption 2",
+     "Ratchet & Clank: Rift Apart"
+    ],
+    "sources": [
+     "https://300mind.studio/blog/radial-menus-in-game-design/",
+     "https://gameaccessibilityguidelines.com/full-list/"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "tutorial-spotlight",
+    "name_ko": "튜토리얼 강조·맥락 힌트",
+    "group": "D",
+    "paradigm": "screen",
+    "what_ko": "화면을 어둡게 덮고 특정 버튼만 뚫어 보여 주는 스포트라이트, 말풍선 코치마크, 행동을 실제로 해야 넘어가는 단계를 보여 줍니다. 일정 시간 입력이 없을 때 뜨는 조작 리마인더와 목표 리마인더도 포함합니다.",
+    "why_ko": "GAG 인지 기본 '상호작용형 튜토리얼'과 중급 '조작 리마인더', '목표 리마인더', '맥락 도움말'에 대응합니다. Celia Hodent의 온보딩 원칙(필요할 때 하나씩, 해 보며 배우기)도 글로 잘 정리되어 있습니다. 모바일 게임 수강생 프로젝트에서 수요가 높고 백로그의 튜토리얼 강조와도 일치합니다.",
+    "teaching_points_ko": [
+     "스포트라이트 마스크: UGUI는 반전 마스크 또는 4분할 패널, UITK는 오버레이 위의 구멍 요소",
+     "단계 정의 데이터(ScriptableObject)와 완료 조건 이벤트",
+     "유휴 타이머 기반 조작 리마인더",
+     "강조 대상 RectTransform을 화면 좌표로 추적하기"
+    ],
+    "example_games": [
+     "Clash Royale",
+     "Fortnite",
+     "Portal 2"
+    ],
+    "sources": [
+     "https://gameaccessibilityguidelines.com/full-list/",
+     "https://gamedeveloper.com/design/video-inside-the-ux-of-onboarding-and-player-engagement",
+     "https://www.wayline.io/blog/tutorial-as-onboarding-ux-lessons-new-players"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "skill-tree",
+    "name_ko": "스킬트리·성장 노드",
+    "group": "E",
+    "paradigm": "screen",
+    "what_ko": "노드 그래프 형태의 스킬트리입니다. 잠김·습득 가능·습득·최대 상태를 색과 모양·아이콘으로 함께 구분하고, 선행 조건 연결선, 포인트 소비와 초기화, 확대·이동, 습득 가능한 노드 강조를 보여 줍니다.",
+    "why_ko": "E 그룹에는 인벤토리와 결과 화면만 있고 성장 축이 없습니다. 실제 사례(Diablo IV 출시 때 가독성 비판, 확대하면 글자가 안 읽히는 문제)에서 가독성 원칙을 끌어낼 수 있습니다. RPG를 기획하는 수강생 팀이 많아 수요가 확실합니다.",
+    "teaching_points_ko": [
+     "노드 상태 기계와 색에만 의존하지 않는 표시",
+     "그래프 데이터(ScriptableObject 또는 TSV)와 선행 조건 검사",
+     "연결선 그리기: UGUI UILineRenderer 직접 구현 / UITK Painter2D",
+     "팬·줌 컨테이너와 확대 단계별 글자 크기 유지(LOD)"
+    ],
+    "example_games": [
+     "Path of Exile",
+     "Diablo IV",
+     "Ghost of Tsushima"
+    ],
+    "sources": [
+     "https://www.icy-veins.com/forums/topic/52508-official-response-to-feedback-regarding-the-diablo-4-skill-tree/",
+     "https://mwomercs.com/forums/topic/244864-skill-tree-first-impressions-reflection",
+     "https://git.cleverlibre.org/aethyr/Aethyr/issues/235"
+    ],
+    "cost": "medium",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "loading-screen",
+    "name_ko": "로딩 화면·체감 대기 시간",
+    "group": "D",
+    "paradigm": "screen",
+    "what_ko": "씬 비동기 로딩 진행 바, 팁과 이야기 요약 회전, 짧은 대기에는 스피너만 쓰고 긴 대기에는 진행 바를 쓰는 기준, 대기 중 상호작용(조작 연습)을 보여 줍니다. 진행 바 애니메이션 방식에 따라 체감 시간이 어떻게 달라지는지도 비교합니다.",
+    "why_ko": "모든 팀 프로젝트에 씬 전환이 있지만 기존 13개에는 흐름 사이의 대기 화면이 없습니다. 체감 대기 시간에 관한 UX 연구 근거(진행 바와 반복 애니메이션의 차이, 감속하며 뒤로 흐르는 줄무늬)가 있어 원리 수업으로 좋습니다. 백로그 항목도 검증되었습니다.",
+    "teaching_points_ko": [
+     "SceneManager.LoadSceneAsync, allowSceneActivation, progress가 0.9에서 멈추는 특성",
+     "실제 진행률과 표시 진행률 분리(부드럽게 보간)",
+     "대기 시간 구간별로 스피너와 진행 바 선택하기",
+     "Addressables 로딩 진행률 연동(선택)"
+    ],
+    "example_games": [
+     "Bayonetta",
+     "The Witcher 3: Wild Hunt",
+     "Marvel's Spider-Man"
+    ],
+    "sources": [
+     "https://uxmovement.com/buttons/how-to-make-progress-bars-feel-faster-to-users/",
+     "https://wiki.mi.uni-r.de/arbeiten/evaluating_interactive_loading_screens",
+     "https://indieklem.substack.com/p/14-how-to-fake-faster-loading-times"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 3
+   }
+  ]
+ },
+ {
+  "lens": "mobile-live",
+  "lens_summary_ko": "모바일·라이브서비스 관점에서는 기존 13개 표본이 모두 '플레이 중' UI(HUD·메뉴·대화)에 몰려 있어, 한국 모바일 게임이 매일 접하는 '메타 화면'(뽑기, 배틀패스, 출석, 상점·재화, 레드닷, 에너지)과 '터치 입력·화면 대응'(가상 조이스틱, 세이프 에어리어)이 통째로 비어 있다. 이 공백이 가장 크고, PC·모바일 반반인 팀 프로젝트에서 수강생이 실제로 만들게 되는 UI라 포트폴리오 가치도 높다. 특히 한국은 2024-03-22부터 게임산업법 시행령(제19조의2, 별표 3의2)으로 확률형 아이템(캡슐형·강화형·합성형·컴플리트 가챠·천장)의 확률 표시가 의무화되었다. 공정위가 넥슨에 확률 변경 미고지로 116억 원 과징금을 부과했고, 구매 의사 확인 절차와 청약철회 안내, '이 창을 닫으면 다시 구매 불가' 같은 유인 문구 제재 사례도 있다. 그래서 '확률표·천장 카운터·구매 확인 팝업'은 장식이 아니라 법적 요구사항이고, 이를 UI로 정확히 구현하는 법(확률 데이터 하나로 실제 추첨과 표시를 같이 처리하기, 서버가 결정하고 클라이언트는 연출만 하기)이 한국 강의만의 강점이 된다. 대부분 2D·데이터 기반이라 용량 부담이 적다. 우선순위는 레드닷 트리, 가상 조이스틱, 뽑기+확률표, 배틀패스 트랙, 세이프 에어리어 순으로 권한다.",
+  "candidates": [
+   {
+    "id": "gacha-reveal-odds",
+    "name_ko": "뽑기 연출 + 확률표·천장 카운터",
+    "group": "E",
+    "paradigm": "meta",
+    "what_ko": "10연차 뽑기 결과를 2단계로 공개하는 연출(먼저 빛 색·카드 테두리로 최고 등급을 암시하고, 다음에 카드를 뒤집어 아이템 공개), 그리고 '건너뛰기·결과 일괄 보기' 버튼, 배너 화면의 '확률 정보' 표, 천장까지 남은 횟수 카운터를 한 세트로 보여 준다. 파라미터는 등급별 확률, 천장 횟수, 연출 속도·건너뛰기 허용 여부.",
+    "why_ko": "한국·아시아 모바일 게임 수익 구조의 중심이고, 한국에서는 2024-03-22부터 확률 표시가 법적 의무다(캡슐형은 모든 아이템의 종류·등급·확률, 천장제도도 표시 대상). Apple(3.1.1)·Google Play도 구매 전 확률 공개를 요구한다. 보기 좋은 연출과 법이 요구하는 투명성을 한 화면에서 함께 가르칠 수 있는 유일한 소재다. 백로그의 '뽑기 연출'을 확률 표시까지 넓혀 검증한 후보.",
+    "teaching_points_ko": [
+     "2단계 기대감: 등급 예고(색·빛)와 아이템 공개를 분리해 '좋은 결과'를 두 번 느끼게 하는 타이밍 설계",
+     "건너뛰기·일괄 보기는 필수. 반복 시청 피로와 접근성 관점",
+     "데이터 일원화: 확률 테이블(ScriptableObject/JSON) 하나를 추첨 로직과 확률표 UI가 같이 읽는다. 표시와 실제가 어긋나면 위법이고, 넥슨 116억 과징금 사례가 그 예",
+     "결과는 서버가 결정하고 클라이언트는 연출만 한다는 원칙(클라이언트 난수 금지)",
+     "천장 카운터는 남은 횟수와 '확정' 상태를 분명히 보여 주는 진행 바로 만든다",
+     "Unity: UGUI는 Animator/Timeline으로 카드 뒤집기와 CanvasGroup 페이드, UI Toolkit은 USS transition과 rotate·scale, 그리고 ListView로 확률표 구현",
+     "윤리: 아깝게 놓친 듯 보이는 연출(near-miss)이 더 뽑게 만든다는 점, 그리고 거기에 쓰이는 다크패턴을 함께 짚기"
+    ],
+    "example_games": [
+     "원신",
+     "붕괴: 스타레일",
+     "블루 아카이브",
+     "니케"
+    ],
+    "sources": [
+     "https://www.ajunews.com/view/20240102104711033",
+     "https://www.dailian.co.kr/news/view/1294309/",
+     "https://newstomato.com/ReadNews.aspx?no=1214731",
+     "https://www.fenwick.com/insights/publications/apple-now-requires-disclosure-of-loot-box-odds",
+     "https://fenwick.com/insights/publications/google-play-now-requires-disclosure-of-loot-box-odds",
+     "https://gurugamer.com/mobile-games/the-actual-psychology-behind-why-a-banner-pull-feels-so-good-27122",
+     "https://pressbooks.library.torontomu.ca/visualculture-howtosee/chapter/chapter-6/"
+    ],
+    "cost": "medium",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "red-dot-badge-tree",
+    "name_ko": "레드닷 알림 배지 트리",
+    "group": "C",
+    "paradigm": "meta",
+    "what_ko": "로비 메뉴 → 하위 탭 → 개별 항목으로 이어지는 레드닷(빨간 점·숫자 배지)이 트리 구조로 위로 전파되는 데모. 가장 깊은 항목을 확인하면 부모 점들이 차례로 꺼지는 것을 보여 주고, 보조 패널에 트리 상태를 함께 띄운다. 파라미터는 점/숫자/'N' 표시 방식, 숫자 상한(99+), 전파 규칙(합산/OR).",
+    "why_ko": "한국 모바일 게임 로비에 빠짐없이 들어가고, 팀 프로젝트에서 이벤트·우편·퀘스트가 늘수록 반드시 꼬이는 기능이다. 그림은 단순하지만 구현은 상태 관리 설계 문제라서, 면접에서 '옵저버 패턴으로 레드닷을 설계했다'고 말할 수 있는 포트폴리오 소재가 된다. 기존 quest-tracker-toasts는 일회성 알림 큐이고, 이것은 계속 유지되는 '확인 필요' 상태라 겹치지 않는다. 에셋이 필요 없어 비용도 가장 낮다.",
+    "teaching_points_ko": [
+     "경로 키('Lobby/Mail/Gift') 기반 노드 트리, 자식 개수의 합산을 부모로 전파",
+     "옵저버 패턴: 데이터 노드와 UI 배지를 분리해 배지가 데이터 변경을 구독하게 만들기",
+     "레드닷 남발 방지: 우선순위와 '본 적 있음' 처리, 사용자 피로",
+     "Unity: UGUI는 배지 프리팹 + 이벤트 구독, UI Toolkit은 VisualElement에 USS 클래스(.has-badge) 토글",
+     "저장 위치 결정: 클라이언트에 둘지(PlayerPrefs), 서버 동기화가 필요한지"
+    ],
+    "example_games": [
+     "로스트아크 모바일 메뉴",
+     "블루 아카이브",
+     "쿠키런: 킹덤"
+    ],
+    "sources": [
+     "https://www.besthub.dev/tags/red-dot",
+     "https://awesome.ecosyste.ms/projects/github.com%2Fblacksentrydevxo%2Funity-ui-badge-notification-system"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "virtual-joystick-touch-layout",
+    "name_ko": "가상 조이스틱 + 터치 버튼 배치",
+    "group": "G",
+    "paradigm": "screen",
+    "what_ko": "고정형·플로팅형·다이내믹형(손가락을 따라오는) 가상 조이스틱을 전환하며 비교하고, 오른쪽 엄지 영역에 공격·스킬 버튼을 호 형태로 배치한 모바일 컨트롤 레이아웃을 보여 준다. 드래그로 버튼 위치·크기·투명도를 바꾸는 '레이아웃 편집 모드'를 포함한다. 파라미터는 데드존, 최대 반경, 복귀 속도, 투명도, 좌우 반전.",
+    "why_ko": "팀 프로젝트의 절반은 모바일인데, 지금 갤러리에는 터치 입력 표본이 하나도 없다. 조이스틱이 '조작감 나쁨'으로 가장 자주 지적받는 이유는 데드존·반경·플로팅 여부 같은 구체적인 값 때문이라, 조절 파라미터 데모와 잘 맞는다. 연구·실무 자료 모두 플로팅이 배우기 쉽고 고정형은 근육 기억에 유리하다는 장단점을 제시하므로 비교 데모의 근거가 분명하다. skill-cooldown-prompt와는 입력 장치 쪽이라는 점에서 다르다.",
+    "teaching_points_ko": [
+     "데드존·최대 반경·입력 정규화(벡터 크기 0~1)와 아날로그 속도 매핑",
+     "플로팅 vs 고정: 엄지 위치 학습 부담과 화면 가림의 트레이드오프",
+     "멀티터치: 포인터 ID별로 조이스틱과 버튼을 구분하기",
+     "엄지 도달 영역(thumb zone)과 최소 터치 크기",
+     "Unity: Input System의 OnScreenStick/OnScreenButton, UGUI는 IPointerDown/IDrag 핸들러, UI Toolkit은 PointerCapture와 PointerMoveEvent",
+     "레이아웃 편집 결과를 정규화 좌표로 저장해 화면비가 바뀌어도 유지하기"
+    ],
+    "example_games": [
+     "브롤스타즈",
+     "원신 모바일",
+     "배틀그라운드 모바일",
+     "리니지M"
+    ],
+    "sources": [
+     "https://repository.upi.edu/101077",
+     "https://www.construct.net/en/tutorials/touch-stick-controllers-241",
+     "https://publications.ait.ac.at/de/publications/investigating-on-screen-gamepad-designs-for-smartphone-controlled/",
+     "https://discussions.unity.com/t/opinions-wanted-why-are-joystick-controls-so-terrible-on-mobile/640042",
+     "https://bugnet.io/blog/how-to-fix-mobile-virtual-joystick-feeling-bad"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "battle-pass-track",
+    "name_ko": "배틀패스 보상 트랙",
+    "group": "E",
+    "paradigm": "meta",
+    "what_ko": "무료·프리미엄 2단 보상 트랙을 가로로 스크롤하고, 각 칸이 잠김/수령 가능/수령 완료 상태를 갖는다. 현재 레벨 위치로 자동 스냅하고 '모두 받기' 버튼을 둔다. 패스 경험치 바와 시즌 남은 기간 카운트다운, 주간 미션 목록을 함께 보여 준다. 파라미터는 레벨 수, 무료 보상 간격, 프리미엄 구매 여부 토글.",
+    "why_ko": "라이브서비스 게임의 표준 수익 모델이고, 모바일·PC 공통으로 쓰인다. 자료들은 '잠김·수령 가능 상태를 한눈에 보여 줄 것', '2단 트랙이 화면을 잡아먹지 않게 할 것', '무료 보상은 2~3칸 간격으로 배치할 것'을 공통 원칙으로 든다. 가로 가상화 스크롤, 상태 머신, 스냅이라는 Unity 기술 과제도 분명하다. inventory-grid-tooltip은 보유 아이템 그리드이고, 이것은 시간·진행에 따른 보상 트랙이라 겹치지 않는다.",
+    "teaching_points_ko": [
+     "보상 칸 상태 머신(Locked → Claimable → Claimed)과 시각 구분(색·아이콘·흔들림)",
+     "무료 트랙 옆에 '놓친 프리미엄 보상'을 보여 주는 배치의 효과와 윤리",
+     "현재 레벨로 자동 스크롤·스냅, '모두 받기'로 한꺼번에 처리",
+     "Unity: UGUI는 ScrollRect + 오브젝트 풀링으로 가상화, UI Toolkit은 가로 ListView(virtualization)와 ScrollView.ScrollTo",
+     "시즌 종료 카운트다운은 서버 UTC 기준으로 계산하고 로컬 시간을 믿지 않기"
+    ],
+    "example_games": [
+     "포트나이트",
+     "브롤스타즈",
+     "클래시 로얄 패스 로얄",
+     "원신 기행"
+    ],
+    "sources": [
+     "https://www.gamedeveloper.com/game-platforms/let-s-talk-battle-passes-part-1",
+     "https://www.gamedeveloper.com/design/7-tips-to-create-and-improve-battle-pass",
+     "https://docs.unity.com/ugs/en-us/solutions/manual/BattlePasses",
+     "https://medium.com/@joelsgrobinson/overwatch-ui-redesign-b32e8fa32685"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "safe-area-aspect-fit",
+    "name_ko": "세이프 에어리어·화면비 대응",
+    "group": "G",
+    "paradigm": "screen",
+    "what_ko": "가상 기기 프레임(노치·펀치홀·둥근 모서리·홈 인디케이터)과 화면비(16:9, 19.5:9, 21:9, 4:3 태블릿, 가로/세로)를 바꿔 가며, 같은 HUD가 세이프 에어리어 적용 전후로 어떻게 잘리거나 맞춰지는지 보여 주는 시뮬레이터. 오버레이로 안전 영역을 시각화한다.",
+    "why_ko": "모바일 빌드에서 수강생이 가장 흔하게 겪는 실전 버그(노치에 가린 버튼, 태블릿에서 깨지는 레이아웃)를 정면으로 다룬다. Unity 공식 문서도 상호작용 요소는 safeArea 안에 두라고 권하고, Android 15부터는 항상 노치 영역까지 그린다는 변화가 있어 최신성도 있다. UI Toolkit은 좌표 원점이 달라 y를 뒤집어야 한다는 함정이 있어 UGUI·UITK 비교 교재로 좋다. 모든 표본의 '전제 조건'이 되는 기반 표본이다.",
+    "teaching_points_ko": [
+     "Screen.safeArea는 픽셀 Rect이고 원점이 왼쪽 아래라는 점. 노치·오버스캔 대응",
+     "UGUI: CanvasScaler의 Match Width/Height 선택과 SafeArea용 RectTransform 앵커 조정(uGUI 패키지의 SafeArea 컴포넌트는 Unity 6.3 기본 패키지 버전에 있는지 확인 필요)",
+     "UI Toolkit: 원점이 왼쪽 위라 Screen.height - y로 뒤집은 뒤 루트 VisualElement의 padding에 반영",
+     "Android 15 이상은 renderOutsideSafeArea가 무시되고 항상 노치까지 렌더링되므로, 배경은 꽉 채우고 UI만 안쪽에 두는 원칙",
+     "Device Simulator로 기기별 검증하는 작업 흐름"
+    ],
+    "example_games": [
+     "모든 모바일 게임 공통(전용 사례 없음)"
+    ],
+    "sources": [
+     "https://docs.unity.com/en-us/engine/6000.3/script-reference/unityengine/screen/safearea",
+     "https://docs.unity3d.com/Packages/com.unity.ugui@2.6/manual/script-SafeArea.html",
+     "https://discussions.unity.com/t/canvashelper-resizes-a-recttransform-to-iphone-xs-safe-area/694329"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "currency-bar-shop-purchase",
+    "name_ko": "재화 바 + 상점 + 구매 확인",
+    "group": "E",
+    "paradigm": "meta",
+    "what_ko": "화면 상단에 늘 떠 있는 재화 바(골드·유료 재화·에너지와 '+' 충전 버튼), 상점 진열(묶음 상품·할인·한정 기간 표시), 구매 확인 팝업(가격, 구매 후 잔액, 청약철회 안내, 재화 부족 시 충전 유도), 획득한 재화가 바로 날아가며 숫자가 올라가는 피드백을 한 흐름으로 보여 준다. '정직한 UI / 다크패턴' 토글로 차이를 비교한다.",
+    "why_ko": "출석·배틀패스·뽑기 등 모든 메타 화면이 공유하는 공통 부품이다. 한국에서는 공정위가 결제 단계의 구매 의사 확인 절차를 요구하고, '이 창을 닫으면 다시 구매할 수 없습니다' 같은 유인 문구와 환불 가능 아이템의 환불 불가 안내를 제재한 사례가 있다. 그래서 UI 문구와 흐름 자체가 법적 쟁점이다. 잔액 표시, 실제 가격 숨기기, 가격 앵커링 같은 다크패턴 연구도 풍부해 원리로 설명하기 좋다. 백로그의 '상점'을 검증하고 넓힌 후보.",
+    "teaching_points_ko": [
+     "재화 바는 씬이 바뀌어도 유지되는 공용 UI(DontDestroyOnLoad 또는 공용 UIDocument)와 데이터 바인딩",
+     "구매 확인 팝업에 들어갈 정보: 가격, 구매 후 잔액, 청약철회 가능 여부. 유인 문구 금지",
+     "다크패턴 비교: 재화 단위로 실제 가격 가리기, 가격 앵커링, 기본값을 구매로 두기",
+     "획득 피드백: 아이콘이 재화 바로 날아가는 연출(베지어 경로) + 숫자 카운트업",
+     "Unity: UGUI는 오브젝트 풀링으로 코인 비행, UI Toolkit은 runtime data binding과 transition, Unity IAP 연동 지점 설명"
+    ],
+    "example_games": [
+     "클래시 오브 클랜",
+     "쿠키런: 킹덤",
+     "브롤스타즈"
+    ],
+    "sources": [
+     "https://www.gamemeca.com/view.php?gid=100991",
+     "https://mobile.newsis.com/view/NISX20190626_0000692144",
+     "https://arxiv.org/pdf/2412.05039",
+     "https://www.pocketgamer.biz/comment-and-opinion/78654/currency-confusion-reduces-player-trust-f2p-edd-coates/",
+     "https://adriancrook.com/5-psychological-pricing-tactics-for-freemium-games/"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "daily-login-calendar",
+    "name_ko": "출석 보상 캘린더",
+    "group": "E",
+    "paradigm": "meta",
+    "what_ko": "7일(또는 28일) 출석판에서 오늘 칸 강조와 받기 버튼 펄스, 수령 완료 도장, 놓친 날, 7일차 큰 보상, 다음 초기화까지 남은 시간 카운트다운을 보여 준다. 그리드형/타임라인형 레이아웃 전환과 '연속 출석/누적 출석' 규칙 토글을 둔다.",
+    "why_ko": "한국 모바일 게임 수익화 분석에서 대부분의 게임이 쓴다고 보고될 만큼 보편적이고, 접속 직후 첫 팝업이라 신입 UI 개발자가 처음 맡기 쉬운 화면이다. 구현 자체는 쉽지만 '하루의 기준'(서버 UTC와 지역 초기화 시각), 연속 출석과 누적 출석의 차이, 놓쳤을 때 손실 회피 심리 같은 설계 판단을 가르치기 좋다.",
+    "teaching_points_ko": [
+     "보상 칸 상태(과거 수령/놓침/오늘/미래)와 미래 보상을 미리 보여 주는 동기 부여",
+     "하루 경계: 서버 시간 기준 초기화 시각(예: 오전 5시)과 기기 시계 조작 방지",
+     "연속 출석은 놓치면 초기화, 누적 출석은 놓쳐도 진행. 피로도와 손실 회피의 차이",
+     "Unity: UGUI는 GridLayoutGroup, UI Toolkit은 flex-wrap 그리드 + USS 상태 클래스",
+     "접속 시 뜨는 팝업들의 순서 관리(출석 → 이벤트 → 공지)"
+    ],
+    "example_games": [
+     "메이플스토리M",
+     "쿠키런: 킹덤",
+     "드래곤 시티"
+    ],
+    "sources": [
+     "https://docs.unity.com/en-us/services/solutions/daily-rewards",
+     "https://beamable.com/blog/inspiring-examples-of-daily-login-rewards-for-your-mobile-game",
+     "https://www.gameanalytics.com/blog/appointment-mechanics-how-to-keep-your-players-in-game",
+     "https://nerdbot.com/2026/08/19/the-psychology-behind-daily-rewards-in-video-games/"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "energy-refill-timer",
+    "name_ko": "에너지(행동력) 회복 타이머",
+    "group": "A",
+    "paradigm": "meta",
+    "what_ko": "현재/최대 에너지(예: 37/60), '다음 1 회복까지 4:12'와 '전체 회복까지 1:23:00' 두 가지 타이머, 보상 등으로 최대치를 넘긴 상태(초과 표시, 회복 정지), 에너지 부족 시 입장 버튼 비활성과 충전 팝업을 보여 준다. 시간 배속 슬라이더로 오프라인 경과를 시뮬레이션한다.",
+    "why_ko": "스테이지형 모바일 게임과 수집형 RPG에서 표준적인 시간 제한 장치다. UI는 작지만 '앱을 끄고 다시 켰을 때 얼마나 찼는가'를 계산하는 시간 로직이 핵심이라, 수강생이 가장 많이 틀리는 부분을 데모로 보여 줄 수 있다. 출석 캘린더와 같은 시간 처리 원리를 공유하므로 묶어서 가르치기 좋다.",
+    "teaching_points_ko": [
+     "마지막 회복 시각 + 경과 시간으로 현재값을 계산. 매초 증가시키는 방식은 오답",
+     "최대치에서 타이머 정지, 최대치 초과는 허용하되 그동안 회복 정지",
+     "OnApplicationPause/Focus로 복귀 시 다시 계산하고, 서버 시간으로 시계 조작 방지",
+     "부족할 때 결과(버튼 비활성, 남은 시간)를 직접 보여 주기",
+     "Unity: DateTime.UtcNow·TimeSpan 포맷, UI Toolkit 라벨 바인딩, 로컬 알림(가득 참) 연결"
+    ],
+    "example_games": [
+     "캔디 크러시(하트)",
+     "붕괴: 스타레일(개척력)",
+     "프린세스 커넥트"
+    ],
+    "sources": [
+     "https://forum.heroiclabs.com/t/regenerating-energy-and-timer/389",
+     "https://uefncentral.com/nl/blog/how-to-build-stamina-and-energy-systems-in-uefn-th"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 3
+   },
+   {
+    "id": "auto-battle-speed-toggle",
+    "name_ko": "자동 전투·배속·절전 모드",
+    "group": "G",
+    "paradigm": "screen",
+    "what_ko": "전투 HUD 구석의 자동 전투 토글(수동/반자동/완전 자동), 배속 버튼(1x/2x/3x), 절전 모드(화면을 어둡게 하고 획득 요약만 표시, 밀어서 해제)를 보여 준다. 자동 상태를 화면 테두리나 아이콘 회전으로 상시 알리는 방식도 비교한다.",
+    "why_ko": "한국 모바일 RPG·MMORPG 특유의 필수 UI로, 국내 논문은 불편한 모바일 조작과 짧고 잦은 접속 패턴이 오토 시스템 성공의 원인이라고 분석한다. 한국 취업 시장(모바일 RPG 개발사)에서 바로 쓰이는 지식이고, '자동화는 끄고 켤 수 있어야 한다', '지금 자동 상태인지 늘 보여야 한다' 같은 상태 표시 원리를 가르치기 좋다. 다만 해외 레퍼런스가 적고 설계 원리를 다룬 공개 자료가 부족하다.",
+    "teaching_points_ko": [
+     "모드 상태를 계속 보여 주기(테두리·아이콘 애니메이션), 수동 입력 시 자동 해제 규칙",
+     "배속은 Time.timeScale 대신 게임 전용 시간 스케일로 처리해 UI 애니메이션 속도와 분리",
+     "절전 모드: 화면 밝기를 낮추고 Application.targetFrameRate를 낮추며, 획득 요약 오버레이와 밀어서 해제",
+     "Unity: UGUI는 Toggle 그룹, UI Toolkit은 RadioButtonGroup과 USS 상태 표시"
+    ],
+    "example_games": [
+     "리니지M",
+     "오딘: 발할라 라이징",
+     "세븐나이츠 키우기"
+    ],
+    "sources": [
+     "https://koreascience.or.kr/article/JAKO201909055503142.do",
+     "https://www.bluestacks.com/ko/blog/bluestacks-exclusives/lineage-m-eco-mode-ko.html",
+     "https://tilnote.io/pages/6a084ccf215f88a030ad2ddf"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 3
+   }
+  ]
+ },
+ {
+  "lens": "education-jobs",
+  "lens_summary_ko": "교육·취업 관점에서 보면 기존 13개는 '보이는 HUD·화면' 위주라서, 국내 공고가 실제로 묻는 'UI 구조·최적화·데이터 연결' 역량을 보여 주는 표본이 비어 있다. 공고에는 UGUI 실무, 프리팹·UI 구조 이해, 아틀라스·캔버스 분리·배칭 최적화, 프로파일러로 병목 해결, UGUI 또는 UI Toolkit 상용화 경험이 반복해서 나온다. 그래서 1순위는 팝업 스택(UIManager), 재활용 스크롤 리스트, 가상 조이스틱+세이프 에어리어다. 셋 다 학생 팀 프로젝트에 거의 반드시 들어가고 면접에서 설명하기 좋다. Unity 6 기능 쪽은 런타임 데이터 바인딩(INotifyBindablePropertyChanged), ListView 가상화, 6.2 World Space UI Toolkit, Localization Smart Strings, uGUI 2.6 SafeArea 컴포넌트가 공식 문서와 예제로 잘 정리되어 있어서 UGUI/UITK 두 방식을 나란히 보여 주는 갤러리 형식과 잘 맞는다. 후보 대부분은 2D 화면 UI라 용량 부담이 작다. 월드스페이스 이름표만 3D 씬이 필요해 비용이 중간이다.",
+  "candidates": [
+   {
+    "id": "popup-stack-modal",
+    "name_ko": "팝업 스택·확인 모달(UI 매니저)",
+    "group": "D",
+    "paradigm": "screen",
+    "what_ko": "팝업이 여러 겹 열리고 ESC·안드로이드 뒤로가기로 맨 위부터 닫히는 흐름을 보여 준다. 뒤 화면 입력 차단(딤 배경), '정말 나가시겠습니까?' 같은 확인/취소 모달, 열기/닫기 트랜지션이 들어간다. 데모에서 팝업을 쌓고 중간 팝업을 강제로 닫아 보며 스택과 연결 리스트 방식의 차이를 직접 볼 수 있다.",
+    "why_ko": "국내 강의 Q&A와 블로그에서 가장 자주 나오는 UI 구조 주제다(씬 UI와 팝업 UI 분리, 스택 관리). 공고의 'UI 구조와 프리팹에 대한 깊은 이해'와 바로 연결되고, 팀 프로젝트에서 UI를 맡은 학생이 처음 설계하는 부분이라 가르치면 바로 쓴다. 지금 main-pause-menu는 화면 하나의 메뉴이고, 여러 UI를 관리하는 구조 표본은 없다.",
+    "teaching_points_ko": [
+     "UIManager 싱글톤 + Stack<UIPopup> 또는 LinkedList(중간 팝업을 먼저 닫는 경우) 선택 기준",
+     "Canvas sortingOrder 자동 증가와 딤 배경 Image(Raycast Target)로 뒤 화면 입력 차단",
+     "Input System의 UI/Cancel 액션 하나로 ESC와 안드로이드 Back을 같이 처리",
+     "팝업 프리로드 + SetActive 재사용과 매번 Instantiate/Destroy 비교(GC·로딩 비용)",
+     "CanvasGroup alpha/interactable로 트랜지션 중 중복 클릭 방지, async/await 또는 DOTween으로 닫힘 완료 콜백 받기",
+     "UITK: 루트 VisualElement에 팝업 레이어를 추가하고 pickingMode·focus로 입력 차단, USS transition으로 애니메이션"
+    ],
+    "example_games": [
+     "모바일 RPG 전반(우편·설정·구매 확인 팝업)",
+     "원신(중첩 메뉴와 뒤로가기)",
+     "리그 오브 레전드 클라이언트(확인 모달)"
+    ],
+    "sources": [
+     "https://www.inflearn.com/community/questions/1798042/baseui-uimanager",
+     "https://velog.io/@jxng-min/키-바인딩-시스템-팝업-UI-관리자",
+     "https://velog.io/@kjhdx/Unity-UI-Manager",
+     "https://www.inflearn.com/community/questions/487021/ui-관련해서-질문드립니다"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "recycled-scroll-list",
+    "name_ko": "재활용 스크롤 리스트(랭킹·우편함)",
+    "group": "E",
+    "paradigm": "screen",
+    "what_ko": "1,000개 이상인 랭킹/우편함/친구 목록을 화면에 보이는 칸 수만큼의 셀로 돌려쓰며 스크롤한다. 데모에는 '생성된 셀 수 / 데이터 수' 카운터와 풀 크기 슬라이더를 두고, 재활용을 끈 상태와 비교할 수 있게 한다. 내 순위로 바로 이동, 당겨서 새로고침, 받기·모두 받기 버튼도 넣는다.",
+    "why_ko": "공고의 '캔버스 분리·동적 배칭 등 최적화 기법', '프로파일러로 UI 병목 해결' 우대사항을 가장 쉽게 보여 줄 수 있는 표본이다. 포트폴리오에 '셀 1000개를 12개로 줄임, 프로파일러 전후 비교'처럼 수치로 적을 수 있다. UGUI는 직접 구현(LoopScrollRect 계열)하고, UITK는 ListView 가상화가 기본 내장이라 두 방식을 비교하기에도 좋다.",
+    "teaching_points_ko": [
+     "ScrollRect.onValueChanged + content 위치로 보이는 인덱스 범위를 계산하고, 화면을 벗어난 셀을 반대쪽으로 옮겨 데이터를 다시 넣기",
+     "풀 크기는 보이는 셀 수 + 여유분(대략 2배), LayoutGroup/ContentSizeFitter를 쓰지 않고 위치를 직접 계산하는 이유(레이아웃 재빌드 비용)",
+     "스크롤 영역만 서브 캔버스로 분리해 다른 UI의 리빌드를 막기, Profiler의 UI/Canvas.SendWillRenderCanvases 확인",
+     "UITK ListView: makeItem/bindItem/unbindItem, fixedItemHeight 가상화, Unity 6 itemsSource 데이터 바인딩",
+     "ScrollToIndex(내 순위로 이동)와 끝에 닿으면 다음 페이지 요청(서버 페이징 흉내)",
+     "셀 프리팹을 데이터 클래스(ScriptableObject/JSON)와 분리한 MVP 구조"
+    ],
+    "example_games": [
+     "모바일 RPG 랭킹·우편함",
+     "클래시 로얄 클랜 목록",
+     "카카오 계열 게임 친구 목록"
+    ],
+    "sources": [
+     "https://github.com/random-logic/LoopScrollRect",
+     "https://openupm.com/packages/com.migzro.recyclablescrollrect/",
+     "https://github.com/disas69/Unity-Pooled-Scroll-List",
+     "https://docs.unity3d.com/Manual/UIE-runtime-binding-list-view.html",
+     "https://learn.unity.com/tutorial/optimizing-unity-ui",
+     "https://unity.com/kr/how-to/unity-ui-optimization-tips",
+     "https://www.gamejob.co.kr/Recruit/GI_Read_Comt_Ifrm?gno=280943"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "virtual-joystick-safe-area",
+    "name_ko": "가상 조이스틱·세이프 에어리어(모바일 입력 레이아웃)",
+    "group": "G",
+    "paradigm": "screen",
+    "what_ko": "고정형/플로팅형/따라오는형 가상 조이스틱과 공격·스킬 버튼 묶음을 노치·펀치홀 기기 프레임 안에서 보여 준다. 기기 프리셋(노치, 펀치홀, 태블릿)과 가로/세로를 바꾸면 SafeArea 안쪽으로 UI가 다시 배치된다. 데드존, 조작 반경, 투명도 슬라이더와 '게임패드 연결 시 숨김' 토글을 둔다.",
+    "why_ko": "팀 프로젝트의 절반이 모바일이라고 가정하면 거의 필수다. 그런데 노치 대응과 터치 영역 설계를 빼먹어 실기기에서 깨지는 일이 흔하다. Input System 공식 OnScreenStick과 uGUI 2.6 SafeArea 컴포넌트가 문서로 잘 정리되어 있어 수업 근거가 확실하다. skill-cooldown-prompt가 버튼 안내라면, 이 표본은 터치 입력 레이아웃 자체를 다룬다.",
+    "teaching_points_ko": [
+     "Input System OnScreenStick/OnScreenButton의 Control Path(<Gamepad>/leftStick)로 기존 이동 코드를 그대로 재사용",
+     "플로팅 조이스틱: IPointerDownHandler로 터치 지점에 베이스를 놓고 movementRange·데드존을 정규화",
+     "Screen.safeArea를 앵커(anchorMin/Max)로 바꾸는 루트 컨테이너, uGUI 2.6 SafeArea 컴포넌트, 배경은 SafeArea 밖에 두기",
+     "UITK에서 safeArea의 y축 뒤집기(원점이 좌하단)와 RuntimePanelUtils 좌표 변환",
+     "Canvas Scaler(Scale With Screen Size, Match 0.5)와 화면비별 테스트, Device Simulator로 노치 미리보기",
+     "PlayerInput.onControlsChanged로 터치·키보드·게임패드를 전환하고 UI 표시/숨김"
+    ],
+    "example_games": [
+     "브롤스타즈",
+     "원신 모바일",
+     "배틀그라운드 모바일"
+    ],
+    "sources": [
+     "https://docs.unity3d.com/Packages/com.unity.inputsystem@1.8/manual/OnScreen.html",
+     "https://unity.com/resources/input-system-video-tutorial-series",
+     "https://github.com/AnnulusGames/EnhancedOnScreenStick",
+     "https://docs.unity3d.com/Packages/com.unity.ugui@2.6/manual/script-SafeArea.html",
+     "https://docs.unity.com/en-us/engine/6000.3/script-reference/unityengine/screen/safearea"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "loading-screen-progress",
+    "name_ko": "로딩 화면·진행률 표시",
+    "group": "D",
+    "paradigm": "screen",
+    "what_ko": "씬/에셋을 비동기로 로딩하는 동안 진행률 바, 팁 문구 순환, '터치하여 시작'을 보여 준다. 데모에서 실제 진행률(계단식·0.9에서 멈춤)과 화면에 보이는 보간된 진행률을 두 줄로 겹쳐 그리고, 최소 표시 시간과 보간 속도 슬라이더로 '믿을 수 있는 로딩 바'의 원리를 보여 준다.",
+    "why_ko": "모든 팀 프로젝트가 씬 전환을 하고, 공고 우대사항의 AssetBundle·Addressables 경험과 바로 이어진다. 'PercentComplete가 부정확하다/0.9에서 멈춘다'는 실제 함정이 포럼과 이슈 트래커에 남아 있어, 원리를 설명하고 해결법을 가르치기 좋다.",
+    "teaching_points_ko": [
+     "SceneManager.LoadSceneAsync + allowSceneActivation=false일 때 progress가 0.9에서 멈추는 이유와 처리",
+     "Addressables.LoadSceneAsync/LoadAssetsAsync의 PercentComplete, 원격 다운로드는 GetDownloadStatus()로 따로 표시",
+     "표시용 진행률 = MoveTowards(표시값, 실제값, 속도*dt), 최소 노출 시간으로 깜빡임 방지",
+     "로딩 전용 씬(Additive) 또는 DontDestroyOnLoad 오버레이 구조, 페이드 인/아웃",
+     "팁 문구를 ScriptableObject/Localization 테이블로 관리, 무작위 순환",
+     "UITK: ProgressBar 컨트롤과 데이터 바인딩으로 value 연결"
+    ],
+    "example_games": [
+     "원신(다운로드·로딩 팁)",
+     "리그 오브 레전드 로딩 화면",
+     "모바일 게임 패치 다운로드 화면"
+    ],
+    "sources": [
+     "https://discussions.unity.com/t/percentagecomplete-differs-to-underlying-asyncoperation/764706",
+     "https://issuetracker.unity.com/issues/22504/addressables-asyncoperationpercentcomplete-returns-innaccurate-progress-values-when-the-assetbundles-being-loaded-are-local",
+     "https://discussions.unity.com/t/display-progress-of-download/857921",
+     "https://www.gamejob.co.kr/Recruit/GI_Read_Comt_Ifrm?gno=188365"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "data-bound-stat-panel",
+    "name_ko": "데이터 바인딩 캐릭터 스탯·장비 비교",
+    "group": "E",
+    "paradigm": "screen",
+    "what_ko": "캐릭터 스탯 창에서 장비를 바꾸면 공격력·방어력 등이 자동으로 갱신되고, 장착 전에 미리보기 차이(+12 초록, -5 빨강)를 보여 준다. 데모에서 데이터 객체의 값을 바꾸면 여러 UI(스탯 창, 상단 전투력, 체력 바)가 한꺼번에 따라 바뀌는 것을 보여 주고, '직접 갱신 코드'와 '바인딩'을 비교한다.",
+    "why_ko": "Unity 6 UI Toolkit의 런타임 데이터 바인딩은 공식 베스트 프랙티스 가이드가 체력 바 예제로 설명할 만큼 핵심 신기능이다. 학생들이 흔히 짜는 'Update에서 매 프레임 text 대입' 습관을 고치는 데 효과적이다. 공고의 'UI Toolkit 기반 상용화 경험' 우대와도 맞는다. inventory-grid-tooltip이 아이템 목록이라면, 이 표본은 모델에서 뷰로의 데이터 흐름이 주제다.",
+    "teaching_points_ko": [
+     "[CreateProperty] + INotifyBindablePropertyChanged로 바뀐 프로퍼티만 알리기, 같은 값이면 일찍 반환해 중복 알림 막기",
+     "DataBinding의 dataSource/dataSourcePath/BindingMode(ToTarget, TwoWay)와 UI Builder에서 바인딩 설정",
+     "ConverterGroup으로 숫자를 문자열·색으로 변환(증감 색 표시)",
+     "UGUI 대응: C# event/Action 또는 ObservableProperty<T> 패턴으로 MVP 구성",
+     "ScriptableObject를 데이터 소스로 써서 씬 사이에 공유",
+     "전투력 같은 파생값을 캐싱하고 재계산할 때 알리기"
+    ],
+    "example_games": [
+     "로스트아크 장비 비교",
+     "디아블로 4 장비 비교 툴팁",
+     "모바일 수집형 RPG 캐릭터 상세"
+    ],
+    "sources": [
+     "https://docs.unity.com/en-us/engine/6000.3/manual/best-practice-guides/bpg-uiad-index/data-binding",
+     "https://docs.unity3d.com/kr/6000.0/Manual/best-practice-guides/ui-toolkit-for-advanced-unity-developers/data-binding.html",
+     "https://docs-alpha.unity3d.com/Manual/UIE-runtime-binding-define-data-source.html",
+     "https://unity.com/blog/try-the-new-ui-toolkit-sample-now-available-on-the-asset-store"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "drag-drop-slots",
+    "name_ko": "드래그앤드롭 퀵슬롯·장착",
+    "group": "E",
+    "paradigm": "screen",
+    "what_ko": "인벤토리 아이템을 끌어 퀵슬롯이나 장비 칸에 놓는다. 끄는 동안 반투명 고스트 아이콘, 놓을 수 있는/없는 칸 하이라이트, 칸끼리 교환, 바깥에 놓으면 버리기 확인이 나온다. 모바일용 길게 누르기로 드래그 시작과 PC 우클릭 빠른 장착을 토글로 바꿀 수 있다.",
+    "why_ko": "팀 프로젝트 인벤토리에서 학생들이 가장 많이 막히는 인터랙션이다(레이캐스트가 고스트에 막힘, 부모 레이아웃이 깨짐 등). UGUI 이벤트 인터페이스와 UITK PointerManipulator를 비교하기 좋은 소재다. 기존 inventory-grid-tooltip은 그리드와 툴팁만 다루므로 그 확장으로 넣는 게 자연스럽다.",
+    "teaching_points_ko": [
+     "IBeginDragHandler/IDragHandler/IEndDragHandler/IDropHandler 흐름과 eventData.pointerDrag",
+     "고스트는 최상위 캔버스로 옮기고 CanvasGroup.blocksRaycasts=false로 드롭 대상을 찾게 하기",
+     "RectTransformUtility.ScreenPointToLocalPointInRectangle로 Screen Space-Camera에서도 좌표 맞추기",
+     "슬롯 타입 검사(장비 부위)와 교환 로직을 데이터 계층에서 처리하고, UI는 결과만 다시 그리기",
+     "UITK: PointerManipulator를 상속해 PointerDown/Move/Up, CapturePointer, worldBound.Overlaps로 드롭 판정",
+     "모바일 길게 누르기(IPointerDownHandler + 타이머)와 스크롤과의 충돌 해결"
+    ],
+    "example_games": [
+     "디아블로 시리즈",
+     "메이플스토리 퀵슬롯",
+     "발헤임 인벤토리"
+    ],
+    "sources": [
+     "https://docs.unity3d.com/2022.1/Documentation/Manual/UIE-create-drag-and-drop-ui.html",
+     "https://docs.unity3d.com/Manual/UIE-drag-across-windows.html",
+     "https://forum.unity.com/threads/canvas-group-not-blocking-raycasts-even-when-option-is-enabled.557584/"
+    ],
+    "cost": "low",
+    "extends_existing": "inventory-grid-tooltip",
+    "strength": 4
+   },
+   {
+    "id": "tutorial-spotlight",
+    "name_ko": "튜토리얼 강조(스포트라이트·코치 마크)",
+    "group": "G",
+    "paradigm": "screen",
+    "what_ko": "화면 전체를 어둡게 하고 눌러야 할 버튼만 구멍을 뚫어 밝게 보여 준다. 손가락 아이콘과 말풍선 설명을 붙이고, 강조된 대상만 클릭이 통과한다. 단계 목록(1/5)을 넘기며 구멍 모양(원/사각), 페이드, 대상 추적(움직이는 UI) 파라미터를 조절한다.",
+    "why_ko": "부트캠프 팀 프로젝트 발표에서 '처음 하는 사람이 이해할 수 있는가'는 늘 지적받는 부분이고, 튜토리얼 강조 UI는 적은 비용으로 완성도를 크게 올린다. 스텐실/마스크와 레이캐스트 필터링이라는 UGUI 고급 원리를 함께 가르칠 수 있다.",
+    "teaching_points_ko": [
+     "전체 화면 딤 Image + ICanvasRaycastFilter.IsRaycastLocationValid로 구멍 영역만 클릭 통과",
+     "컷아웃 표현: 셰이더(원/사각 SDF) 또는 스텐실 마스크, Mask 스텐실 비트 충돌 주의",
+     "대상 RectTransform의 GetWorldCorners로 구멍 위치·크기를 따라가기(해상도·스크롤 대응)",
+     "단계 데이터를 ScriptableObject 시퀀스로 만들고, 조건(버튼 클릭·이벤트 수신)이 맞으면 다음 단계",
+     "월드 오브젝트 클릭은 EventSystem.IsPointerOverGameObject로 따로 막기",
+     "UITK: 오버레이 VisualElement의 generateVisualContent(Painter2D)로 구멍 그리기, pickingMode 조정"
+    ],
+    "example_games": [
+     "모바일 수집형 RPG 첫 진입 튜토리얼",
+     "클래시 오브 클랜 튜토리얼",
+     "하스스톤 튜토리얼"
+    ],
+    "sources": [
+     "https://github.com/codewriter-packages/TutorialMaskForUGUI",
+     "https://discussions.unity.com/t/make-a-raycast-not-go-through-ui-objects/569171",
+     "https://forum.unity.com/threads/canvas-group-not-blocking-raycasts-even-when-option-is-enabled.557584/"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "localization-language-switch",
+    "name_ko": "다국어 전환·가변 텍스트 레이아웃",
+    "group": "G",
+    "paradigm": "screen",
+    "what_ko": "한국어/영어/일본어/독일어를 바꾸면 버튼·라벨·숫자 문구가 그 자리에서 바뀐다. 독일어처럼 긴 문자열에서 레이아웃이 늘어나거나 줄어드는 모습, 복수형·변수 문구('적 1마리/3마리 처치', '{gold} 골드')를 보여 준다. 텍스트 확장률 슬라이더로 '번역 대비 여유 공간' 원리를 시연한다.",
+    "why_ko": "한국 게임사는 글로벌 출시가 기본이라 Localization 경험이 실무에서 자주 쓰인다. Unity Learn에도 공식 튜토리얼(Smart Strings, UI Toolkit 바인딩)이 있다. settings-accessibility의 언어 옵션을 깊게 다루는 확장으로 두면 겹치지 않는다.",
+    "teaching_points_ko": [
+     "Localization 패키지: Locale 생성, String Table/Asset Table, LocalizeStringEvent(UGUI·TMP)",
+     "Smart Strings로 변수·복수형 처리, LocalizedString.Arguments/LocalVariables와 RefreshString",
+     "LocalizationSettings.SelectedLocale 런타임 전환과 StringChanged 구독",
+     "UITK: LocalizedString을 라벨에 데이터 바인딩해 로케일이 바뀌면 자동 갱신",
+     "TMP 폰트 에셋 Fallback(한·중·일) 구성과 Dynamic 아틀라스",
+     "ContentSizeFitter/HorizontalLayoutGroup, UITK flex로 길이가 바뀌는 텍스트에 대응, Game View Locale 드롭다운으로 미리보기"
+    ],
+    "example_games": [
+     "원신 언어 설정",
+     "스타듀 밸리 다국어",
+     "모바일 글로벌 서비스 게임 전반"
+    ],
+    "sources": [
+     "https://learn.unity.com/tutorial/smarter-localization-with-unity-strings-assets-and-ui-toolkit",
+     "https://docs.unity3d.com/kr/current/Manual/best-practice-guides/ui-toolkit-for-advanced-unity-developers/localization.html",
+     "https://docs.unity.com/en-us/engine/6000.7/manual/localization/translations/localize-strings"
+    ],
+    "cost": "low",
+    "extends_existing": "settings-accessibility",
+    "strength": 3
+   },
+   {
+    "id": "worldspace-nameplate",
+    "name_ko": "월드스페이스 이름표·머리 위 체력",
+    "group": "A",
+    "paradigm": "spatial",
+    "what_ko": "여러 NPC·적 머리 위에 이름, 레벨, 체력 바, 상호작용 키 안내가 떠 있다. 카메라 거리에 따라 크기를 고정하거나 줄이고, 멀면 사라지고, 벽 뒤에서는 반투명해진다. 'World Space Canvas'와 '화면 공간에서 위치만 따라가기' 두 방식을 토글로 비교하고 성능 카운터를 표시한다.",
+    "why_ko": "3D 팀 프로젝트(액션·RPG)에서 거의 반드시 만드는 UI이고, 유니티 튜토리얼 유튜브의 단골 주제다. Unity 6.2에서 UI Toolkit이 World Space를 공식 지원하게 되어 'UGUI vs UITK' 비교 형식에 딱 맞는 새 소재다. diegetic-vitals(플레이어 몸에 붙은 체력)와는 대상과 원리(다수 엔티티, 빌보드, 컬링)가 달라 별도 표본이 낫다.",
+    "teaching_points_ko": [
+     "방식 A: World Space Canvas + 카메라를 향하는 빌보드(LookAt/LateUpdate), 이벤트 카메라 설정",
+     "방식 B: Camera.WorldToScreenPoint로 화면 오버레이 UI 위치를 갱신하고, 화면 밖·카메라 뒤(z<0)는 숨김",
+     "거리 기반 스케일·알파, 일정 거리 밖은 SetActive가 아니라 CanvasGroup/풀로 비용 줄이기",
+     "엔티티가 많을 때 Canvas 하나에 몰지 않기, 이름표 풀링",
+     "Unity 6.2 UITK: Panel Settings Render Mode=World Space, Pixels Per Unit, Panel Input Configuration",
+     "Physics.Linecast로 가림 판정 후 반투명 처리"
+    ],
+    "example_games": [
+     "로스트아크",
+     "월드 오브 워크래프트 이름표",
+     "젤다의 전설 브레스 오브 더 와일드 적 체력"
+    ],
+    "sources": [
+     "https://unity.com/resources/how-to-create-world-space-ui-toolkit",
+     "https://docs.unity.cn/Manual/ui-systems/world-space-ui.html",
+     "https://docs.unity.com/en-us/engine/6000.6/manual/uitoolkits/uielements/uie-support-for-runtime-ui/world-space-ui/create"
+    ],
+    "cost": "medium",
+    "extends_existing": "",
+    "strength": 4
+   }
+  ]
+ },
+ {
+  "lens": "genre",
+  "lens_summary_ko": "지금 있는 13개는 액션·RPG·슈터 HUD에 몰려 있다. 그래서 카드·덱빌딩, 로그라이크, 전략·타워디펜스, 멀티플레이 슈터, 생존·크래프팅, 리듬, 격투, 퍼즐·캐주얼이 통째로 비어 있다. 부트캠프 팀 프로젝트에서 실제로 자주 고르는 장르(서바이버류 로그라이트, 덱빌딩, 타워디펜스, 모바일 캐주얼)의 대표 UI를 먼저 채우는 게 효과가 가장 크다. 레벨업 3택 선택, 카드 손패+드래그 타겟팅, 건설 배치 미리보기가 1순위다. 셋 다 2D 위주라 용량 부담이 적고, Unity 기술 포인트도 선명하다(timeScale 일시정지, 부채꼴 배치 공식, 레이캐스트+그리드 스냅). 그다음은 멀티플레이 장르의 킬 피드·스코어보드와 핑 시스템, 그리고 크래프팅·리듬·격투·매치3 HUD로 장르 폭을 넓히면 된다. 핑은 offscreen-waypoint의 3D 장면을, 격투 HUD는 health-bar-trail을 재사용할 수 있어 비용을 줄일 수 있다. 레이싱 HUD(속도계·랩 델타 바)와 RTS 드래그 박스 선택·커맨드 카드는 근거가 대부분 커뮤니티·모드 자료라 우선순위를 낮췄다. 시뮬레이션·경영 UI(자원 바·데이터 오버레이)는 글로 된 원리 자료를 찾지 못해 이번 후보에서 뺐다.",
+  "candidates": [
+   {
+    "id": "upgrade-draft-choice",
+    "name_ko": "레벨업 3택 업그레이드 선택(리롤·추방)",
+    "group": "E",
+    "paradigm": "screen",
+    "what_ko": "대표 장르: 로그라이트·서바이버류(뱀서라이크), 액션 로그라이크. 레벨업하면 게임이 멈추고 무작위 카드 3~4장이 뜬다. 새 무기를 얻을지 기존 것을 강화할지 고르고, 슬롯 한도·희귀도 색·리롤·추방(풀에서 영구 제거) 버튼이 함께 있다. 조절 파라미터로 선택지 수, 희귀도 가중치, 리롤·추방 횟수, 등장 연출 속도를 둔다.",
+    "why_ko": "한국 부트캠프 팀 프로젝트에서 서바이버류가 매우 흔하다. 그런데 갤러리에는 성장 선택 UI가 없다. results-reward는 판이 끝난 뒤의 정산이고, 이 표본은 판 도중에 내리는 결정이라 겹치지 않는다. 2D라 용량이 가볍고, 일시정지 중 UI 애니메이션 같은 실무 함정을 가르치기 좋다.",
+    "teaching_points_ko": [
+     "Time.timeScale=0 상태에서 UI 연출: unscaledDeltaTime, Animator Update Mode=Unscaled Time",
+     "중복 없는 가중치 무작위 뽑기, 슬롯이 꽉 차면 강화만 제시하는 필터",
+     "ScriptableObject로 업그레이드 데이터를 정의하고 희귀도 색 토큰을 매핑",
+     "리롤·추방은 횟수가 정해진 자원이다: 버튼 비활성 상태 표현",
+     "UGUI: 카드 프리팹 Instantiate+LayoutGroup / UITK: VisualTreeAsset 템플릿 복제, :hover·:focus USS 전이",
+     "게임패드·키보드 탐색(Selectable Navigation / UITK focus)"
+    ],
+    "example_games": [
+     "Vampire Survivors",
+     "Brotato",
+     "Hades",
+     "Risk of Rain 2"
+    ],
+    "sources": [
+     "https://gmdq.substack.com/p/vampire-survivors-banish-mechanic",
+     "https://www.tuni.fi/playlab/?p=11048",
+     "https://steamcommunity.com/app/1794680/discussions/0/3549427890066531343"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "card-hand-targeting",
+    "name_ko": "카드 손패 부채꼴 + 드래그 타겟 화살표 + 적 의도 표시",
+    "group": "G",
+    "paradigm": "screen",
+    "what_ko": "대표 장르: 카드·덱빌딩 로그라이크, CCG. 손패를 반지름·각도 공식으로 부채꼴로 겹쳐 놓는다. 호버하면 카드가 위로 튀어나오며 확대되고 이웃 카드는 옆으로 비킨다. 대상 지정 카드를 끌면 베지어 화살표가 커서를 따라가고, 유효한 대상 위에서는 색이 바뀐다. 적 머리 위의 의도 아이콘(다음 턴 공격 수치)으로 텔레그래프하는 원리도 함께 보여 준다. 조절 파라미터로 손패 수, 반지름, 최대 각도, 호버 상승량, 겹침 비율을 둔다.",
+    "why_ko": "백로그에도 있는 '카드 손패'로, 덱빌딩은 학생 프로젝트 인기 장르다. LayoutGroup만으로는 부채꼴을 만들 수 없어 직접 배치 계산이 필요하다. 드래그·드롭과 대상 판정이 함께 들어가 입력 처리 교재로도 가치가 크다. 2D라 비용이 낮다.",
+    "teaching_points_ko": [
+     "부채꼴 배치: 카드 i의 각도 = lerp(-maxAngle, maxAngle, i/(n-1)), 위치는 원호 위의 점, 회전은 각도",
+     "호버 시 sibling index/sortingOrder를 올리고 이웃 카드를 벌리는 보간(Lerp/DOTween)",
+     "IBeginDragHandler·IDragHandler·IEndDragHandler와 대상 레이캐스트(GraphicRaycaster/Physics2D)",
+     "타겟 화살표: 2차 베지어 점 배열을 UI 이미지로 찍거나 LineRenderer로 그림",
+     "UITK: position:absolute + style.rotate/translate, PointerManipulator로 드래그 캡처",
+     "적 의도 아이콘: 행동 데이터 → 아이콘·수치 바인딩(정보 공개가 전략성을 만든다는 원리)"
+    ],
+    "example_games": [
+     "Slay the Spire",
+     "Hearthstone",
+     "Monster Train",
+     "Balatro"
+    ],
+    "sources": [
+     "https://cdn.jsdelivr.net/npm/cardsJS@1.1.1/fiddle.html",
+     "https://github.com/richardschneider/cardsJS/blob/master/README.md",
+     "https://www.construct.net/fr/tutorials/hearthstone-unit-move-orders-532",
+     "https://www.pocketgamer.com/slay-the-spire/slay-the-spire-review-genre-defining-card-roguelike-finally-goes-mobile/"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "build-placement-preview",
+    "name_ko": "건설 배치 미리보기(그리드 스냅·유효/무효 틴트·사거리 원)",
+    "group": "G",
+    "paradigm": "spatial",
+    "what_ko": "대표 장르: 타워디펜스, RTS·전략, 생존 건설, 시티빌더. 건물을 집으면 반투명 고스트가 커서를 따라 그리드에 붙는다. 놓을 수 없으면 빨강, 놓을 수 있으면 초록으로 칠해지고, 배치 전에 사거리 원이 보인다. 이미 지어진 포탑들의 사거리도 함께 보인다. 무효 사유(길 위, 너무 가까움, 비용 부족)는 짧은 문구로 알려 준다. 조절 파라미터로 격자 크기, 최소 간격, 사거리, 비용과 소지금을 둔다.",
+    "why_ko": "타워디펜스·생존 건설 팀 프로젝트에서 거의 반드시 만드는 UI인데, 갤러리에는 공간 배치형 입력 표본이 없다. 원리는 데브로그에 글로 잘 설명되어 있고, 위에서 내려다보는 평면이면 가벼운 R3F 장면이나 2D로도 재현할 수 있다.",
+    "teaching_points_ko": [
+     "Camera.ScreenPointToRay+Physics.Raycast(레이어 마스크)로 지면 좌표를 얻고, Mathf.Round로 그리드에 스냅",
+     "유효성 검사: Physics.OverlapBox, 경로·점유 타일맵 조회, 비용 확인을 한 함수로 모으기",
+     "고스트 머티리얼 틴트(MaterialPropertyBlock), URP Decal Projector나 원형 메시로 사거리 표시",
+     "무효 사유를 enum으로 반환해 툴팁 문구에 매핑(피드백은 '왜 안 되는지'까지)",
+     "살 수 없으면 아예 집기 상태로 진입하지 않게(미리보기는 클릭이 성공할 때만)",
+     "모바일: 드래그 후 확인 버튼으로 2단계 배치(손가락이 고스트를 가림)"
+    ],
+    "example_games": [
+     "Bloons TD 6",
+     "Kingdom Rush",
+     "Factorio",
+     "Age of Empires IV"
+    ],
+    "sources": [
+     "https://fairytalesgames.itch.io/justd/devlog/817232/range-indicator-added-to-placement-indicator",
+     "https://syntaxsurfers.itch.io/wave-breakers-firstperson-strategy-hybrid-tower-defense/devlog/1035728/lines-and-boxes-everything-has-its-place",
+     "https://forums.factorio.com/viewtopic.php?p=75704",
+     "https://tldraw.dev/examples/tower-defense",
+     "https://forums.ageofempires.com/t/when-building-or-selecting-fortifications-add-an-option-to-highlight-tiles-in-range-of-the-fortification/73838"
+    ],
+    "cost": "medium",
+    "extends_existing": "",
+    "strength": 5
+   },
+   {
+    "id": "branching-route-map",
+    "name_ko": "분기 경로 맵(노드 선택·범례 하이라이트)",
+    "group": "D",
+    "paradigm": "meta",
+    "what_ko": "대표 장르: 로그라이크·덱빌딩, 로그라이트 전반. 아래에서 위로 갈라졌다 합쳐지는 노드 그래프가 보스까지 이어진다. 노드 종류(전투·엘리트·휴식·상점·보물·?)를 아이콘으로 표시하고, 갈 수 있는 다음 노드만 강조한다. 범례 아이콘에 호버하면 같은 종류의 노드가 모두 깜박이고, 지나온 길은 선으로 남는다. 조절 파라미터로 층 수, 열 수, 경로 수, 노드 종류 비율, 시드를 둔다.",
+    "why_ko": "로그라이크 런 구조를 보여 주는 대표 메타 화면으로, 백로그의 'meta 독립 표본' 수요에 정확히 맞는다. 절차 생성(DAG)과 UI 선 그리기가 결합되어 교육 포인트가 많고, 순수 2D라 가볍다.",
+    "teaching_points_ko": [
+     "층별 노드를 배치하고 교차하지 않게 간선을 생성하는 DAG 절차 생성, 시드 고정",
+     "보장 규칙: 보스 직전 휴식, 중간층 보물(제약 기반 생성)",
+     "UGUI: 노드 사이 선을 회전·늘린 Image로 그리기 / UITK: generateVisualContent+Painter2D로 곡선 그리기",
+     "갈 수 있는 노드만 interactable, 범례 호버 시 같은 종류 일괄 하이라이트",
+     "세로 ScrollRect 위치 자동 이동, 현재 위치 기준 포커스",
+     "런 진행 상태 저장(JSON 직렬화)"
+    ],
+    "example_games": [
+     "Slay the Spire",
+     "Monster Train",
+     "Inscryption",
+     "FTL"
+    ],
+    "sources": [
+     "https://sts2.untapped.gg/en/guides/how-to-make-the-best-map-choices-in-slay-the-spire-2",
+     "https://www.muddasheep.com/blog/416",
+     "https://www.pcgworkshop.com/archive/bazzaz2025uncertainty.pdf",
+     "https://mechanicsofmagic.com/?p=1806"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "killfeed-scoreboard",
+    "name_ko": "킬 피드 + 탭 스코어보드",
+    "group": "C",
+    "paradigm": "non-diegetic",
+    "what_ko": "대표 장르: 멀티플레이 슈터·배틀로얄·MOBA. 오른쪽 위 킬 피드는 '가해자 [무기 아이콘] 피해자' 한 줄에 팀 색과 헤드샷 아이콘을 붙인다. 최대 줄 수를 넘거나 시간이 지나면 위에서부터 사라지고, 내가 관련된 줄은 강조한다. Tab을 누르고 있는 동안만 팀별 스코어보드가 뜬다(K/A/D·점수·핑). 정렬 기준과, 게임 모드에 중요한 숫자(승리까지 남은 킬)를 우선 표시하는 원리를 보여 준다. 조절 파라미터로 최대 줄 수, 유지 시간, 이벤트 발생 빈도, 플레이어 수를 둔다.",
+    "why_ko": "멀티플레이 슈터 장르를 대표하는 핵심 UI로, 백로그에도 있다. quest-tracker-toasts의 알림 큐와 큐·페이드 로직은 비슷하지만, 짧은 시간에 몰려 오는 이벤트를 훑어 읽게 하는 설계와 홀드형 전체 화면 표라는 점이 다르다. 2D라 가볍다.",
+    "teaching_points_ko": [
+     "오브젝트 풀링+최대 줄 수 캡+시간 경과 페이드(CanvasGroup.alpha / UITK transition)",
+     "TMP 스프라이트 에셋으로 텍스트 안에 무기·헤드샷 아이콘 넣기, 팀 색 토큰",
+     "Input System 'Hold' 상호작용으로 Tab을 누르는 동안만 표시",
+     "스코어보드 정렬·갱신: UITK ListView 가상화 / UGUI 행 재사용",
+     "정보 우선순위: 모드별로 승리 조건에 가까운 숫자를 크게",
+     "네트워크 이벤트(Netcode RPC) → UI 이벤트로 분리하는 구조"
+    ],
+    "example_games": [
+     "Counter-Strike 2",
+     "Valorant",
+     "Overwatch 2",
+     "Team Fortress 2"
+    ],
+    "sources": [
+     "https://reforger.armaplatform.com/workshop/68FD0C1DBEB69F0F-REABetterKillFeed",
+     "https://builtbybit.com/resources/killfeed-system.92897/updates",
+     "https://gosugamers.net/overwatch/features/38572-suggested-fixes-to-the-overwatch-ui",
+     "https://forum.warthunder.com/t/the-new-battle-gamemode-ui-is-almost-good/78264"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "contextual-ping-wheel",
+    "name_ko": "상황 인식 핑 + 통신 휠",
+    "group": "C",
+    "paradigm": "spatial",
+    "what_ko": "대표 장르: 팀 기반 멀티플레이 슈터·배틀로얄·MOBA. 버튼 하나로 조준한 대상을 판별해(적/아이템/장소) 맞는 핑 마커를 세계에 꽂고, 화면 밖이면 가장자리에 붙는다. 길게 누르면 방사형 통신 휠이 열린다(공격, 방어, 위험, 도움). 적 핑은 짧게 유지하고 '여기 있었음' 상태로 바뀌며, 아이템 핑에는 '내 거' 응답을 붙인다. 조절 파라미터로 핑 유지 시간, 휠 칸 수, 홀드 임계 시간, 데드존을 둔다.",
+    "why_ko": "음성 없이 협동하게 해 접근성(청각·발화 장애) 가치도 높다고 평가받는 패턴이다. 업계 전반이 따라 했다. 화면 밖 클램핑은 offscreen-waypoint와 겹치므로 그 3D 장면을 재사용하면 비용이 준다. 방사형 휠은 백로그의 무기 휠과 같은 기술이라 두 수요를 한 번에 채운다.",
+    "teaching_points_ko": [
+     "레이캐스트 히트 대상의 레이어·컴포넌트로 핑 종류를 정하는 상황 판별",
+     "방사형 메뉴: Atan2로 스틱·마우스 방향을 칸 인덱스로 변환, 데드존·홀드 임계 시간",
+     "월드→스크린 투영과 가장자리 클램핑(offscreen-waypoint 로직 재사용)",
+     "핑 수명 주기 상태 머신(활성 → 마지막 위치 → 소멸), 응답(확인·내 거)",
+     "UITK: 방사형 칸을 Painter2D 호로 그리기 / UGUI: Image fillAmount+회전으로 칸 만들기",
+     "팀원 동기화는 RPC 한 번으로(무엇을 동기화할지 최소화)"
+    ],
+    "example_games": [
+     "Apex Legends",
+     "Fortnite",
+     "League of Legends",
+     "Valorant"
+    ],
+    "sources": [
+     "https://uxdesign.cc/apex-legends-ping-system-gaming-ux-done-right-4661cd94954c",
+     "https://www.pcgamer.com/au/apex-legends-ping-system-is-a-tiny-miracle-for-fps-teamwork-and-communication/",
+     "https://www.gfinityesports.com/article/how-the-ping-system-evolved-to-break-barriers-and-redefine-in-game-communication"
+    ],
+    "cost": "medium",
+    "extends_existing": "offscreen-waypoint",
+    "strength": 4
+   },
+   {
+    "id": "crafting-recipe-panel",
+    "name_ko": "제작 패널(재료 충족 표시·제작 큐·핫바)",
+    "group": "E",
+    "paradigm": "non-diegetic",
+    "what_ko": "대표 장르: 생존·크래프팅, 샌드박스. 레시피 목록에 탭 분류와 검색을 둔다. 레시피를 선택하면 필요 재료를 '보유/필요'(3/5)로 보여 주고, 모자란 재료는 빨강으로 칠하며, 만들 수 있는 것만 강조한다. 제작 큐에는 진행 바가 붙고, 새로 해금된 레시피에는 배지가 뜬다. 다시 열면 마지막으로 보던 선택을 복원하고, 아래 핫바는 숫자 키로 고른다. 조절 파라미터로 보유 재료량, 제작 시간, 큐 길이, '만들 수 있는 것만 보기' 필터를 둔다.",
+    "why_ko": "생존·크래프팅은 팀 프로젝트 단골 장르인데, inventory-grid-tooltip은 보관·비교만 다루고 '재료 → 결과' 변환 UI는 없다. 커뮤니티 자료에 구체적인 UX 원칙(선택 복원, 미발견 레시피 배지)이 글로 남아 있어 재구현하기 좋다.",
+    "teaching_points_ko": [
+     "ScriptableObject 레시피(재료 목록·결과·시간)와 인벤토리 수량 조회 분리",
+     "데이터 바인딩: 재료 수량이 바뀌면 레시피 상태 전체 갱신(이벤트 기반, UITK runtime binding)",
+     "제작 큐: 코루틴/타이머 + Image.fillAmount 진행 표시, 취소하면 재료 환불",
+     "상태 지속: 닫았다 열어도 탭·선택·스크롤 위치 복원",
+     "핫바: Input System 숫자 키 액션, 선택 슬롯 강조, 모바일 탭 대응",
+     "inventory-grid-tooltip의 툴팁·슬롯 컴포넌트 재사용"
+    ],
+    "example_games": [
+     "Valheim",
+     "Don't Starve Together",
+     "7 Days to Die",
+     "Minecraft"
+    ],
+    "sources": [
+     "https://7daystodie.wiki.gg/wiki/Crafting_Window",
+     "https://forums.funcom.com/t/crafting-menu-sticky-menu-position-tabs/90062",
+     "https://kleiforums.com/forums/topic/164742-crafting-menu-ui-idea/",
+     "https://create.roblox.com/docs/production/game-design/ui-ux-design"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 4
+   },
+   {
+    "id": "rhythm-judgment-highway",
+    "name_ko": "리듬 노트 하이웨이 + 판정 피드백",
+    "group": "C",
+    "paradigm": "screen",
+    "what_ko": "대표 장르: 리듬. 레인을 따라 노트가 판정선으로 내려온다. 입력하면 시간 오차(ms)로 PERFECT/GOOD/MISS를 정하고, 판정 텍스트·콤보 숫자·레인 플래시로 즉시 피드백한다. EARLY/LATE 표시와 오프셋 보정 화면도 보여 준다. 소리는 WebAudio로 합성해 에셋이 필요 없다. 조절 파라미터로 BPM, 스크롤 속도, 판정 창(ms), 오프셋, 레인 수를 둔다.",
+    "why_ko": "한국은 DJMAX 등 리듬 게임 인지도가 높고, 수업 미니 프로젝트로도 자주 나온다. '화면 위치가 아니라 오디오 시계로 판정한다'는 원리가 명확해 기술 교재 가치가 크다. 오프셋 보정은 settings-accessibility와 이어진다.",
+    "teaching_points_ko": [
+     "AudioSettings.dspTime 하나만 기준 시계로 쓰기(Time.time과 섞지 않기)",
+     "노트 위치 = (노트 시각 - 현재 오디오 시각) × 스크롤 속도: 해상도와 무관한 판정",
+     "판정 창을 상수로 고정하고 경계값 테스트하기",
+     "판정 텍스트 풀링+스케일 펀치 애니메이션, 콤보가 끊길 때의 연출",
+     "입력 지연 오프셋 보정 UI(탭 테스트로 평균 오차 계산)",
+     "UITK: 레인을 absolute 요소로 / UGUI: RectTransform anchoredPosition 갱신"
+    ],
+    "example_games": [
+     "DJMAX RESPECT V",
+     "osu!",
+     "Hi-Fi Rush",
+     "Beat Saber"
+    ],
+    "sources": [
+     "https://dev.to/skywalker_2de7de5f97df567/building-fair-rhythm-game-judgement-windows-in-javascript-1og9",
+     "https://beatsportable.com/static/misc/cis400/siggraph/poster.pdf",
+     "https://skillselion.com/skills/thedivergentai/gd-agentic-skills/godot-genre-rhythm"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 3
+   },
+   {
+    "id": "versus-fighting-hud",
+    "name_ko": "대전 격투 대칭 HUD(미러 체력바·슈퍼 게이지 칸·콤보 카운터)",
+    "group": "A",
+    "paradigm": "non-diegetic",
+    "what_ko": "대표 장르: 격투, 1:1 대전 액션. 좌우로 대칭인 체력 바(안쪽에서 바깥쪽으로 줄어듦)와 잔상, 가운데 라운드 타이머와 라운드 승리 표시가 있다. 슈퍼 게이지는 칸 단위로 차고, 사용할 수 있으면 색이 바뀐다. 콤보 카운터는 히트 수와 누적 데미지를 보여 주고, 보정(스케일링) 때문에 데미지가 줄어드는 것을 표시한다. 저체력 색 변화도 있다. 조절 파라미터로 게이지 칸 수, 콤보 보정 비율, 저체력 임계값, 라운드 시간을 둔다.",
+    "why_ko": "격투 장르 대표 HUD로, 1:1 대전 프로젝트에서 그대로 쓸 수 있다. 잔상 체력 바는 health-bar-trail을 재사용하고, 새로 가르칠 것은 미러 레이아웃·칸 게이지·콤보 보정 표시다. 그래서 확장 표본으로 싸게 만들 수 있다.",
+    "teaching_points_ko": [
+     "미러 레이아웃: Fill Origin을 반대로 하거나 앵커를 대칭으로(scale.x=-1을 쓰면 텍스트가 뒤집히는 함정)",
+     "칸 게이지: 칸 수만큼 Image를 두고 부분 채움 + 꽉 찬 칸 강조",
+     "콤보 카운터: 마지막 히트 후 리셋 타이머, 히트마다 스케일 펀치, 보정된 데미지 누적 표시",
+     "health-bar-trail의 지연 잔상 로직을 양쪽에 재사용",
+     "라운드 흐름 상태 머신(READY, FIGHT, KO, 라운드 표시)",
+     "UITK: flex-direction:row-reverse로 대칭 구성"
+    ],
+    "example_games": [
+     "Street Fighter 6",
+     "Tekken 8",
+     "Granblue Fantasy Versus",
+     "Guilty Gear Strive"
+    ],
+    "sources": [
+     "https://dustloop.com/w/GBVS/HUD",
+     "https://streetfighter.fandom.com/wiki/Health_Meter",
+     "https://strategywiki.org/wiki/Them%27s_Fightin%27_Herds/Gameplay",
+     "https://en.wikipedia.org/wiki/HUD_(video_games)"
+    ],
+    "cost": "low",
+    "extends_existing": "health-bar-trail",
+    "strength": 3
+   },
+   {
+    "id": "match3-goal-hud",
+    "name_ko": "퍼즐·캐주얼 목표 HUD(남은 이동 수·수집 목표·별 진행 바·부스터)",
+    "group": "A",
+    "paradigm": "non-diegetic",
+    "what_ko": "대표 장르: 퍼즐·캐주얼(매치3, 모바일 스테이지형). 위쪽에 남은 이동 수를 두고 적게 남으면 경고 색으로 바꾼다. 색별 수집 목표 아이콘과 남은 개수를 보여 주고, 블록이 깨지면 그 자리에서 목표 아이콘으로 날아가 개수가 줄어든다. 점수 진행 바 위의 별 3개 임계 마커가 하나씩 켜지고, 아래 부스터 버튼에는 보유 수 배지가 붙는다. 조절 파라미터로 이동 수, 목표 개수, 별 임계값, 날아가는 시간을 둔다.",
+    "why_ko": "한국 모바일 시장에서 캐주얼 퍼즐 비중이 크고, '모바일 반' 팀이 만들 법한 장르다. 갤러리에는 모바일 캐주얼 HUD가 없다. 세계 좌표에서 UI로 날아가는 연출과 진행 바 위 마커 배치 같은 실무 기술을 가볍게 보여 줄 수 있다.",
+    "teaching_points_ko": [
+     "월드/보드 좌표 → UI 좌표로 날아가는 연출(RectTransformUtility, 베지어 경로, 도착하면 카운트 감소)",
+     "진행 바 위 별 임계 마커 위치 = 임계값/최대 점수 × 바 너비",
+     "남은 이동 수 경고 상태(색·펄스), 마지막 연쇄가 끝날 때까지 게임 오버 판정 미루기",
+     "부스터 버튼 보유 수 배지, 0개면 구매 유도 상태로 전환",
+     "모바일 안전 영역(Screen.safeArea)과 Canvas Scaler / UITK Panel Settings 스케일 모드",
+     "목표 데이터(ScriptableObject 레벨 정의) → HUD 자동 구성"
+    ],
+    "example_games": [
+     "Candy Crush Saga",
+     "Royal Match",
+     "Anipang",
+     "Homescapes"
+    ],
+    "sources": [
+     "https://support.awem.com/hc/en-gb/articles/205773352",
+     "https://www.raywenderlich.com/673-how-to-make-a-match-3-game-in-unity/page/4",
+     "https://freelancehunt.com/en/showcase/work/ui-ux-for-mobile-game-three/1966246.html"
+    ],
+    "cost": "low",
+    "extends_existing": "",
+    "strength": 3
+   }
+  ]
+ }
+]
