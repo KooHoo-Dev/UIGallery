@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "check": "python tools/check.py"
+    "check": "python tools/check.py",
+    "size": "node tools/size.mjs"
   },
   "dependencies": {
     "@fontsource/chakra-petch": "5.3.0",

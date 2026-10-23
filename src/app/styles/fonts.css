@@ -1,0 +1,24 @@
+/* 게임풍 영문·숫자 웹폰트 (OFL) — woff2 만 넣는다.
+   @fontsource 의 CSS 를 그대로 쓰면 woff 대체 파일까지 인라인돼 약 70KB 가 중복된다.
+   woff2 는 Chrome 36 · Edge 14 · Safari 12 · Firefox 39 이후 모두 지원. */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('@fontsource/chakra-petch/files/chakra-petch-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('@fontsource/chakra-petch/files/chakra-petch-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2') format('woff2');
+}

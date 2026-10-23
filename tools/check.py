@@ -8,12 +8,15 @@
   2. 표본 폴더: kebab-case 이름, index.tsx · meta.ts 필수, meta.ts 의 id 와 폴더명 일치
   3. Unity 코드: 표본마다 ugui · uitk 폴더 존재 (없으면 경고)
   4. 상대 경로 import 의 대소문자가 실제 파일과 정확히 일치 (Windows 에선 통과해도 Linux CI 에서 깨짐)
-  5. dist/index.html 용량 예산 (3MB)
+  5. dist/index.html 용량 예산 (원본 5MB · gzip 1.5MB, 90% 넘으면 경고)
+     - gzip 은 GitHub Pages 가 실제로 보내는 양, 원본은 '오프라인용 HTML 받기' 파일 크기
+     - 표본별로 얼마나 늘었는지는 node tools/size.mjs
   6. 네트워크를 완전히 막은 헤드리스 Chrome 으로 file:// 실행 → 모든 표본 제목이 렌더되는지
 """
 
 from __future__ import annotations
 
+import gzip
 import os
 import re
 import subprocess
@@ -24,7 +27,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src"
 DIST = ROOT / "dist" / "index.html"
-BUDGET = 3 * 1024 * 1024
+BUDGET = 5 * 1024 * 1024
+BUDGET_GZIP = int(1.5 * 1024 * 1024)
 KEBAB = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 BITMAP = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".tga", ".psd"}
 CHROME_CANDIDATES = [
@@ -114,10 +118,16 @@ def check_dist(titles: list[tuple[str, str]]) -> None:
     if not DIST.exists():
         warn("dist/index.html 없음 — npm run build 후 다시 실행하면 용량·오프라인 검사를 합니다")
         return
-    size = DIST.stat().st_size
-    print(f"  dist/index.html: {size / 1024:,.0f} KB (예산 {BUDGET / 1024:,.0f} KB)")
-    if size > BUDGET:
-        err(f"용량 예산 초과: {size / 1024:,.0f} KB")
+    raw = DIST.read_bytes()
+    for label, size, budget in [
+        ("원본", len(raw), BUDGET),
+        ("gzip", len(gzip.compress(raw, compresslevel=6)), BUDGET_GZIP),
+    ]:
+        print(f"  dist/index.html {label}: {size / 1024:,.0f} KB (예산 {budget / 1024:,.0f} KB, {size / budget:.0%})")
+        if size > budget:
+            err(f"용량 예산 초과({label}): {size / 1024:,.0f} KB")
+        elif size > budget * 0.9:
+            warn(f"용량 예산 90% 넘음({label}): {size / 1024:,.0f} KB — 예산 재검토 시점")
 
     html = DIST.read_text(encoding="utf-8")
     for pat, what in [
