@@ -1,0 +1,29 @@
+{
+  "specimen_id": "red-dot-badge-tree",
+  "name_ko": "레드닷 알림 배지 트리",
+  "name_en": "Red-Dot Notification Badge Tree",
+  "group": "C",
+  "paradigm": "non-diegetic",
+  "source_candidate": "research/next-batch-candidates.json 의 red-dot-badge-tree (모바일·라이브서비스 관점, 강도 5). docs/next-specimens-research.md 1순위 #8",
+  "scope_decision_ko": "후보 카드는 패러다임을 meta 로 적었지만, 레드닷은 화면 효과로 게임 세계 상태를 표현하는 것이 아니라 메뉴 위에 덧붙는 표시라 non-diegetic 으로 분류했다. 겹치는 기존 표본은 없다 — quest-tracker-toasts 는 한 번 알리고 사라지는 알림, inventory-grid-tooltip 의 새 아이템 표시는 레드닷의 '보면 꺼지는' 한 사례로 링크만 한다. 핵심을 '부모 배지를 계산할 것인가, 따로 저장할 것인가' 로 잡고, 나쁜 예를 실제 팀 프로젝트에서 흔한 화면별 bool 플래그로 재현했다. 후보의 '전파 규칙(합산/OR)' 파라미터는 표시 방식(점/숫자)과 겹쳐 '배지 표시' 하나로 합쳤다.",
+  "why_ko": [
+    "한국 모바일 게임 로비에 빠짐없이 들어가고, 이벤트·우편·임무가 늘수록 팀 프로젝트에서 반드시 어긋나는 기능 (모바일 관점 근거)",
+    "그림은 단순하지만 구현은 상태 관리 설계 문제 — 옵저버 패턴과 데이터/UI 분리를 가르칠 수 있다",
+    "에셋이 필요 없어 비용이 가장 낮다 (+용량 측정 후 기록)"
+  ],
+  "teaching_points_ko": [
+    "경로 키 트리(mail/reward/item-12), 점 데이터는 잎에만, 부모는 자식 합으로 계산",
+    "Changed 이벤트 + 배지 구독(옵저버), OnDisable 에서 구독 해제",
+    "조상만 다시 세기 — 바뀌지 않은 노드에서 멈춤",
+    "꺼지는 규칙을 종류별로: 할 일=행동, 소식=보기, 홍보=약하게",
+    "숫자 상한(9+ · 99+), 점 있는 탭으로 열기",
+    "본 적 있음 저장 위치: PlayerPrefs vs 서버 (보상 수령 여부는 서버가 정답)"
+  ],
+  "references": [
+    "https://refactoring.guru/ko/design-patterns/observer",
+    "https://www.nngroup.com/articles/indicators-validations-notifications/",
+    "https://awesome.ecosyste.ms/projects/github.com%2Fblacksentrydevxo%2Funity-ui-badge-notification-system"
+  ],
+  "inspired_by": [],
+  "confidence_notes_ko": "후보 리서치가 예로 든 게임(블루 아카이브 · 쿠키런: 킹덤 · 로스트아크 모바일)의 화면은 직접 확인하지 못해 inspiredBy 에 싣지 않았다. 원리를 다룬 공개 글이 적어 실무 관례와 옵저버 패턴 일반론에 기댄 표본이다. 수치(켜짐 160ms, 경로 번쩍임 단계 150ms)는 권장값이다. Unity 코드는 아직 실제 컴파일 미확인."
+}

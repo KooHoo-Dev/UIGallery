@@ -1,0 +1,39 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="RedDot.uss" />
+    <!-- 배지 = .red-dot 요소 하나 + 숫자 Label. 어느 노드를 볼지는 C# 의 이름 → 경로 표가 정한다 -->
+    <ui:VisualElement name="nav" class="nav">
+        <ui:Button name="nav-mail" class="nav-btn" text="우편">
+            <ui:VisualElement class="red-dot" picking-mode="Ignore">
+                <ui:Label class="red-dot__count" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:Button>
+        <ui:Button name="nav-mission" class="nav-btn" text="임무">
+            <ui:VisualElement class="red-dot" picking-mode="Ignore">
+                <ui:Label class="red-dot__count" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:Button>
+        <ui:Button name="nav-shop" class="nav-btn" text="상점">
+            <ui:VisualElement class="red-dot" picking-mode="Ignore">
+                <ui:Label class="red-dot__count" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:Button>
+    </ui:VisualElement>
+
+    <ui:VisualElement name="mail-window" class="window">
+        <ui:Label class="window__title" text="우편" />
+        <ui:VisualElement class="tabs">
+            <ui:Button name="tab-reward" class="tab" text="보상">
+                <ui:VisualElement class="red-dot" picking-mode="Ignore">
+                    <ui:Label class="red-dot__count" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:Button>
+            <ui:Button name="tab-notice" class="tab" text="공지">
+                <ui:VisualElement class="red-dot" picking-mode="Ignore">
+                    <ui:Label class="red-dot__count" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:Button>
+        </ui:VisualElement>
+        <!-- 보상 행은 C# 이 만든다 -->
+        <ui:ScrollView name="list" class="list" />
+    </ui:VisualElement>
+</ui:UXML>
