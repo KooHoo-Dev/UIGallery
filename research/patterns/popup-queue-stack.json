@@ -1,0 +1,32 @@
+{
+  "specimen_id": "popup-queue-stack",
+  "name_ko": "팝업 관리자: 대기열 + 레이어 + 뒤로가기",
+  "name_en": "Popup Manager: Queue, Layers & Back Rules",
+  "group": "D",
+  "paradigm": "menu",
+  "source_candidate": "research/next-batch-candidates.json 의 popup-stack-modal(교육·채용 관점, 강도 5) + confirm-modal-stack(분류 체계 관점, 강도 4) 병합. docs/next-specimens-research.md 1순위 #2",
+  "scope_decision_ko": "후보 원안(팝업 스택 · ESC 로 위부터 닫기 · 확인 모달 기본 포커스 · 입력 차단)은 절반이 기존 main-pause-menu 와 겹친다(메뉴 스택 push/pop · 포커스 복원 · 전환 중 입력 버퍼 · 확인 창 기본 포커스 취소 + 0.3초 잠금 · 딤 클릭 차단). 그래서 이 표본은 '한 화면의 메뉴'가 아니라 '여러 곳에서 열리는 창을 관리하는 구조'로 범위를 옮겼다: 접속 팝업 우선순위 대기열, 레이어(일반·시스템·토스트), 딤 한 장의 위치, 창 종류별 바깥 탭·뒤로가기 규칙, 창이 없을 때의 뒤로가기(종료 확인), 길게 눌러 확정, 연출 중 클릭 무시. 포커스 복원·입력 버퍼는 main-pause-menu 로 링크한다.",
+  "why_ko": [
+    "국내 Unity 강의 Q&A·블로그에서 'UI 매니저 / 팝업 스택' 이 반복되는 질문 주제 (후보 근거: inflearn·velog 글)",
+    "팀 프로젝트에서 UI 담당이 처음 설계하는 구조이고, 채용 공고의 'UI 구조 이해' 요구와 바로 연결",
+    "XAG 115(오류 메시지·파괴적 행동)의 '되돌릴 수 없는 행동 확인' 과 '원인·해결을 함께 말하는 오류 문구' 에 대응"
+  ],
+  "teaching_points_ko": [
+    "레이어 = 같은 Canvas 의 형제 순서(UGUI) / 형제 순서(UITK). 레이어 안에서만 SetAsLastSibling · BringToFront",
+    "Stack 대신 List — 중간 창이 먼저 닫히는 경우(서버 응답)",
+    "딤 한 장을 맨 위 창 바로 아래로 옮긴다 (UGUI SetSiblingIndex, UITK PlaceBehind). Raycast Target / pickingMode",
+    "대기열: priority 정렬 + 열린 창이 없을 때만 + 닫힌 뒤 간격",
+    "뒤로가기 하나의 액션(UI/Cancel)으로 Esc·패드·안드로이드 뒤로",
+    "길게 눌러 확정: unscaled time, 되감기, 손을 뗄 때까지 재실행 금지"
+  ],
+  "references": [
+    "https://learn.microsoft.com/en-us/gaming/accessibility/xbox-accessibility-guidelines/115",
+    "https://developer.android.com/guide/navigation/custom-back",
+    "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/CanvasGroup-blocksRaycasts.html",
+    "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/UIElements.VisualElement-pickingMode.html",
+    "https://www.inflearn.com/community/questions/1798042/baseui-uimanager",
+    "https://velog.io/@kjhdx/Unity-UI-Manager"
+  ],
+  "inspired_by": [],
+  "confidence_notes_ko": "특정 게임 화면을 근거로 삼지 않았다(inspiredBy 비움). 대기열·레이어·바깥 탭 규칙은 모바일 라이브 서비스 게임의 일반 관례와 접근성 지침에서 정리한 것이고, 수치(열림 180ms, 간격 250ms, 길게 누르기 800ms)는 모두 권장값이다. '안드로이드 뒤로 버튼이 Input System 에서 Esc 키로 들어온다' 는 Unity Input System 의 Android 키 매핑에 기댄 설명으로, 강사가 실기기에서 확인할 항목이다. Unity 코드는 아직 실제 컴파일 미확인."
+}
