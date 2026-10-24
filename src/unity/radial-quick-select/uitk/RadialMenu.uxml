@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="RadialMenu.uss" />
+    <!-- #wheel 안에 C# 가 RadialWheelElement(칸 그리기)를 넣는다. 이름 Label 은 그 위에 겹친다 -->
+    <ui:VisualElement name="wheel-root" class="wheel-root" picking-mode="Ignore">
+        <ui:VisualElement name="wheel" class="wheel" picking-mode="Ignore">
+            <ui:VisualElement name="wheel__label" class="wheel__label" picking-mode="Ignore">
+                <ui:Label name="name" class="wheel__name" picking-mode="Ignore" />
+                <ui:Label name="desc" class="wheel__desc" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

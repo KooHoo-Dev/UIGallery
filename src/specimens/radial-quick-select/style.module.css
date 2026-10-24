@@ -1,0 +1,258 @@
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+  color: #eaf2fb;
+  outline: none;
+  touch-action: none;
+  user-select: none;
+  --accent: #5ee6c9;
+  --gold: #ffd166;
+}
+.root:focus-visible {
+  box-shadow: inset 0 0 0 4px var(--accent);
+}
+.root[data-paused] * {
+  animation-play-state: paused !important;
+}
+
+/* ───── 세계 ───── */
+.world,
+.field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* 휠이 열리면 세계를 어둡고 흐리게 — 지금은 '고르는 시간' */
+.dimmer {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 46%, #02060b55 0 28%, #02060bcc 70%);
+  opacity: 0;
+  transition: opacity var(--dur);
+  pointer-events: none;
+}
+.root[data-open] .dimmer {
+  opacity: 1;
+}
+.root:not([data-juice])[data-open] .dimmer {
+  opacity: 0.35;
+}
+.slowmo {
+  position: absolute;
+  left: 50%;
+  top: 40px;
+  translate: -50% 0;
+  padding: 10px 24px;
+  border-radius: 30px;
+  background: #050a10e6;
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  font-size: 24px;
+  white-space: nowrap;
+  visibility: hidden;
+}
+.slowmo[data-on] {
+  visibility: visible;
+}
+
+/* ───── 휠 ───── */
+.wheel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.ring {
+  transform-origin: 960px 500px;
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity var(--dur) ease-out,
+    transform var(--dur) cubic-bezier(0.33, 1, 0.68, 1);
+}
+.root[data-open] .ring {
+  opacity: 1;
+  transform: none;
+}
+.sector {
+  transition: transform calc(var(--dur) * 0.7);
+}
+.sector path {
+  fill: #0c1622e6;
+  stroke: #ffffff33;
+  stroke-width: 2;
+}
+.sector[data-eq] path {
+  stroke: #5ee6c988;
+  stroke-width: 3;
+}
+.sector[data-sel] path {
+  fill: #5ee6c9;
+  stroke: #fff;
+  stroke-width: 4;
+}
+.root:not([data-juice]) .sector[data-sel] path {
+  fill: #2c4a66;
+  stroke: #ffffff66;
+  stroke-width: 2;
+}
+.icon {
+  fill: none;
+  stroke: #eaf2fb;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sector[data-sel] .icon {
+  stroke: #062a24;
+}
+.root:not([data-juice]) .sector[data-sel] .icon {
+  stroke: #eaf2fb;
+}
+.band path {
+  fill: #ffd16655;
+  stroke: none;
+}
+.band {
+  visibility: hidden;
+}
+.band[data-on] {
+  visibility: visible;
+}
+.hub {
+  fill: #050a10f0;
+  stroke: #ffffff33;
+  stroke-width: 2;
+}
+.dz {
+  fill: none;
+  stroke: none;
+}
+.dz[data-guide] {
+  stroke: #ffd166aa;
+  stroke-width: 3;
+  stroke-dasharray: 10 8;
+}
+.arrow,
+.tip,
+.angle {
+  visibility: hidden;
+}
+.arrow[data-on],
+.tip[data-on],
+.angle[data-on] {
+  visibility: visible;
+}
+.arrow {
+  stroke: #ffffffaa;
+  stroke-width: 4;
+}
+.tip {
+  fill: #fff;
+}
+.angle {
+  fill: #ffffffcc;
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 30px;
+}
+
+/* 가운데 이름 */
+.label {
+  position: absolute;
+  width: 300px;
+  translate: -50% -50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur);
+}
+.root[data-open] .label {
+  opacity: 1;
+}
+.label b {
+  font-size: 32px;
+}
+.label span {
+  font-size: 22px;
+  color: #9fb4c9;
+}
+
+/* ───── 장착 · 안내 ───── */
+.equip {
+  position: absolute;
+  right: 48px;
+  bottom: 48px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 26px 14px 14px;
+  border-radius: 18px;
+  background: #050a10e0;
+  border: 2px solid #ffffff33;
+}
+.equip svg {
+  width: 84px;
+  height: 84px;
+  border-radius: 14px;
+  background: #13202f;
+}
+.equip div {
+  display: flex;
+  flex-direction: column;
+}
+.equip small {
+  font-size: 22px;
+  color: #9fb4c9;
+}
+.equip b {
+  font-size: 30px;
+}
+.equip[data-new] {
+  animation: pop calc(0.4s / var(--ts)) ease-out;
+  border-color: var(--accent);
+}
+@keyframes pop {
+  40% {
+    scale: 1.08;
+  }
+}
+.hint {
+  position: absolute;
+  left: 48px;
+  bottom: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-radius: 16px;
+  background: #050a10cc;
+  font-size: 24px;
+}
+.note {
+  position: absolute;
+  left: 50%;
+  bottom: 170px;
+  translate: -50% 0;
+  padding: 12px 28px;
+  border-radius: 30px;
+  background: #050a10f0;
+  border: 2px solid var(--accent);
+  font-size: 26px;
+  white-space: nowrap;
+}
+.note[data-bad] {
+  border-color: #ff8a95;
+}
+@media (prefers-reduced-motion: reduce) {
+  .equip[data-new] {
+    animation: none;
+  }
+}

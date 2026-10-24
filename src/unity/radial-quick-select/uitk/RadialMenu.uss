@@ -1,0 +1,47 @@
+/* 방사형 휠 — Panel Settings: Scale With Screen Size, Reference Resolution 1920×1080.
+   한글이 네모로 보이면 Panel Settings 의 Text Settings 에 한글 글꼴(Font Asset)을 넣는다.
+   열기 연출은 USS transition — 패널의 transition 은 Time.timeScale 의 영향을 받지 않는다(늘 실제 시간). */
+
+.wheel-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.wheel {
+    width: 660px;
+    height: 660px;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    scale: 0.85 0.85;
+    transition-property: opacity, scale;
+    transition-duration: 0.16s, 0.16s;
+    transition-timing-function: ease-out-cubic, ease-out-cubic;
+}
+
+.wheel--open {
+    opacity: 1;
+    scale: 1 1;
+}
+
+/* RadialWheelElement 는 C# 가 넣고 position absolute 로 #wheel 을 꽉 채운다 */
+.wheel__label {
+    width: 300px;
+    align-items: center;
+}
+
+.wheel__name {
+    font-size: 32px;
+    -unity-font-style: bold;
+    color: rgb(234, 242, 251);
+}
+
+.wheel__desc {
+    font-size: 22px;
+    color: rgb(159, 180, 201);
+}
