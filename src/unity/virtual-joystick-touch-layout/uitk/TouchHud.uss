@@ -1,0 +1,95 @@
+/* 터치 HUD — Panel Settings: Scale With Screen Size, Reference Resolution 1920×1080, Match 0.5.
+   한글이 네모로 보이면 Panel Settings 의 Text Settings 에 한글 글꼴(Font Asset)을 넣는다.
+   받침·손잡이는 C# 가 style.translate 로 옮긴다 (레이아웃을 다시 계산하지 않아 가볍다). */
+
+.safe-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.hud {
+    flex-grow: 1;
+}
+
+/* 왼쪽 아래 45% × 70% */
+.stick-zone {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 45%;
+    height: 70%;
+}
+
+.stick-base {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 240px;
+    height: 240px;
+    border-radius: 120px;
+    border-width: 4px;
+    border-color: rgba(255, 255, 255, 0.67);
+    background-color: rgba(255, 255, 255, 0.09);
+    align-items: center;
+    justify-content: center;
+    opacity: 0.45;
+}
+
+.stick-base--active {
+    opacity: 1;
+}
+
+.stick-knob {
+    width: 110px;
+    height: 110px;
+    border-radius: 55px;
+    background-color: rgba(244, 247, 251, 0.87);
+}
+
+.touch-btn {
+    position: absolute;
+    width: 132px;
+    height: 132px;
+    border-radius: 66px;
+    border-width: 4px;
+    border-color: rgba(255, 255, 255, 0.67);
+    background-color: rgba(13, 26, 40, 0.8);
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    -unity-font-style: bold;
+    color: rgb(234, 242, 251);
+}
+
+.touch-btn--big {
+    right: 40px;
+    bottom: 60px;
+    width: 196px;
+    height: 196px;
+    border-radius: 98px;
+    border-color: rgb(255, 107, 94);
+    background-color: rgba(74, 29, 25, 0.87);
+    font-size: 30px;
+}
+
+.touch-btn--skill1 {
+    right: 260px;
+    bottom: 30px;
+}
+
+.touch-btn--dodge {
+    right: 70px;
+    bottom: 290px;
+    width: 120px;
+    height: 120px;
+    border-radius: 60px;
+}
+
+/* 눌린 동안 — 엄지 밑에서도 눌렸다는 것을 알 수 있게 */
+.touch-btn--pressed {
+    scale: 0.9 0.9;
+    background-color: rgba(255, 255, 255, 0.27);
+}

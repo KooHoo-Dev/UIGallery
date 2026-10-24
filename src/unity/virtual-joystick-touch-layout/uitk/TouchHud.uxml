@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="TouchHud.uss" />
+    <!-- 배경(게임 화면)은 이 문서 밖. #safe-area 의 padding 을 C# 가 세이프 에어리어로 채운다 -->
+    <ui:VisualElement name="safe-area" class="safe-area" picking-mode="Ignore">
+        <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
+            <!-- 플로팅 조이스틱이 시작될 수 있는 왼쪽 아래 영역 (투명하지만 입력을 받는다) -->
+            <ui:VisualElement name="stick-zone" class="stick-zone">
+                <ui:VisualElement name="stick-base" class="stick-base" picking-mode="Ignore">
+                    <ui:VisualElement name="stick-knob" class="stick-knob" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="btn-attack" class="touch-btn touch-btn--big">
+                <ui:Label text="공격" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement name="btn-skill1" class="touch-btn touch-btn--skill1">
+                <ui:Label text="스킬" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement name="btn-dodge" class="touch-btn touch-btn--dodge">
+                <ui:Label text="회피" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

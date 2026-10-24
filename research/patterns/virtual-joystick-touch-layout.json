@@ -1,0 +1,30 @@
+{
+  "specimen_id": "virtual-joystick-touch-layout",
+  "name_ko": "가상 조이스틱 + 터치 배치",
+  "name_en": "Virtual Joystick & Touch Layout",
+  "group": "G",
+  "paradigm": "non-diegetic",
+  "source_candidate": "research/next-batch-candidates.json 의 touch-controls-layout(분류 체계) · virtual-joystick-touch-layout(모바일) · virtual-joystick-safe-area(교육·채용) · safe-area-aspect-fit(모바일) 병합. docs/next-specimens-research.md 1순위 #1 — 세 관점이 모두 최고 강도로 추천",
+  "scope_decision_ko": "후보 네 장을 하나로 합치되, 세이프 에어리어는 독립 시뮬레이터(기기 프리셋 여러 개 · 세로 모드) 대신 '노치 폰 / 태블릿' 두 기기와 적용 토글만 두었다 — 범위가 커지면 safe-area-aspect-fit 을 별도 표본으로 뗄 수 있다. 조이스틱은 가로(16:9) 액션 장르 기준. 기존 표본 중 skill-cooldown-prompt 가 버튼 쿨다운 표시를 다루므로 이 표본의 쿨다운은 회색 부채꼴로 짧게 두고 링크한다.",
+  "why_ko": [
+    "모바일·PC 반반인 팀 프로젝트에서 가장 실용적인 빈칸이고, 지금 갤러리에 터치 입력 표본이 없다",
+    "데드존 · 정규화 · 포인터 ID 별 멀티터치는 학생 프로젝트에서 반복되는 버그의 원인이다",
+    "OnScreenControl 상속으로 패드용 이동 코드를 그대로 쓰는 Input System 구조를 가르칠 수 있다"
+  ],
+  "teaching_points_ko": [
+    "고정 · 플로팅 · 따라오기 조이스틱의 장단점",
+    "거리 ÷ 반경 → 0~1, 데드존 밖 다시 펼치기, 반응 곡선 (입력→출력 그래프)",
+    "pointerId 별 역할 고정 — 이동 중 공격",
+    "Screen.safeArea → 앵커(UGUI) / padding(UITK, y 뒤집기)",
+    "배치 편집 결과를 세이프 에어리어 안의 비율로 저장, 크기는 px 유지",
+    "OnScreenControl 상속 · OnScreenButton 으로 기존 액션 재사용"
+  ],
+  "references": [
+    "https://docs.unity3d.com/Packages/com.unity.inputsystem@1.8/manual/OnScreen.html",
+    "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Screen-safeArea.html",
+    "https://publications.ait.ac.at/de/publications/investigating-on-screen-gamepad-designs-for-smartphone-controlled/",
+    "https://gameaccessibilityguidelines.com/full-list/"
+  ],
+  "inspired_by": [],
+  "confidence_notes_ko": "후보 리서치가 예로 든 게임(브롤스타즈 · 배틀그라운드 모바일 등)의 화면은 직접 확인하지 못해 inspiredBy 에 싣지 않았다. '플로팅이 고정보다 낫다' 류의 주장은 소규모 연구 근거라 해설에서 단정하지 않고 장단점으로만 다뤘다. 손가락 최소 크기(약 9mm)는 모바일 플랫폼 가이드의 일반적인 권장 범위를 따른 값이다. 무대 1920 폭을 약 6인치 가로 폰으로 볼 때 88px ≈ 9mm 로 환산했다(대략값). Unity 코드는 아직 실제 컴파일 미확인."
+}

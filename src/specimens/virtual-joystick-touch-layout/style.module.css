@@ -1,0 +1,362 @@
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+  color: #eaf2fb;
+  outline: none;
+  touch-action: none;
+  user-select: none;
+  background: #04070b;
+  --accent: #5ee6c9;
+  --gold: #ffd166;
+  --red: #ff6b5e;
+}
+.root:focus-visible {
+  box-shadow: inset 0 0 0 4px var(--accent);
+}
+.root[data-paused] * {
+  animation-play-state: paused !important;
+}
+
+/* ───── 기기 화면 ───── */
+.screen {
+  position: absolute;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 40%, #1d3a2f, #0f2018 70%);
+  box-shadow: 0 0 0 10px #1b1f26, 0 0 0 12px #2c323c;
+}
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(#ffffff0d 2px, transparent 2px),
+    linear-gradient(90deg, #ffffff0d 2px, transparent 2px);
+  background-size: 120px 120px;
+}
+.notch {
+  position: absolute;
+  width: 74px;
+  border-radius: 0 40px 40px 0;
+  background: #04070b;
+}
+
+/* ───── 안내선 ───── */
+.safe,
+.zone {
+  position: absolute;
+  pointer-events: none;
+  visibility: hidden;
+}
+.safe[data-show],
+.zone[data-show] {
+  visibility: visible;
+}
+.safe {
+  border: 3px dashed #ffd16699;
+  border-radius: 12px;
+}
+.safe span,
+.zone span {
+  position: absolute;
+  left: 12px;
+  bottom: 8px;
+  font-size: 22px;
+  color: #ffd166cc;
+}
+.zone {
+  border-radius: 24px;
+  background: #5ee6c912;
+  border: 2px solid #5ee6c944;
+}
+.zone span {
+  color: #5ee6c9cc;
+  top: 10px;
+  bottom: auto;
+  left: auto;
+  right: 14px; /* 왼쪽 위는 수업용 패널이 덮는다 */
+}
+.thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.thumb circle {
+  fill: #ffffff08;
+  stroke: #ffffff22;
+  stroke-width: 2;
+  stroke-dasharray: 10 10;
+}
+
+/* ───── 캐릭터 ───── */
+.hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.player {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+}
+.body {
+  position: absolute;
+  left: -34px;
+  top: -34px;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: inset -10px 0 0 #2aa58b;
+}
+/* 바라보는 방향 표시 */
+.body::after {
+  content: '';
+  position: absolute;
+  right: -18px;
+  top: 22px;
+  border: 12px solid transparent;
+  border-left: 18px solid var(--accent);
+}
+.player[data-dash] .body {
+  box-shadow:
+    inset -10px 0 0 #2aa58b,
+    -40px 0 0 -8px #5ee6c955,
+    -80px 0 0 -16px #5ee6c922;
+}
+.slash,
+.burst {
+  position: absolute;
+  pointer-events: none;
+  visibility: hidden;
+}
+.slash {
+  left: 20px;
+  top: -80px;
+  width: 120px;
+  height: 160px;
+  border-right: 10px solid #fff;
+  border-radius: 0 80px 80px 0;
+}
+.player[data-slash] .slash {
+  visibility: visible;
+}
+.burst {
+  left: -110px;
+  top: -110px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 8px solid var(--gold);
+}
+.player[data-burst] .burst {
+  visibility: visible;
+  animation: burst calc(0.4s / var(--ts)) ease-out;
+}
+@keyframes burst {
+  from {
+    transform: scale(0.4);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .player[data-burst] .burst {
+    animation: none;
+  }
+}
+
+/* ───── 조이스틱 ───── */
+.base,
+.knob {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+.base {
+  border-radius: 50%;
+  border: 4px solid #ffffffaa;
+  background: #ffffff18;
+  translate: -50% -50%;
+}
+.knob {
+  width: 110px;
+  height: 110px;
+  margin: -55px 0 0 -55px;
+  border-radius: 50%;
+  background: #f4f7fbdd;
+  box-shadow: 0 6px 16px #0008;
+}
+.root:not([data-juice]) .base {
+  border-color: #ffffff66;
+}
+
+/* ───── 버튼 ───── */
+.btn,
+.stickEdit {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  pointer-events: none;
+  font-size: 24px;
+  font-weight: 700;
+  --cd: 0;
+}
+.btn {
+  border: 4px solid #ffffffaa;
+  background:
+    conic-gradient(#000000aa calc(var(--cd) * 360deg), transparent 0),
+    #0d1a28cc;
+}
+.btn[data-id='attack'] {
+  border-color: var(--red);
+  background:
+    conic-gradient(#000000aa calc(var(--cd) * 360deg), transparent 0),
+    #4a1d19dd;
+  font-size: 30px;
+}
+.btn[data-pressed] {
+  scale: 0.9;
+  background-color: #ffffff44;
+}
+.root[data-editing] .btn,
+.stickEdit {
+  outline: 4px dashed var(--gold);
+  outline-offset: 6px;
+}
+.stickEdit {
+  border: 4px solid #ffd16699;
+  background: #ffd16618;
+  color: var(--gold);
+}
+.handle {
+  position: absolute;
+  right: 14%;
+  bottom: 14%;
+  width: 40px;
+  height: 40px;
+  translate: 50% 50%;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 4px solid #04070b;
+}
+
+/* ───── 손가락 ───── */
+.finger {
+  position: absolute;
+  left: -46px;
+  top: -46px;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  border: 5px solid #fff;
+  background: #ffffff33;
+  pointer-events: none;
+  visibility: hidden;
+}
+.finger[data-on] {
+  visibility: visible;
+}
+.finger::after {
+  content: attr(data-n);
+  position: absolute;
+  left: 50%;
+  top: -44px;
+  translate: -50% 0;
+  padding: 2px 10px;
+  border-radius: 8px;
+  background: #000c;
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ───── 수업용 패널 ───── */
+.panel {
+  position: absolute;
+  width: 360px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #02060bcc;
+  border: 2px dashed #ffffff40;
+  font-size: 22px;
+  pointer-events: none;
+}
+.read {
+  font-family: 'Chakra Petch', 'Malgun Gothic', sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.graph {
+  width: 100%;
+  height: auto;
+  margin: 6px 0;
+}
+.axis {
+  fill: none;
+  stroke: #ffffff55;
+  stroke-width: 2;
+}
+.dz {
+  stroke: var(--gold);
+  stroke-width: 2;
+  stroke-dasharray: 6 6;
+}
+.curve {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 4;
+}
+.root:not([data-juice]) .curve {
+  stroke: #ff8a95;
+}
+.dot {
+  fill: #fff;
+}
+.touches {
+  color: #b7c7d8;
+}
+.note {
+  margin-top: 8px;
+  color: var(--accent);
+}
+.note[data-bad] {
+  color: #ff8a95;
+}
+
+.toolbar {
+  position: absolute;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 10px 20px;
+  border-radius: 14px;
+  background: #050a10ee;
+  border: 2px solid var(--gold);
+  font-size: 22px;
+  white-space: nowrap;
+}
+.toolbar button {
+  height: 56px;
+  padding: 0 22px;
+  border: 2px solid #ffffff55;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.toolbar button[data-primary] {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: #2a1d00;
+  font-weight: 700;
+}
