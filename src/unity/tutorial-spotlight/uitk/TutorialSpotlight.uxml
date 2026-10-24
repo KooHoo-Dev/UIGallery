@@ -1,0 +1,56 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="TutorialSpotlight.uss" />
+
+    <!-- 게임 화면: 버튼의 본래 기능은 C# 에서 연결. 튜토리얼은 같은 버튼을 가리키기만 한다 -->
+    <ui:VisualElement name="game" class="game">
+        <ui:VisualElement class="tabs">
+            <ui:Button name="tab-home" class="tab" text="기지" />
+            <ui:Button name="tab-gear" class="tab" text="장비" />
+            <ui:Button name="tab-shop" class="tab" text="상점" />
+            <ui:Button name="tab-mail" class="tab" text="우편" />
+        </ui:VisualElement>
+        <ui:Button name="sortie" class="sortie" text="출격" />
+
+        <!-- 닫힌 서랍은 display: none 이 아니라 화면 밖으로 밀어 둔다 → 열리는 동안에도 worldBound 를 잴 수 있다 -->
+        <ui:VisualElement name="mail-drawer" class="drawer">
+            <ui:Label class="panel-title" text="우편함" />
+            <ui:Label class="row" text="정비 지원금  +150" />
+            <ui:Label class="row" text="첫 접속 선물  +150" />
+            <ui:Label class="row" text="탐사대 환영 메시지" />
+            <ui:Button name="mail-claim" class="primary" text="모두 받기" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="shop" class="shop">
+            <ui:Label class="panel-title" text="보급 상점" />
+            <ui:ScrollView name="shop-list" class="shop-list">
+                <ui:Button class="item" text="수리 키트 · 1,200" />
+                <ui:Button class="item" text="산소 캔 ×10 · 800" />
+                <ui:Button class="item" text="회로 조각 ×20 · 2,000" />
+                <ui:Button class="item" text="탐사 조명 · 1,500" />
+                <ui:Button class="item" text="견인 케이블 · 600" />
+                <ui:Button class="item" text="지형 스캔 칩 · 900" />
+                <ui:Button name="item-cell" class="item" text="냉각 셀 ×5 · 500" />
+                <ui:Button class="item" text="도장 키트 · 300" />
+            </ui:ScrollView>
+        </ui:VisualElement>
+    </ui:VisualElement>
+
+    <!-- 튜토리얼 레이어: 게임 화면 뒤 형제라 위에 그려진다. 자신은 입력을 받지 않고 .block 네 장만 받는다 -->
+    <ui:VisualElement name="tutorial" class="tutorial" picking-mode="Ignore">
+        <ui:VisualElement name="block-top" class="block" />
+        <ui:VisualElement name="block-bottom" class="block" />
+        <ui:VisualElement name="block-left" class="block" />
+        <ui:VisualElement name="block-right" class="block" />
+        <ui:VisualElement name="ring" class="ring" picking-mode="Ignore" />
+        <ui:VisualElement name="hand" class="hand" picking-mode="Ignore" />
+        <ui:VisualElement name="tip" class="tip" picking-mode="Ignore">
+            <ui:VisualElement class="tip__head" picking-mode="Ignore">
+                <ui:Label name="tip-title" class="tip__title" picking-mode="Ignore" />
+                <ui:Label name="tip-progress" class="tip__progress" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <!-- 말풍선 글자도 Ignore — 말풍선이 아래 대상의 클릭을 가로채지 않게 -->
+            <ui:Label name="tip-body" class="tip__body" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:Button name="skip" class="skip" text="건너뛰기" />
+    </ui:VisualElement>
+</ui:UXML>

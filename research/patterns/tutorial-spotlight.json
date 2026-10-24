@@ -1,0 +1,31 @@
+{
+  "specimen_id": "tutorial-spotlight",
+  "name_ko": "튜토리얼 스포트라이트 + 코치마크",
+  "name_en": "Tutorial Spotlight & Coach Marks",
+  "group": "D",
+  "paradigm": "non-diegetic",
+  "source_candidate": "research/next-batch-candidates.json 의 tutorial-spotlight (분류 체계 관점 강도 4 + 교육·채용 관점 강도 4) 병합. docs/next-specimens-research.md 1순위 #4",
+  "scope_decision_ko": "두 후보의 공통 핵심(구멍만 통과하는 딤 · 말풍선 · 단계 진행 · 유휴 리마인더)을 하나로 묶었다. 원안의 '목표 리마인더'는 퀘스트 목록 표본과 겹쳐 뺐다. 기존 표본 중 겹치는 것은 없다(popup-queue-stack 의 딤은 창 바깥 전체를 막고, 이쪽은 구멍만 남긴다). 재현 장면은 같은 세계관의 '첫 접속' 5단계로 하고, 교육 포인트가 되는 두 상황 — 움직이는 대상(서랍)과 스크롤 목록 밖의 대상 — 을 일부러 넣었다.",
+  "why_ko": [
+    "GAG(Game Accessibility Guidelines) 인지 항목: 상호작용형 튜토리얼, 조작 리마인더, 맥락 도움말",
+    "팀 프로젝트 발표에서 '처음 하는 사람이 이해할 수 있는가'가 늘 지적되고, 적은 비용으로 완성도를 크게 올린다 (교육·채용 관점 후보 근거)",
+    "UGUI 의 레이캐스트 차단 원리(Raycast Target · ICanvasRaycastFilter)와 좌표 변환(GetWorldCorners → 다른 Canvas 로컬)을 함께 가르칠 수 있다"
+  ],
+  "teaching_points_ko": [
+    "구멍 바깥 네 장 차단막 (UGUI · UITK 공통) vs 단일 딤 + ICanvasRaycastFilter + SDF 셰이더(원형 정확)",
+    "대상 위치를 매 프레임 다시 재기 — 서랍 애니메이션, 스크롤, 해상도",
+    "스크롤 목록 안 대상을 먼저 가운데로 (ScrollRect normalizedPosition / ScrollView.ScrollTo)",
+    "말풍선 배치: 선호 방향 → 뒤집기 → 화면 안 고정 (core/placement.ts 와 같은 규칙)",
+    "단계 데이터를 ScriptableObject 로, 완료 조건은 '그 버튼이 눌렸다' 이벤트 (튜토리얼 전용 가짜 버튼 금지)",
+    "유휴 타이머 + 바깥 탭 즉시 힌트, 건너뛰기 확인 + 다시 보기 위치 안내"
+  ],
+  "references": [
+    "https://gameaccessibilityguidelines.com/full-list/",
+    "https://www.gamedeveloper.com/design/video-inside-the-ux-of-onboarding-and-player-engagement",
+    "https://github.com/codewriter-packages/TutorialMaskForUGUI",
+    "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/ICanvasRaycastFilter.IsRaycastLocationValid.html",
+    "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/UIElements.ScrollView.ScrollTo.html"
+  ],
+  "inspired_by": [],
+  "confidence_notes_ko": "특정 게임의 튜토리얼 화면을 근거로 삼지 않았다(inspiredBy 비움). 후보 리서치가 예로 든 게임(클래시 로얄 · 하스스톤 등)은 화면을 직접 확인하지 못해 싣지 않았다. 수치(구멍 이동 280ms, 힌트 4초, 톡톡 0.9Hz)는 모두 권장값이다. UGUI 판은 사각 구멍 + 원형 테두리로 타협했고(정확한 원형 판정은 pitfalls 에 대안 기재), Unity 코드는 아직 실제 컴파일 미확인."
+}
