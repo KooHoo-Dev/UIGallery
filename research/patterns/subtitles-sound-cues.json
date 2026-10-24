@@ -1,0 +1,30 @@
+{
+  "specimen_id": "subtitles-sound-cues",
+  "name_ko": "자막 · 효과음 캡션 + 소리 방향 링",
+  "name_en": "Subtitles, Sound Captions & Directional Sound Ring",
+  "group": "F",
+  "paradigm": "non-diegetic",
+  "source_candidate": "research/next-batch-candidates.json 의 subtitles-captions(분류 체계, 강도 5) · sound-visualizer(분류 체계, 강도 4) · sound-visualizer-ring(호평작, 강도 4) 병합. docs/next-specimens-research.md 1순위 #5",
+  "scope_decision_ko": "자막 크기 · 배경 · 화자 표시를 '고르는 설정 화면'은 settings-accessibility 가, 플레이어가 넘기는 대화창은 dialogue-choices 가 이미 다룬다. 그래서 이 표본은 '게임 중에 저절로 흘러가는 자막' 의 규칙(장 나누기 · 읽기 속도 기반 표시 시간 · 화자가 바뀔 때만 이름 · 무전/화면 밖 표시)과 대사가 아닌 소리(캡션 · 방향 링)에 집중했다. 크기 · 배경은 최소한의 값만 두고 설정 표본으로 링크한다. 후보가 '범위가 크면 나눈다' 고 했지만, 자막과 링이 같은 소리 이벤트에서 나오는 관계가 교육 포인트라 한 표본에 두었다.",
+  "why_ko": [
+    "GAG 청각 항목이 가장 많이 몰린 영역이고, XAG 104(자막 · 캡션)에 직접 대응",
+    "비어 있던 F 그룹(대화 · 서사)과 청각 대체 채널을 함께 채운다",
+    "월드 위치 → 화면 기준 각도 계산을 offscreen-waypoint 와 공유"
+  ],
+  "teaching_points_ko": [
+    "최대 줄 수에 맞춘 장 나누기 (TMP Overflow Page / 글자 수 어림)",
+    "표시 시간 = 공백 뺀 글자 수 ÷ 읽기 속도, 최소 1.5초, 실제 시간으로 대기",
+    "화자 라벨: 바뀔 때만, 색 + 모양, 무전 · 화면 밖 방향",
+    "자막과 캡션의 차이, [효과음] 표기, 최대 개수",
+    "Vector3.SignedAngle(수평 정면, 수평 음원 방향, up) → 링 각도, 거리 → 진하기",
+    "한국어 어절 단위 줄바꿈 (CSS keep-all · TMP Modern Hangul Line Breaking)"
+  ],
+  "references": [
+    "https://learn.microsoft.com/en-us/gaming/accessibility/xbox-accessibility-guidelines/104",
+    "https://gameaccessibilityguidelines.com/full-list/",
+    "https://80.lv/articles/10-golden-rules-on-subtitles-for-games",
+    "https://caniplaythat.com/?p=14083"
+  ],
+  "inspired_by": [],
+  "confidence_notes_ko": "후보 리서치가 예로 든 게임들의 자막 · 소리 시각화 화면을 직접 확인하지 않아 inspiredBy 에 싣지 않았다. 읽기 속도 13자/초, 최소 1.5초, 이름 다시 붙이는 쉼 4초, 캡션 3개는 공개된 자막 모범 사례를 바탕으로 한 권장값이며 한국어 기준으로 조정한 값이다. Unity 코드는 아직 실제 컴파일 미확인."
+}

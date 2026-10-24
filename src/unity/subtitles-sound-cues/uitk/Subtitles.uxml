@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Subtitles.uss" />
+    <!-- 루트 클래스로 크기 · 배경을 바꾼다: .size-small/.size-medium/.size-large/.size-xl · .bg-none/.bg-default/.bg-heavy -->
+    <ui:VisualElement name="subtitle-root" class="subtitle-root size-medium bg-default" picking-mode="Ignore">
+        <!-- 소리 방향 링 (C# 가 SoundRingElement 를 넣는다) -->
+        <ui:VisualElement name="ring" class="ring" picking-mode="Ignore" />
+        <ui:VisualElement name="captions" class="captions" picking-mode="Ignore" />
+        <ui:VisualElement name="sub" class="sub" picking-mode="Ignore">
+            <ui:Label name="speaker" class="sub__speaker" picking-mode="Ignore" />
+            <ui:Label name="body" class="sub__body" picking-mode="Ignore" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

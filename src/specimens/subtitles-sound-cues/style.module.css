@@ -1,0 +1,211 @@
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+  color: #fff;
+  --danger: #ff6b5e;
+  --info: #eaf2fb;
+}
+.root[data-paused] * {
+  animation-play-state: paused !important;
+}
+.scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ───── 소리 방향 링 ───── */
+.ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  visibility: hidden;
+}
+.ring[data-on] {
+  visibility: visible;
+}
+.ringBase {
+  fill: none;
+  stroke: #ffffff26;
+  stroke-width: 3;
+  stroke-dasharray: 6 10;
+}
+.cue path:first-child {
+  fill: none;
+  stroke-linecap: round;
+}
+.cue[data-kind='danger'] path:first-child {
+  stroke: var(--danger);
+}
+.cue[data-kind='info'] path:first-child {
+  stroke: var(--info);
+}
+.mark {
+  stroke: #0b1626;
+  stroke-width: 3;
+}
+.cue[data-kind='danger'] .mark {
+  fill: var(--danger);
+}
+.cue[data-kind='info'] .mark {
+  fill: var(--info);
+}
+/* 가까울수록 진하게, 시간이 지나면 사라진다 */
+.cue {
+  opacity: calc(0.45 + var(--near) * 0.55);
+  animation: fade calc(2.4s / var(--ts)) ease-in forwards;
+}
+@keyframes fade {
+  0%,
+  55% {
+    opacity: calc(0.45 + var(--near) * 0.55);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ───── 효과음 캡션 ───── */
+.captions {
+  position: absolute;
+  left: 50%;
+  bottom: 300px;
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.caption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 18px;
+  border-radius: 10px;
+  background: #02060bd9;
+  font-size: calc(var(--font) * 0.8);
+  white-space: nowrap;
+  animation: fade calc(2.6s / var(--ts)) ease-in forwards;
+  --near: 1;
+}
+.caption[data-kind='danger'] {
+  color: #ffb3ab;
+}
+.dir {
+  width: 1.1em;
+  height: 1.1em;
+  flex: none;
+  fill: currentColor;
+}
+
+/* ───── 자막 ───── */
+.sub {
+  position: absolute;
+  left: 50%;
+  bottom: 70px;
+  translate: -50% 0;
+  width: max-content;
+  max-width: 1240px;
+  padding: 16px 40px 14px;
+  border-radius: 14px;
+  background: rgb(2 6 11 / var(--bg));
+  text-align: center;
+  opacity: 0;
+}
+.sub[data-on] {
+  opacity: 1;
+}
+.root[data-juice] .sub[data-on] {
+  animation: subIn calc(0.15s / var(--ts)) ease-out;
+}
+.root[data-reduce] .sub[data-on] {
+  animation: none;
+}
+@keyframes subIn {
+  from {
+    opacity: 0;
+  }
+}
+/* 블록 수준 flex — 숨겼을 때 빈 줄 높이가 남지 않게 */
+.speaker {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  height: 0;
+  overflow: hidden;
+  font-size: calc(var(--font) * 0.8);
+  font-weight: 700;
+  visibility: hidden;
+}
+.speaker[data-show] {
+  visibility: visible;
+  height: auto;
+  margin-bottom: 4px;
+}
+.shape {
+  width: 0.7em;
+  height: 0.7em;
+}
+.shape[data-shape='circle'] {
+  border-radius: 50%;
+}
+.shape[data-shape='diamond'] {
+  rotate: 45deg;
+  scale: 0.85;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: #ffffff22;
+  color: #eaf2fb;
+  font-style: normal;
+  font-weight: 400;
+  font-size: max(22px, 0.85em);
+}
+.text {
+  margin: 0;
+  font-size: var(--font);
+  line-height: 1.38;
+  word-break: keep-all; /* 한국어는 어절 단위로 줄바꿈 */
+  overflow-wrap: anywhere;
+  /* 배경을 꺼도 읽히게 얇은 외곽선 */
+  text-shadow:
+    0 0 3px #000,
+    0 2px 4px #000;
+}
+.root[data-juice] .text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--lines);
+  overflow: hidden;
+}
+/* 나쁜 예: 외곽선 없음 — 밝은 눈밭 위 흰 글자 */
+.root:not([data-juice]) .text {
+  text-shadow: none;
+}
+.timing {
+  height: 4px;
+  margin-top: 10px;
+  border-radius: 2px;
+  background: #ffffff22;
+  overflow: hidden;
+}
+.bar {
+  height: 100%;
+  background: #ffffffaa;
+  transform-origin: left;
+}
+.root:not([data-juice]) .timing {
+  visibility: hidden;
+}

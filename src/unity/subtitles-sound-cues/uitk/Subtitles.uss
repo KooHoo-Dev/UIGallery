@@ -1,0 +1,78 @@
+/* 자막 — Panel Settings: Scale With Screen Size, Reference Resolution 1920×1080.
+   한글이 네모로 보이면 Panel Settings 의 Text Settings 에 한글 글꼴(Font Asset)을 넣는다.
+   크기 · 배경은 루트 클래스로 바꾼다 (런타임에 C# 로 USS 변수를 바꿀 수 없다). */
+
+.subtitle-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 70px;
+}
+
+.ring {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.captions {
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.caption {
+    padding: 6px 18px;
+    margin-top: 8px;
+    border-radius: 10px;
+    background-color: rgba(2, 6, 11, 0.85);
+    color: rgb(234, 242, 251);
+}
+
+.caption--danger {
+    color: rgb(255, 179, 171);
+}
+
+.sub {
+    max-width: 1240px;
+    padding: 16px 40px 14px;
+    border-radius: 14px;
+    align-items: center;
+    opacity: 0;
+}
+
+.sub--on {
+    opacity: 1;
+}
+
+.sub__speaker {
+    -unity-font-style: bold;
+    margin-bottom: 4px;
+}
+
+.sub__body {
+    white-space: normal;               /* 기본(nowrap)이면 긴 자막이 화면 밖으로 나간다 */
+    -unity-text-align: middle-center;
+    color: rgb(255, 255, 255);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 1);
+}
+
+/* 크기 */
+.size-small .sub__body { font-size: 28px; }
+.size-medium .sub__body { font-size: 36px; }
+.size-large .sub__body { font-size: 46px; }
+.size-xl .sub__body { font-size: 58px; }
+.size-small .sub__speaker, .size-small .caption { font-size: 22px; }
+.size-medium .sub__speaker, .size-medium .caption { font-size: 29px; }
+.size-large .sub__speaker, .size-large .caption { font-size: 37px; }
+.size-xl .sub__speaker, .size-xl .caption { font-size: 46px; }
+
+/* 배경판 */
+.bg-none .sub { background-color: rgba(2, 6, 11, 0); }
+.bg-default .sub { background-color: rgba(2, 6, 11, 0.65); }
+.bg-heavy .sub { background-color: rgba(2, 6, 11, 0.9); }
