@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <!-- 카드 한 장 템플릿. 희귀도는 .card--common / .card--rare / .card--epic 클래스로 (색 + 모양) -->
+    <ui:Button name="card" class="card">
+        <ui:VisualElement class="card__head" picking-mode="Ignore">
+            <ui:VisualElement name="rarity-shape" class="card__shape" picking-mode="Ignore" />
+            <ui:Label name="rarity" class="card__rarity" picking-mode="Ignore" />
+            <ui:Label name="kind" class="card__kind" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="icon" class="card__icon" picking-mode="Ignore" />
+        <ui:Label name="name" class="card__name" picking-mode="Ignore" />
+        <ui:Label name="level" class="card__level" picking-mode="Ignore" />
+        <ui:Label name="diff" class="card__diff" picking-mode="Ignore" />
+    </ui:Button>
+</ui:UXML>

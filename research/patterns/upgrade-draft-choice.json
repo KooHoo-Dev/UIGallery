@@ -1,0 +1,30 @@
+{
+  "specimen_id": "upgrade-draft-choice",
+  "name_ko": "레벨업 3택 업그레이드",
+  "name_en": "Level-Up Upgrade Draft",
+  "group": "E",
+  "paradigm": "menu",
+  "source_candidate": "research/next-batch-candidates.json 의 upgrade-draft-choice (장르 관점, 강도 5). docs/next-specimens-research.md 1순위 #6",
+  "scope_decision_ko": "results-reward 는 판이 끝난 뒤의 보상 연출(숫자 올라가기 · 순차 등장)을 다루므로, 이 표본은 판 도중에 내리는 짧은 결정에 집중했다: 세계 정지 + UI 실제 시간, 고를 수 있는 것만 뽑는 추첨 규칙, 지금 → 다음 수치 비교, 리롤 · 추방 자원, 입력 잠금. 후보가 제안한 '희귀도 가중치' 는 파라미터 대신 고정 가중치(70/25/5)로 두고 첫 화면에서 세 희귀도가 모두 보이게 시드를 골랐다.",
+  "why_ko": [
+    "서바이버 · 로그라이트는 부트캠프 팀 프로젝트에서 아주 흔한 장르",
+    "Time.timeScale = 0 상태의 UI 연출(unscaled)과 중복 없는 가중치 추첨은 학생 코드에서 자주 틀리는 지점",
+    "입력 잠금 · 자원 버튼 비활성 표현 같은 '실수 방지' 원리를 작은 화면 하나로 보여 준다"
+  ],
+  "teaching_points_ko": [
+    "Time.timeScale = 0 + unscaledDeltaTime / WaitForSecondsRealtime / Animator Unscaled Time",
+    "고를 수 있는 것만 모아 뽑은 것을 빼며 뽑기, 최대 레벨 · 슬롯 · 추방 필터, 대체 보상",
+    "희귀도 = 색 + 모양, 지금 → 다음 수치",
+    "입력 잠금은 누른 시각으로 판정 (UGUI IPointerDownHandler / UITK PointerDownEvent TrickleDown) — onClick · clicked 는 손을 뗄 때 불린다",
+    "리롤 · 추방 = 횟수가 정해진 자원, 0 이면 비활성 + 빨간 0",
+    "희귀도마다 증가량이 다르면 수치를 빌드에 쌓아 둔다 (레벨 × 기본값으로 되짚을 수 없다), Mathf.Round 는 짝수 반올림",
+    "ScriptableObject 는 파일 이름 = 클래스 이름"
+  ],
+  "references": [
+    "https://gmdq.substack.com/p/vampire-survivors-banish-mechanic",
+    "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Time-timeScale.html",
+    "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/AnimatorUpdateMode.UnscaledTime.html"
+  ],
+  "inspired_by": [],
+  "confidence_notes_ko": "후보 리서치가 예로 든 게임들의 화면은 직접 확인하지 않아 inspiredBy 에 싣지 않았다(참고 글 주소에만 게임명이 나온다). 입력 잠금 0.4초, 순차 등장 90ms, 희귀도 가중치 70/25/5 는 권장값이다. Unity 코드는 아직 실제 컴파일 미확인."
+}

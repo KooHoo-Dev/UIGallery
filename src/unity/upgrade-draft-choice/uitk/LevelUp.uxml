@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="LevelUp.uss" />
+    <ui:VisualElement name="levelup" class="levelup" picking-mode="Ignore">
+        <ui:VisualElement class="levelup__dim" picking-mode="Ignore" />
+        <ui:VisualElement class="levelup__body" picking-mode="Ignore">
+            <ui:Label name="title" class="levelup__title" text="레벨 업!" />
+            <ui:VisualElement name="lock" class="lock">
+                <ui:VisualElement name="lock-fill" class="lock__fill" />
+            </ui:VisualElement>
+            <!-- C# 가 UpgradeCard.uxml 을 n 장 복제해 넣는다 -->
+            <ui:VisualElement name="cards" class="cards" />
+            <ui:VisualElement name="actions" class="actions">
+                <!-- 추방 버튼은 UGUI 판(LevelUpPanel.cs)에 있다. 같은 방식으로 #banish 를 더해 쓸 수 있다 -->
+                <ui:Button name="reroll" class="action" text="리롤 2" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

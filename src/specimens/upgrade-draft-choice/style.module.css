@@ -1,0 +1,382 @@
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+  color: #eaf2fb;
+  outline: none;
+  --accent: #5ee6c9;
+  --common: #b7c7d8;
+  --rare: #6fb6ff;
+  --epic: #ffb347;
+}
+.root:focus-visible {
+  box-shadow: inset 0 0 0 4px var(--accent);
+}
+.root[data-paused] * {
+  animation-play-state: paused !important;
+}
+.arena {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.player[data-hurt] {
+  fill: #ff6b5e;
+}
+
+/* ───── HUD ───── */
+.xp {
+  position: absolute;
+  left: 40px;
+  right: 40px;
+  top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: 'Chakra Petch', 'Malgun Gothic', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+}
+.xpTrack {
+  flex: 1;
+  height: 18px;
+  border-radius: 9px;
+  background: #0b1622cc;
+  border: 2px solid #ffffff33;
+  overflow: hidden;
+}
+.xpFill {
+  height: 100%;
+  background: var(--accent);
+  transform-origin: left;
+}
+.hp {
+  position: absolute;
+  left: 40px;
+  top: 70px;
+  font-size: 24px;
+}
+.hp b {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 28px;
+}
+.slots {
+  position: absolute;
+  left: 40px;
+  bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: #050a10cc;
+}
+.slotRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.slotLabel {
+  width: 110px;
+  font-size: 22px;
+  color: #9fb4c9;
+}
+.slot {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #1b2c40;
+  border: 2px solid #ffffff44;
+  font-size: 24px;
+  font-weight: 700;
+}
+.slot[data-empty] {
+  background: transparent;
+  border-style: dashed;
+}
+.slot em {
+  position: absolute;
+  right: -6px;
+  bottom: -8px;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #062a24;
+  font-style: normal;
+  font-size: 22px;
+  line-height: 24px;
+  text-align: center;
+  font-family: 'Chakra Petch', sans-serif;
+}
+
+/* ───── 레벨업 화면 ───── */
+.dim {
+  position: absolute;
+  inset: 0;
+  background: #02060bb3;
+  opacity: 0;
+  pointer-events: none;
+}
+.root[data-open] .dim {
+  opacity: 1;
+}
+.root[data-open]:not([data-frozen]) .dim {
+  opacity: 0.45;
+}
+.frozen {
+  position: absolute;
+  right: 40px;
+  top: 70px;
+  padding: 6px 16px;
+  border-radius: 10px;
+  background: #050a10e6;
+  font-size: 22px;
+  visibility: hidden;
+}
+.root[data-open] .frozen {
+  visibility: visible;
+}
+.root[data-open]:not([data-frozen]) .frozen {
+  color: #ff8a95;
+}
+.draft {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  visibility: hidden;
+}
+.root[data-open] .draft {
+  visibility: visible;
+}
+.draft h2 {
+  margin: 0;
+  font-size: 44px;
+}
+.draft h2 span {
+  font-family: 'Chakra Petch', sans-serif;
+  color: var(--accent);
+}
+.lock {
+  position: relative;
+  width: 520px;
+  height: 30px;
+  border-radius: 15px;
+  background: #0b1622;
+  overflow: hidden;
+  text-align: center;
+}
+.lockFill {
+  position: absolute;
+  inset: 0;
+  background: #5ee6c955;
+  transform-origin: left;
+}
+.lock span {
+  position: relative;
+  font-size: 22px;
+  line-height: 30px;
+}
+.lock:not([data-locked]) span {
+  color: #9fb4c9;
+}
+.cards {
+  display: flex;
+  gap: 36px;
+}
+.card {
+  position: relative;
+  width: 360px;
+  height: 470px;
+  padding: 26px 24px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border-radius: 22px;
+  border: 4px solid var(--c, #ffffff44);
+  background: linear-gradient(#152437, #0d1826);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  --c: var(--common);
+}
+.card[data-rarity='rare'] {
+  --c: var(--rare);
+}
+.card[data-rarity='epic'] {
+  --c: var(--epic);
+  box-shadow: 0 0 30px #ffb34755;
+}
+.card[data-rarity='plain'] {
+  --c: #ffffff55;
+}
+/* 순차 등장 — 카드마다 --stagger 만큼 늦게 */
+.root[data-juice] .card {
+  animation: cardIn calc(0.24s / var(--ts)) cubic-bezier(0.33, 1, 0.68, 1) calc(var(--i) * var(--stagger)) both;
+}
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    translate: 0 40px;
+  }
+}
+.card[data-focus] {
+  translate: 0 -12px;
+  outline: 4px solid #fff;
+  outline-offset: 6px;
+}
+.root[data-banish] .card {
+  border-style: dashed;
+  border-color: #ff8a95;
+}
+.card[data-picked] {
+  scale: 1.06;
+  border-color: #fff;
+  transition: scale calc(0.2s / var(--ts));
+}
+.card[data-gone] {
+  opacity: 0.25;
+  transition: opacity calc(0.2s / var(--ts));
+}
+.rarity {
+  position: absolute;
+  left: 18px;
+  top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--c);
+  font-size: 22px;
+  font-weight: 700;
+}
+/* 희귀도는 색 + 모양 (색만으로 구분하지 않는다) */
+.rarity i {
+  width: 18px;
+  height: 18px;
+  background: var(--c);
+}
+.rarity i[data-shape='common'] {
+  border-radius: 50%;
+}
+.rarity i[data-shape='rare'] {
+  rotate: 45deg;
+  scale: 0.85;
+}
+.rarity i[data-shape='epic'] {
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+.kind {
+  position: absolute;
+  right: 18px;
+  top: 16px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: #ffffff1a;
+  font-size: 22px;
+}
+.icon {
+  width: 130px;
+  height: 130px;
+  margin-top: 30px;
+}
+.icon polygon {
+  fill: #0b1622;
+  stroke: var(--c);
+  stroke-width: 3;
+}
+.icon text {
+  fill: #fff;
+  font-size: 34px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+.name {
+  font-size: 32px;
+}
+.level {
+  font-family: 'Chakra Petch', 'Malgun Gothic', sans-serif;
+  font-size: 26px;
+  color: var(--c);
+  font-weight: 700;
+}
+.diff {
+  margin-top: auto;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #050a10;
+  font-size: 24px;
+}
+.diff[data-empty] {
+  visibility: hidden;
+}
+.diff s {
+  color: #7d90a4;
+}
+.diff b {
+  color: var(--accent);
+}
+.actions {
+  display: flex;
+  gap: 16px;
+}
+.actions button {
+  height: 64px;
+  padding: 0 22px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid #ffffff55;
+  border-radius: 14px;
+  background: #050a10e6;
+  color: inherit;
+  font: inherit;
+  font-size: 24px;
+  cursor: pointer;
+}
+.actions button b {
+  font-family: 'Chakra Petch', sans-serif;
+  color: var(--accent);
+}
+.actions button[data-on] {
+  border-color: #ff8a95;
+  color: #ffb3ab;
+}
+/* 다 쓴 자원은 흐리게 + 숫자 0 — 왜 안 눌리는지 보이게 */
+.actions button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.actions button:disabled b {
+  color: #ff8a95;
+}
+.note {
+  position: absolute;
+  left: 50%;
+  bottom: 40px;
+  translate: -50% 0;
+  padding: 12px 28px;
+  border-radius: 30px;
+  background: #050a10f0;
+  border: 2px solid var(--accent);
+  font-size: 26px;
+  white-space: nowrap;
+}
+.note[data-bad] {
+  border-color: #ff8a95;
+}
+@media (prefers-reduced-motion: reduce) {
+  .root[data-juice] .card {
+    animation: none;
+  }
+}
