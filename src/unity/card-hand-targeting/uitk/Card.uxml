@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <!-- 카드 한 장 템플릿. 종류는 .card--attack / .card--skill, 못 쓰면 .card--unplayable -->
+    <ui:VisualElement name="card" class="card" picking-mode="Ignore">
+        <ui:Label name="cost" class="card__cost" picking-mode="Ignore" />
+        <ui:VisualElement name="aim" class="card__aim" picking-mode="Ignore" />
+        <ui:Label name="name" class="card__name" picking-mode="Ignore" />
+        <ui:VisualElement name="art" class="card__art" picking-mode="Ignore" />
+        <ui:Label name="type" class="card__type" picking-mode="Ignore" />
+        <ui:Label name="text" class="card__text" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

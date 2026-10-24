@@ -1,0 +1,61 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="CardHand.uss" />
+    <ui:VisualElement name="battle" class="battle">
+        <ui:VisualElement name="enemies" class="enemies" picking-mode="Ignore">
+            <!-- 적 세 개. C# 가 이름 순서대로 데이터를 묶는다. .enemy 는 panel.Pick 으로 찾는 판정 영역 -->
+            <ui:VisualElement name="enemy-0" class="enemy">
+                <ui:VisualElement class="intent" picking-mode="Ignore">
+                    <ui:VisualElement class="intent__icon" picking-mode="Ignore" />
+                    <ui:Label class="intent__value" picking-mode="Ignore" />
+                    <ui:Label class="intent__label" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="bracket" picking-mode="Ignore" />
+                <ui:VisualElement class="enemy__body" picking-mode="Ignore" />
+                <ui:Label class="enemy__name" picking-mode="Ignore" />
+                <ui:VisualElement class="hp" picking-mode="Ignore">
+                    <ui:VisualElement class="hp__loss" picking-mode="Ignore" />
+                    <ui:VisualElement class="hp__fill" picking-mode="Ignore" />
+                    <ui:Label class="hp__text" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="enemy-1" class="enemy">
+                <ui:VisualElement class="intent" picking-mode="Ignore">
+                    <ui:VisualElement class="intent__icon" picking-mode="Ignore" />
+                    <ui:Label class="intent__value" picking-mode="Ignore" />
+                    <ui:Label class="intent__label" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="bracket" picking-mode="Ignore" />
+                <ui:VisualElement class="enemy__body" picking-mode="Ignore" />
+                <ui:Label class="enemy__name" picking-mode="Ignore" />
+                <ui:VisualElement class="hp" picking-mode="Ignore">
+                    <ui:VisualElement class="hp__loss" picking-mode="Ignore" />
+                    <ui:VisualElement class="hp__fill" picking-mode="Ignore" />
+                    <ui:Label class="hp__text" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="enemy-2" class="enemy">
+                <ui:VisualElement class="intent" picking-mode="Ignore">
+                    <ui:VisualElement class="intent__icon" picking-mode="Ignore" />
+                    <ui:Label class="intent__value" picking-mode="Ignore" />
+                    <ui:Label class="intent__label" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="bracket" picking-mode="Ignore" />
+                <ui:VisualElement class="enemy__body" picking-mode="Ignore" />
+                <ui:Label class="enemy__name" picking-mode="Ignore" />
+                <ui:VisualElement class="hp" picking-mode="Ignore">
+                    <ui:VisualElement class="hp__loss" picking-mode="Ignore" />
+                    <ui:VisualElement class="hp__fill" picking-mode="Ignore" />
+                    <ui:Label class="hp__text" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <!-- 카드는 C# 가 Card.uxml 을 복제해 넣는다. 모두 picking-mode Ignore — 판정은 C# 의 수학으로 -->
+        <ui:VisualElement name="hand" class="hand" picking-mode="Ignore" />
+        <!-- 화살표(ArrowElement)는 C# 가 #battle 맨 위에 더한다 -->
+        <ui:VisualElement name="energy" class="energy" picking-mode="Ignore">
+            <ui:Label name="energy-text" class="energy__text" text="3/3" />
+            <ui:Label class="energy__label" text="에너지" />
+        </ui:VisualElement>
+        <ui:Button name="end-turn" class="end-turn" text="턴 종료" />
+    </ui:VisualElement>
+</ui:UXML>

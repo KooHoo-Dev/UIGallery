@@ -1,0 +1,292 @@
+/* 카드 손패 — Panel Settings: Scale With Screen Size, Reference Resolution 1920×1080.
+   한글이 네모로 보이면 Panel Settings 의 Text Settings 에 한글 글꼴(Font Asset)을 넣는다.
+   카드 자세(translate · rotate · scale)는 C# 가 매 프레임 계산한다 — 카드에 transition 을 걸지 않는다. */
+
+.battle {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.enemies {
+    position: absolute;
+    left: 1020px;
+    top: 330px;
+    flex-direction: row;
+}
+
+.enemy {
+    width: 220px;
+    height: 380px;
+    margin-right: 40px;
+    align-items: center;
+}
+
+.enemy--dead {
+    opacity: 0.3;
+}
+
+.intent {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 14px;
+    padding: 4px 14px 4px 8px;
+    border-radius: 14px;
+    border-width: 3px;
+    border-color: rgb(159, 180, 201);
+    background-color: rgba(5, 10, 16, 0.9);
+}
+
+.intent__icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 6px;
+}
+
+.intent__value {
+    font-size: 34px;
+    -unity-font-style: bold;
+}
+
+.intent__label {
+    font-size: 22px;
+    margin-left: 4px;
+}
+
+/* 모양(아이콘) + 수치 + 글자 + 색 — 색만으로 구분하지 않는다 */
+.intent--attack { border-color: rgb(255, 106, 92); color: rgb(255, 106, 92); }
+.intent--block { border-color: rgb(90, 209, 255); color: rgb(90, 209, 255); }
+.intent--buff { border-color: rgb(242, 201, 76); color: rgb(242, 201, 76); }
+.intent--attack .intent__icon { -unity-background-image-tint-color: rgb(255, 106, 92); }
+.intent--block .intent__icon { -unity-background-image-tint-color: rgb(90, 209, 255); }
+.intent--buff .intent__icon { -unity-background-image-tint-color: rgb(242, 201, 76); }
+.intent--hidden { border-color: rgb(159, 180, 201); color: rgb(159, 180, 201); }
+
+.bracket {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    top: 86px;
+    height: 196px;
+    border-width: 5px;
+    border-color: rgb(255, 179, 71);
+    border-radius: 8px;
+    display: none;
+}
+
+.enemy--aimed .bracket {
+    display: flex;
+}
+
+.enemy__body {
+    width: 140px;
+    height: 170px;
+    margin-top: 16px;
+    /* background-image: resource("Icons/drone"); — 적 실루엣 이미지 */
+}
+
+.enemy__name {
+    margin-top: 16px;
+    font-size: 22px;
+    -unity-font-style: bold;
+    color: rgb(234, 242, 251);
+}
+
+.hp {
+    width: 190px;
+    height: 28px;
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.27);
+    background-color: rgb(11, 22, 34);
+    overflow: hidden;
+}
+
+.hp__loss,
+.hp__fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.hp__loss {
+    background-color: rgb(255, 255, 255);
+}
+
+.hp__fill {
+    background-color: rgb(232, 80, 91);
+}
+
+.hp__text {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    -unity-text-align: middle-center;
+    font-size: 22px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+}
+
+.hand {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* 카드 — 왼쪽 위 기준 (0,0) 에 두고 C# 가 translate 로 옮긴다. transform-origin 은 가운데 */
+.card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 200px;
+    height: 280px;
+    transform-origin: center;
+    align-items: center;
+    padding: 16px 10px 10px;
+    border-radius: 16px;
+    border-width: 4px;
+    border-color: rgb(111, 182, 255);
+    background-color: rgb(24, 42, 61);
+}
+
+.card--attack {
+    border-color: rgb(255, 138, 122);
+    background-color: rgb(42, 27, 32);
+}
+
+.card--focus {
+    border-color: rgb(255, 255, 255);
+}
+
+.card--held {
+    border-color: rgb(255, 179, 71);
+}
+
+.card--unplayable {
+    border-color: rgb(74, 85, 102);
+    background-color: rgb(17, 22, 29);
+}
+
+.card--unplayable .card__name,
+.card--unplayable .card__art,
+.card--unplayable .card__text {
+    opacity: 0.45;
+}
+
+.card__cost {
+    position: absolute;
+    left: -14px;
+    top: -14px;
+    width: 52px;
+    height: 52px;
+    border-radius: 26px;
+    border-width: 3px;
+    border-color: rgb(11, 22, 34);
+    background-color: rgb(255, 209, 102);
+    color: rgb(42, 29, 0);
+    -unity-text-align: middle-center;
+    font-size: 30px;
+    -unity-font-style: bold;
+}
+
+.card--unplayable .card__cost {
+    background-color: rgb(255, 90, 106);
+    color: rgb(255, 255, 255);
+}
+
+.card__aim {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 30px;
+    height: 30px;
+    /* background-image: resource("Icons/aim"); — 조준 표시 (끌면 화살표) */
+}
+
+.card__name {
+    margin-top: 14px;
+    font-size: 26px;
+    -unity-font-style: bold;
+    color: rgb(234, 242, 251);
+}
+
+.card__art {
+    margin-top: 8px;
+    width: 156px;
+    height: 92px;
+    border-radius: 10px;
+    background-color: rgb(5, 10, 16);
+}
+
+.card__type {
+    margin-top: 6px;
+    font-size: 22px;
+    color: rgb(159, 180, 201);
+}
+
+.card__text {
+    font-size: 22px;
+    -unity-font-style: bold;
+    white-space: normal;
+    -unity-text-align: middle-center;
+    color: rgb(234, 242, 251);
+}
+
+.energy {
+    position: absolute;
+    left: 70px;
+    top: 790px;
+    width: 150px;
+    height: 150px;
+    border-radius: 75px;
+    border-width: 5px;
+    border-color: rgb(11, 22, 34);
+    background-color: rgb(255, 209, 102);
+    align-items: center;
+    justify-content: center;
+}
+
+.energy--empty {
+    background-color: rgb(58, 70, 86);
+}
+
+.energy__text {
+    font-size: 44px;
+    -unity-font-style: bold;
+    color: rgb(42, 29, 0);
+}
+
+.energy--empty .energy__text {
+    color: rgb(255, 138, 149);
+}
+
+.energy__label {
+    font-size: 22px;
+    -unity-font-style: bold;
+    color: rgb(42, 29, 0);
+}
+
+.end-turn {
+    position: absolute;
+    left: 1660px;
+    top: 800px;
+    width: 220px;
+    height: 80px;
+    border-radius: 40px;
+    border-width: 0;
+    background-color: rgb(242, 201, 76);
+    color: rgb(26, 20, 5);
+    font-size: 28px;
+    -unity-font-style: bold;
+}
+
+.end-turn:hover {
+    background-color: rgb(255, 216, 102);
+}
